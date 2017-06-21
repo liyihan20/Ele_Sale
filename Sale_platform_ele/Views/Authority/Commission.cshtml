@@ -1,0 +1,57 @@
+﻿<script type="text/javascript">
+    $(function () {
+        $("#tb_commission").datagrid({
+            title: "佣金率管理",
+            url: "@Url.Content("~/Authority/GetCommissionList")",
+            fit: true,
+            fitColumns: true,
+            rownumbers: true,
+            singleSelect: true,
+            columns: [[
+                        { field: 'id', title: 'ID', hidden: true },
+                        { field: 'productType', title: '产品类别', width: 160, align: "center" },
+                        { field: 'userName', title: '更新人', width: 100, align: "center" },
+                        { field: 'beginDate', title: '生效日期', width: 120, align: "center" },
+                        { field: 'endDate', title: '结束日期', width: 120, align: "center" },
+                        { field: 'createDate', title: '创建日期', width: 120, align: "center" },
+                        { field: 'updateDate', title: '修改日期', width: 120, align: "center" },
+            ]],
+            toolbar: [{
+                text: "新建",
+                iconCls: 'icon-add',
+                handler: function () {
+                    window.location.href = "@Url.Content("~/Authority/CreateCommission")";
+                }
+            }, '-', {
+                text: "查看/修改",
+                iconCls: 'icon-edit',
+                handler: function () {
+                    var row = $('#tb_commission').datagrid('getSelected');
+                    if (!row) { return; }
+                    window.location.href = "@Url.Content("~/Authority/UpdateCommission?id=")" + row.id;
+                }
+            }, '-', {
+                text: "删除",
+                iconCls: 'icon-remove',
+                handler: function(){
+                    var row = $('#tb_commission').datagrid('getSelected');
+                    if (!row) { return; }
+                    $.messager.confirm('@Html.Lang("confirm")', '确定要删除此行吗?', function (r) {
+                        if (r) {
+                            $.post("@Url.Content("~/Authority/RemoveCommission")",{id:row.id},function(data){
+                                if (!data.suc) {
+                                    showTip(data.msg);
+                                }else{
+                                    $('#tb_commission').datagrid('reload');
+                                }
+                            });
+                        }
+                    });
+                    
+                }
+            }]
+        });
+    });
+</script>
+
+<table id="tb_commission"></table>

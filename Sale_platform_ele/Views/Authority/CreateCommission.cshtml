@@ -1,0 +1,145 @@
+﻿@using Sale_platform_ele.Models;
+@{
+    CommissionRate cr = (CommissionRate)ViewData["commission"];
+    List<CommissionRateDetail> list = (List<CommissionRateDetail>)ViewData["commissionDetails"];
+    string title = cr.id == 0 ? "新建佣金率" : "修改佣金率";
+}
+<script type="text/javascript" src="@Url.Content("~/Scripts/json2.js")"></script>
+<script type="text/javascript">
+    $(function () {
+        $("#dg_detail").datagrid({
+            fit: true,
+            loadMsg: "加载中...",
+            rownumbers: true,
+            singleSelect: true,
+            fitColumns: true,
+            columns: [[
+                { field: 'MU', title: 'MU', width: 60, align: 'center', editor: { type: 'numberbox' } },
+                { field: 'rate_value', title: '佣金率', width: 80, align: 'center', editor: { type: 'numberbox', options: { precision: 2 } } }
+            ]],
+            toolbar: [{
+                text: "新增行",
+                iconCls: 'icon-add',
+                handler: function () {
+                    $("#dg_detail").datagrid("appendRow", {
+                        MU: "",
+                        rate_value: ""
+                    });
+                }
+            }, '-', {
+                text: "删除行",
+                iconCls: 'icon-remove',
+                handler: function () {
+                    var row = $('#dg_detail').datagrid('getSelected');
+                    if (!row) { return; }
+                    var index = $('#dg_detail').datagrid('getRowIndex', row);
+                    $('#dg_detail').datagrid('deleteRow', index);
+                }
+            }],
+            onClickRow: onClickRow
+        });
+
+        $("#saveAllBut").click(function () {
+            $.messager.progress();
+            $('#fm_cr').form('submit', {
+                url: '@Url.Content("~/Authority/SaveCommission")',
+                onSubmit: function (param) {
+                    if (!$('#fm_cr').form('validate') || !endEditing()) {
+                        return false;
+                    }
+                    param.id = "@cr.id";
+                    param.create_date = "@(((DateTime)cr.create_date).ToString("yyyy-MM-dd HH:mm"))";
+                    param.commissionRateDetails = JSON.stringify($("#dg_detail").datagrid("getRows"));
+                    return true;
+                },
+                success: function (data) {
+                    var result = eval('(' + data + ')');
+                    showTip(result.msg);
+                }
+            });
+            $.messager.progress("close");
+        });
+
+        $("#div_cr").click(function () { endEditing(); });
+        if ("@cr.product_type" != "") {
+            $("#product_type").combobox("setValues", "@cr.product_type".split(","));
+            $("#product_type").combobox("setText", "@cr.product_type");
+        }
+
+    });
+
+    var editIndex = undefined;
+    function endEditing() {
+        if (editIndex == undefined) { return true; }
+        if ($('#dg_detail').datagrid('validateRow', editIndex)) {
+            $('#dg_detail').datagrid('endEdit', editIndex);
+            editIndex = undefined;
+            return true;
+        } else {
+            return false;
+        }
+    }
+    function onClickRow(index) {
+        if (editIndex != index) {
+            if (endEditing()) {
+                $('#dg_detail').datagrid('selectRow', index)
+                    .datagrid('beginEdit', index);
+                editIndex = index;
+            } else {
+                $('#dg_detail').datagrid('selectRow', editIndex);
+            }
+        }
+    }
+
+</script>
+<form id="fm_cr" method="post">
+    <div id="div_cr" class="easyui-panel" title="@title" style="width: 840px; padding: 10px; background: #fafafa;">
+        <div>
+            <table border="0" cellpadding="1" cellspacing="3" width="800">
+                <tr>
+                    <td>
+                        产品类别:
+                    </td>
+                    <td>
+                        <input class="easyui-combobox" style="width: 140px" name="product_type" id="product_type"
+                               data-options="textField:'name',valueField:'name',panelHeight:'auto', required:true,editable:false,multiple:true,url:'@Url.Content("~/items/GetItems?what=product_type")'" />
+                    </td>
+                    <td>
+                        生效时间:
+                    </td>
+                    <td>
+                        <input class="easyui-datebox" name="begin_date" style="width: 140px" required="true" editable="false" value="@(cr.begin_date == null ? "" : ((DateTime)cr.begin_date).ToString("yyyy-MM-dd"))" />
+                    </td>
+                    <td>
+                        结束时间:
+                    </td>
+                    <td>
+                        <input class="easyui-datebox" name="end_date" style="width: 140px" required="true" editable="false" value="@(cr.end_date==null?"":((DateTime)cr.end_date).ToString("yyyy-MM-dd"))" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>备注:</td>
+                    <td colspan="5">
+                        <textarea cols="90" rows="3" spellcheck="false" name="comment" id="comment" style="margin: 0;">@cr.comment</textarea>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <br />
+        <div id="detail_div" class="easyui-panel" title="MU——佣金率对应表" style="width: 800px; height: 400px">
+            <table id="dg_detail">               
+                    @foreach (var d in list) {
+                        <tr>
+                            <td>@d.MU</td>
+                            <td>@d.rate_value</td>
+                        </tr>
+                    }
+                
+            </table>
+        </div>
+        <br />
+        <div align="center">
+            <a id="saveAllBut" href="#" class="easyui-linkbutton" iconcls='icon-save' style="margin: 10px 20px;">保存</a>
+        </div>
+    </div>
+</form>

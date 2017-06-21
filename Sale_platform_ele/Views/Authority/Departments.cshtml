@@ -1,0 +1,101 @@
+﻿<script type="text/javascript">
+
+
+    var url;
+    function newDep() {
+        $('#dep_dlg').dialog('open').dialog('setTitle', '@Html.Lang("new_dep")');
+        $('#fm').form('clear');
+        url = 'SaveDepartment';
+    }
+    function editDep() {
+        var row = $('#dep_dg').datagrid('getSelected');
+        if (row) {
+            $('#dep_dlg').dialog('open').dialog('setTitle', '@Html.Lang("eidt_dep")');
+            $('#fm').form('load', row);
+            url = 'UpdateDepartment/' + row.id;
+        }
+    }
+    function saveDep() {
+        $('#fm').form('submit', {
+            url: '' + url,
+            onSubmit: function () {
+                return $(this).form('validate');
+            },
+            success: function (data) {
+                var result = eval('(' + data + ')');
+                if (result.suc) {
+                    $('#dep_dlg').dialog('close');      
+                    $('#dep_dg').datagrid('reload');    
+                } else {
+                    showTip(result.msg);
+                }
+            }
+        });
+    }
+    function removeDep(){
+        var row = $('#dep_dg').datagrid('getSelected');
+        if (row) {
+            $.messager.confirm('@Html.Lang("confirm")', '@Html.Lang("confirm_delete")?', function(r){
+	            if (r){
+	                $.post("@Url.Content("~/Authority/RemoveDep")", { depId: row.id }, function (data) {
+	                    showTip(data.msg);                        
+                        if(data.suc){
+                            $('#dep_dg').datagrid('reload');
+                        }
+                    });
+                }
+            });
+        }
+    }
+    function qq(value,name){
+        $('#dep_dg').datagrid('load',{
+        value: value,
+        name: name
+        });
+    }
+
+</script>
+
+<table id="dep_dg" title="@Html.Lang("department") @Html.Lang("list")" class="easyui-datagrid" fit="true"
+       url="GetDepartments"
+       toolbar="#toolbar"
+       rownumbers="true" fitcolumns="true" singleselect="true" pagination="true" pagesize="40">
+    <thead>
+        <tr>
+            <th field="depName" width="50" align="center">名称</th>
+            <th field="depNo" width="50" align="center">编码</th>
+            <th field="depType" width="100" align="center">类型</th>
+        </tr>
+    </thead>
+</table>
+<div id="toolbar">
+    <a href="#" class="easyui-linkbutton" iconcls="icon-add" plain="true" onclick="newDep()">@Html.Lang("new_dep")</a>
+    <a href="#" class="easyui-linkbutton" iconcls="icon-edit" plain="true" onclick="editDep()">@Html.Lang("eidt_dep")</a>
+    <a href="#" class="easyui-linkbutton" iconcls="icon-remove" plain="true" onclick="removeDep()">@Html.Lang("remove_dep")</a>
+    <input id="ss" class="easyui-searchbox" style="width:220px" searcher="qq" menu="#mm" prompt="@Html.Lang("please_input")" />
+    <div id="mm" style="width:100px">
+        <div name="name">@Html.Lang("name")</div>
+    </div>
+</div>
+
+<div id="dep_dlg" class="easyui-dialog" style="width:400px;padding:10px 20px"
+     closed="true" buttons="#dlg-buttons">
+    <div class="ftitle">@Html.Lang("department") @Html.Lang("info")</div>
+    <form id="fm" method="post">
+        <div class="fitem">
+            <label>@Html.Lang("name"):</label>
+            <input name="depName" class="easyui-validatebox" required="true" />
+        </div>
+        <div class="fitem">
+            <label>类型:</label>
+            <input name="depType" class="easyui-combobox" data-options="panelHeight:'auto',valueField: 'name',textField: 'name',url: '@Url.Content("~/Items/GetDepTypes")' " />
+        </div>
+    </form>
+</div>
+
+<div id="dlg-buttons">
+    <a href="#" class="easyui-linkbutton" iconcls="icon-ok" onclick="saveDep()">@Html.Lang("save")</a>
+    <a href="#" class="easyui-linkbutton" iconcls="icon-cancel" onclick="javascript:$('#dep_dlg').dialog('close')">@Html.Lang("cancel")</a>
+</div>
+
+

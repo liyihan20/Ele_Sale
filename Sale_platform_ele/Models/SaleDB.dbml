@@ -1,0 +1,164 @@
+﻿<?xml version="1.0" encoding="utf-8"?><Database Name="SaleOrder_platform_ele" Class="SaleDBDataContext" xmlns="http://schemas.microsoft.com/linqtosql/dbml/2007">
+  <Connection Mode="WebSettings" ConnectionString="Data Source=192.168.100.205;Initial Catalog=SaleOrder_platform_ele;Persist Security Info=True;User ID=crmOrder" SettingsObjectName="System.Configuration.ConfigurationManager.ConnectionStrings" SettingsPropertyName="SaleOrder_platform_eleConnectionString" Provider="System.Data.SqlClient" />
+  <Table Name="dbo.Sale_authority" Member="Authority">
+    <Type Name="Authority">
+      <Column Name="id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="name" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="description" Type="System.String" DbType="VarChar(200)" CanBeNull="true" />
+      <Column Name="sname" Type="System.String" DbType="VarChar(20)" CanBeNull="true" />
+      <Association Name="Authority_GroupAndAuth" Member="GroupAndAuth" ThisKey="id" OtherKey="auth_id" Type="GroupAndAuth" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Sale_department" Member="Department">
+    <Type Name="Department">
+      <Column Name="id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="name" Type="System.String" DbType="VarChar(100)" CanBeNull="true" />
+      <Column Name="dep_no" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="dep_type" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Sale_group" Member="Group">
+    <Type Name="Group">
+      <Column Name="id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="name" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="description" Type="System.String" DbType="VarChar(200)" CanBeNull="true" />
+      <Association Name="Group_GroupAndAuth" Member="GroupAndAuth" ThisKey="id" OtherKey="group_id" Type="GroupAndAuth" />
+      <Association Name="Group_GroupAndUser" Member="GroupAndUser" ThisKey="id" OtherKey="group_id" Type="GroupAndUser" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Sale_groupAndAuth" Member="GroupAndAuth">
+    <Type Name="GroupAndAuth">
+      <Column Name="id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="group_id" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="auth_id" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Association Name="Authority_GroupAndAuth" Member="Authority" ThisKey="auth_id" OtherKey="id" Type="Authority" IsForeignKey="true" />
+      <Association Name="Group_GroupAndAuth" Member="Group" ThisKey="group_id" OtherKey="id" Type="Group" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Sale_groupAndUser" Member="GroupAndUser">
+    <Type Name="GroupAndUser">
+      <Column Name="id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="group_id" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="user_id" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Association Name="Group_GroupAndUser" Member="Group" ThisKey="group_id" OtherKey="id" Type="Group" IsForeignKey="true" />
+      <Association Name="User_GroupAndUser" Member="User" ThisKey="user_id" OtherKey="id" Type="User" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Sale_login_log" Member="LoginLog">
+    <Type Name="LoginLog">
+      <Column Name="id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="username" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="login_time" Type="System.DateTime" DbType="SmallDateTime" CanBeNull="true" />
+      <Column Name="ip" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="suc" Type="System.Boolean" DbType="Bit" CanBeNull="true" />
+      <Column Name="login_log" Type="System.String" DbType="VarChar(200)" CanBeNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Sale_user" Member="User">
+    <Type Name="User">
+      <Column Name="id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="username" Type="System.String" DbType="VarChar(100) NOT NULL" CanBeNull="false" />
+      <Column Name="real_name" Type="System.String" DbType="VarChar(40)" CanBeNull="true" />
+      <Column Name="password" Type="System.String" DbType="VarChar(32)" CanBeNull="true" />
+      <Column Name="email" Type="System.String" DbType="VarChar(200)" CanBeNull="true" />
+      <Column Name="department_no" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="is_forbit" Type="System.Boolean" DbType="Bit NOT NULL" CanBeNull="false" />
+      <Column Name="in_date" Type="System.DateTime" DbType="SmallDateTime" CanBeNull="true" />
+      <Column Name="forbit_date" Type="System.DateTime" DbType="SmallDateTime" CanBeNull="true" />
+      <Column Name="forbit_reason" Type="System.String" DbType="VarChar(200)" CanBeNull="true" />
+      <Column Name="last_login_date" Type="System.DateTime" DbType="SmallDateTime" CanBeNull="true" />
+      <Column Name="error_times" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Association Name="User_GroupAndUser" Member="GroupAndUser" ThisKey="id" OtherKey="user_id" Type="GroupAndUser" />
+      <Association Name="User_ProcessDetail" Member="ProcessDetail" ThisKey="id" OtherKey="userId" Type="ProcessDetail" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Sale_auditorsRelation" Member="AuditorsRelation">
+    <Type Name="AuditorsRelation">
+      <Column Name="id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="step_name" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="step_value" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="relate_type" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="relate_value" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="auditor_id" Type="System.Int32" DbType="Int" CanBeNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.vw_auditor_relations" Member="vwAuditorRelations">
+    <Type Name="vwAuditorRelations">
+      <Column Name="id" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="step_name" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="step_value" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="relate_type" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="department_id" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="department_name" Type="System.String" DbType="VarChar(100)" CanBeNull="true" />
+      <Column Name="auditor_id" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="auditor_name" Type="System.String" DbType="VarChar(40)" CanBeNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.vw_items" Member="vwItems">
+    <Type Name="vwItems">
+      <Column Name="what" Type="System.String" DbType="VarChar(14) NOT NULL" CanBeNull="false" />
+      <Column Name="interid" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="fid" Type="System.String" DbType="VarChar(255)" CanBeNull="true" />
+      <Column Name="fname" Type="System.String" DbType="NVarChar(255)" CanBeNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Sale_process_detail" Member="ProcessDetail">
+    <Type Name="ProcessDetail">
+      <Column Name="id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="processId" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="step" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="stepName" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="stepType" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="userId" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="canModify" Type="System.Boolean" DbType="Bit" CanBeNull="true" />
+      <Column Name="canBeNull" Type="System.Boolean" DbType="Bit" CanBeNull="true" />
+      <Column Name="isCountersign" Type="System.Boolean" DbType="Bit" CanBeNull="true" />
+      <Association Name="User_ProcessDetail" Member="User" ThisKey="userId" OtherKey="id" Type="User" IsForeignKey="true" />
+      <Association Name="Process_ProcessDetail" Member="Process" ThisKey="processId" OtherKey="id" Type="Process" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Sale_process" Member="Process">
+    <Type Name="Process">
+      <Column Name="id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="billType" Type="System.String" DbType="VarChar(50) NOT NULL" CanBeNull="false" />
+      <Column Name="isUsing" Type="System.Boolean" DbType="Bit" CanBeNull="true" />
+      <Column Name="modifyTime" Type="System.DateTime" DbType="SmallDateTime" CanBeNull="true" />
+      <Column Name="beginTime" Type="System.DateTime" DbType="SmallDateTime" CanBeNull="true" />
+      <Column Name="endTime" Type="System.DateTime" DbType="SmallDateTime" CanBeNull="true" />
+      <Column Name="info" Type="System.String" DbType="VarChar(200)" CanBeNull="true" />
+      <Association Name="Process_ProcessDetail" Member="ProcessDetail" ThisKey="id" OtherKey="processId" Type="ProcessDetail" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Sale_commissionRateDetail" Member="CommissionRateDetail">
+    <Type Name="CommissionRateDetail">
+      <Column Name="id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="interid" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="MU" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="rate_value" Type="System.Decimal" DbType="Decimal(8,2)" CanBeNull="true" />
+      <Association Name="Sale_commissionRate_CommissionRateDetail" Member="CommissionRate" ThisKey="interid" OtherKey="id" Type="CommissionRate" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Sale_backup_data" Member="BackupData">
+    <Type Name="BackupData">
+      <Column Name="id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="sys_no" Type="System.String" DbType="VarChar(20)" CanBeNull="true" />
+      <Column Name="user_id" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="op_date" Type="System.DateTime" DbType="SmallDateTime" CanBeNull="true" />
+      <Column Name="main_data" Type="System.String" DbType="VarChar(MAX)" CanBeNull="true" />
+      <Column Name="secondary_data" Type="System.String" DbType="VarChar(MAX)" CanBeNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Sale_commissionRate" Member="CommissionRate">
+    <Type Name="CommissionRate">
+      <Column Name="id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="user_name" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="begin_date" Type="System.DateTime" DbType="SmallDateTime" CanBeNull="true" />
+      <Column Name="end_date" Type="System.DateTime" DbType="SmallDateTime" CanBeNull="true" />
+      <Column Name="create_date" Type="System.DateTime" DbType="SmallDateTime" CanBeNull="true" />
+      <Column Name="update_date" Type="System.DateTime" DbType="SmallDateTime" CanBeNull="true" />
+      <Column Name="product_type" Type="System.String" DbType="VarChar(100)" CanBeNull="true" />
+      <Column Name="comment" Type="System.String" DbType="VarChar(500)" CanBeNull="true" />
+      <Association Name="Sale_commissionRate_CommissionRateDetail" Member="CommissionRateDetail" ThisKey="id" OtherKey="interid" Type="CommissionRateDetail" />
+    </Type>
+  </Table>
+</Database>

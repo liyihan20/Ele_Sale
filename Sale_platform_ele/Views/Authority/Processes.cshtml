@@ -1,0 +1,311 @@
+﻿<script type="text/javascript" src="@Url.Content("~/Scripts/json2.js")"></script>
+<script type="text/javascript">
+
+    $(function () {
+
+        var stepTypeArray;
+        $.post("@Url.Content("~/Items/GetProcessStepName")",{},function(data){
+            stepTypeArray=data;
+        });
+
+
+        $("#tbPro").datagrid({
+            title:"流程管理",
+            url:"@Url.Content("~/Authority/GetProcesses")",
+            fit:true,
+            fitColumns: true,
+            rownumbers: true,
+            singleSelect: true,
+            columns: [[
+                        { field: 'id', title: 'ID', width: 120,hidden: true },
+                        { field: 'orderType', title: '流程编码', width: 120, align: "center" },
+                        { field: 'orderTypeName', title: '订单类型', width: 120, align: "center" },
+                        { field: 'beginTime', title: '生效时间', width: 120, align: "center" },
+                        { field: 'endTime', title: '失效时间', width: 120, align: "center" },
+                        { field: 'modifyTime', title: '修改时间', width: 120, align: "center" },
+                        { field: 'isUsing', title: '是否启用', width: 120, align: "center",
+                            styler: function(value,row,index){
+                                if (value == "true") {
+					                return 'color:green;';
+				                }else{
+                                    return 'color:red;';
+                                }
+                            },
+                            formatter: function (value, row, index) {
+                                if (value == "true") {
+                                    return "Y";
+                                } else {
+                                    return "N";
+                                }
+                            }
+                         },
+                        { field: 'info', title: '说明', width: 240, align: "left" }
+                    ]],
+             toolbar: [{
+                text: "新建流程",
+                iconCls: 'icon-add',
+                handler: addProc
+            }, '-', {
+                text: "编辑流程",
+                iconCls: 'icon-edit',
+                handler: editProc
+            }, '-', {
+                text: "启用-禁用流程",
+                iconCls: 'icon-ok',
+                handler: function(){
+                    var row = $('#tbPro').datagrid('getSelected');
+                    if(!row){return;}
+                    $.post("@Url.Content("~/Authority/ToggleProc")",{id:row.id},function(data){
+                        if (!data.suc) {
+                            showTip(data.msg);
+                        }else{
+                            $('#tbPro').datagrid('reload');
+                        }
+                    });
+                }
+            }]
+        });
+
+        $("#tbDet").datagrid({
+            title:"流程信息",
+            height:"280",
+            fitColumns: true,
+            rownumbers: true,
+            singleSelect: true,
+            columns: [[
+                        { field: 'step', title: '审批步骤', width: 120, align: "center" },
+                        { field: 'stepName', title: '步骤名称', width: 120, align: "center" },
+                        { field: 'stepType', title: '步骤类型', width: 120, align: "center",
+                            formatter: function(value,row,index){
+				                for(var i=0;i<stepTypeArray.length;i++){
+				                    if (stepTypeArray[i].value == value) {
+				                        return stepTypeArray[i].name;
+				                    }
+                                }
+			                }
+                        },
+                         { field: 'userId', title: '审批人ID', hidden: true },
+                         { field: 'auditor', title: '审批人', width: 120, align: "center" },
+                         {
+                             field: 'canModify', title: '修改权限', width: 120, align: "center",
+                             formatter: function (value, row, index) {
+                                 if (value == "true") {
+                                     return "Y";
+                                 } else {
+                                     return "N";
+                                 }
+                             }
+                         },
+                         {
+                             field: 'canBeNull', title: '审核人可为空', width: 140, align: "center",
+                             formatter: function (value, row, index) {
+                                 if (value == "true") {
+                                     return "Y";
+                                 } else {
+                                     return "N";
+                                 }
+                             }
+                         },
+                         {
+                             field: 'isCounterSign', title: '是否会签', width: 120, align: "center",
+                             formatter: function (value, row, index) {
+                                 if (value == "true") {
+                                     return "Y";
+                                 } else {
+                                     return "N";
+                                 }
+                             }
+                         }
+                    ]],
+             toolbar: [{
+                text: "新建步骤",
+                iconCls: 'icon-add',
+                handler: addDet
+            }, '-', {
+                text: "编辑步骤",
+                iconCls: 'icon-edit',
+                handler: editDet
+            }, '-', {
+                text: "删除步骤",
+                iconCls: 'icon-remove',
+                handler: function(){
+                    var row = $('#tbDet').datagrid('getSelected');
+                    if(!row){return;}
+                    $('#tbDet').datagrid("deleteRow",$('#tbDet').datagrid("getRowIndex",row));
+                }
+            }]
+        });
+    });
+
+    var url;
+    var pro_id=-1;
+    function addProc(){
+        $("#fm").form("clear");
+        $('#tbDet').datagrid('loadData', { total: 0, rows: [] });
+        $("#pro_dlg").dialog("setTitle","新增流程").dialog("open");
+        pro_id=-1;
+    }
+    function editProc(){
+        var row = $('#tbPro').datagrid('getSelected');
+        if(!row){return;}
+        $("#proc_type").val(row.orderType);
+        $("#begin_time").datebox("setValue", row.beginTime);
+        $("#end_time").datebox("setValue", row.endTime);
+        $("#info").val(row.info);
+        $("#tbDet").datagrid({url:"@Url.Content("~/Authority/GetProDets")",queryParams:{id:row.id} });
+        $("#pro_dlg").dialog("setTitle","编辑流程").dialog("open");
+        pro_id=row.id;
+    }
+    function saveProc(){
+        var proc_type=$("#proc_type").val();
+        var begin_time=$("#begin_time").datebox("getValue");
+        var end_time=$("#end_time").datebox("getValue");
+        var info=$("#info").val();
+        $.post("@Url.Content("~/Authority/SaveProcess")",{
+            billType: proc_type,
+            beginTime: begin_time,
+            endTime: end_time,
+            id: pro_id,
+            info: info,
+            proDetails:JSON.stringify($("#tbDet").datagrid("getRows"))
+        },function(data){
+            if(data.suc)
+            {
+                $("#pro_dlg").dialog("close");
+                $('#tbPro').datagrid('reload');
+            }else{
+                $.messager.show({
+                    title: '@Html.Lang("tip")',
+                    msg: data.msg
+                });
+            }
+        });
+
+    }
+
+    var row_index;
+    function addDet(){
+        row_index=-1;
+        $("#det_fm").form("clear");
+        $("#det_dlg").dialog("setTitle","新建步骤").dialog("open");
+    }
+    function editDet(){
+        var row = $('#tbDet').datagrid('getSelected');
+        if(!row){return;}
+        row_index=$('#tbDet').datagrid("getRowIndex",row);
+        $("#det_fm").form("load",row);
+        $("#det_dlg").dialog("setTitle","编辑步骤").dialog("open");
+    }
+    function saveDet(){
+        if(!$('#fm').form('validate')){
+            return;
+        }
+        var this_row={
+                step:$("#step").numberbox("getValue"),
+                stepName:$("#step_name").val(),
+                stepType: $("#step_type").combobox("getValue"),
+                userId: $("#auditor").combobox("getValue"),
+                auditor:$("#auditor").combobox("getText"),
+                canModify:$("#can_modify").combobox("getValue"),
+                canBeNull:$("#can_be_null").combobox("getValue"),
+                isCountersign:$("#is_countersign").combobox("getValue")
+            };
+        if(row_index==-1){
+            $("#tbDet").datagrid("appendRow",this_row);
+        }else {
+            $("#tbDet").datagrid("updateRow",{index:row_index,row:this_row});
+        }
+        $("#det_dlg").dialog("close");
+    }
+
+</script>
+<table id="tbPro"></table>
+<div id="pro_dlg" class="easyui-dialog" style="width: 700px; padding: 10px 5px"
+     closed="true" modal="true" buttons="#pro-buttons">
+    <div class="ftitle">
+        流程明细
+    </div>
+    <form id="fm" method="post">
+        <div style="text-align: center">
+            流程类型:
+            <input class="easyui-validatebox" name="proc_type" id="proc_type" style="width: 90px;" />
+            生效时间：
+            <input id="begin_time" name="begin_time" class="easyui-datebox" style="width: 90px" />
+            失效时间：
+            <input id="end_time" name="end_time" class="easyui-datebox" style="width: 90px" /><br />
+            说明：<input id="info" name="info" class="easyui-validatebox" style="width: 500px" />
+        </div>
+        <br />
+        <table id="tbDet"></table>
+    </form>
+</div>
+<div id="pro-buttons">
+    <a href="#" class="easyui-linkbutton" iconcls="icon-ok" onclick="saveProc()">@Html.Lang("save")</a>
+    <a href="#" class="easyui-linkbutton" iconcls="icon-cancel" onclick="javascript:$('#pro_dlg').dialog('close')">@Html.Lang("cancel")</a>
+</div>
+<div id="det_dlg" class="easyui-dialog" style="width: 380px; height: 340px; padding: 10px 20px"
+     closed="true" buttons="#det-buttons">
+    <div class="ftitle">
+        步骤信息
+    </div>
+    <form id="det_fm" method="post">
+        <div class="fitem">
+            <label>
+                审批步骤:
+            </label>
+            <input id="step" name="step" class="easyui-numberbox" min="1" max="20" style="width: 140px;"
+                   require="true" />
+        </div>
+        <div class="fitem">
+            <label>
+                步骤名称:
+            </label>
+            <input type="text" id="step_name" name="step_name" style="width: 140px;" require="true" />
+        </div>
+        <div class="fitem">
+            <label>
+                步骤类型:
+            </label>
+            <input class="easyui-combobox" name="step_type" id="step_type" style="width: 140px;"
+                   panelheight="100px" valuefield="value" textfield="name" url="@Url.Content("~/Items/GetProcessStepName")" require="true" />
+        </div>
+        <div class="fitem">
+            <label>审批人:</label>
+            <input id="auditor" name="auditor" class="easyui-combobox" url="@Url.Content("~/Items/GetUsersforCombo")" valuefield="value" textfield="name" style="width:140px;" />
+        </div>
+        <div class="fitem">
+            <label>
+                可否修改:
+            </label>
+            <select class="easyui-combobox" name="can_modify" id="can_modify" style="width: 140px;"
+                    panelheight="60px" require="true">
+                <option value="true">YES</option>
+                <option value="false">NO</option>
+            </select>
+        </div>
+        <div class="fitem">
+            <label>
+                审核人可为空:
+            </label>
+            <select class="easyui-combobox" name="can_be_null" id="can_be_null" style="width: 140px;"
+                    panelheight="60px" require="true">
+                <option value="true">YES</option>
+                <option value="false">NO</option>
+            </select>
+        </div>
+        <div class="fitem">
+            <label>
+                是否会签:
+            </label>
+            <select class="easyui-combobox" name="is_countersign" id="is_countersign" style="width: 140px;"
+                    panelheight="60px" require="true">
+                <option value="true">YES</option>
+                <option value="false">NO</option>
+            </select>
+        </div>
+    </form>
+</div>
+<div id="det-buttons">
+    <a href="#" class="easyui-linkbutton" iconcls="icon-ok" onclick="saveDet()">@Html.Lang("save")</a>
+    <a href="#" class="easyui-linkbutton" iconcls="icon-cancel" onclick="javascript:$('#det_dlg').dialog('close')">@Html.Lang("cancel")</a>
+</div>

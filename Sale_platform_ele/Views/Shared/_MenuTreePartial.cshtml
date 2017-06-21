@@ -1,0 +1,66 @@
+﻿@{
+    Layout = null;
+    string[] powers = (string[])ViewData["powers"];
+}
+
+<ul id="menu_tree" class="easyui-tree" style="visibility:hidden">
+    <li>
+        <span>@Html.Lang("invoice_manage")</span>
+        <ul>
+            @if (Array.IndexOf(powers, "new_order") != -1) {
+                <li>
+                    <span>@Html.Lang("sale_order")</span>
+                    <ul>
+                            <li id="~/Saler/CreateSaleOrder"><span>@Html.Lang("new_sale_order")</span> </li>
+                            <li id="~/Saler/CheckAllOrders?bill_type=1"><span>@Html.Lang("check_add_apply")</span> </li>
+                    </ul>
+                </li>
+            }
+         </ul>
+    </li>
+    @if (Array.IndexOf(powers, "ua_manage") != -1) {
+        <li>
+            <span>@Html.Lang("User_depart")</span>
+            <ul>
+                @if (Array.IndexOf(powers, "dep_manage") != -1) {
+                    <li id="~/Authority/Departments"><span>@Html.Lang("dep_manage")</span> </li>
+                }
+                @if (Array.IndexOf(powers, "user_manage") != -1) {
+                    <li id="~/Authority/Users"><span>@Html.Lang("user_manage")</span> </li>
+                }
+                @if (Array.IndexOf(powers, "group_manage") != -1) {
+                    <li id="~/Authority/Groups"><span>@Html.Lang("group_manage")</span> </li>
+                }                
+                @if (Array.IndexOf(powers, "auditor_manage") != -1) {
+                    <li id="~/Authority/ProcDepAuditor"><span>@Html.Lang("auditor_manage")</span> </li>
+                }
+            </ul>
+        </li>
+    }
+    @if (Array.IndexOf(powers, "data_manage") != -1) {
+        <li>
+            <span>@Html.Lang("data_manage")</span>
+            <ul>
+                @if (Array.IndexOf(powers, "process_manage") != -1) {
+                    <li id="~/Authority/Processes"><span>@Html.Lang("process_manage")</span> </li>
+                }
+                @if (Array.IndexOf(powers, "commission_manage") != -1) {
+                    <li id="~/Authority/Commission"><span>@Html.Lang("commission_manage")</span> </li>
+                }
+            </ul>
+        </li>
+    }
+</ul>
+
+<script type="text/javascript">
+    $(function () {
+        $('#menu_tree').tree({
+            onClick: function (node) {
+                if (node.id) {
+                    $("iframe").attr("src", node.id);
+                }
+            }
+        });
+        $('#menu_tree').css("visibility", "visible");
+    });
+</script>
