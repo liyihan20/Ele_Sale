@@ -9,11 +9,12 @@ namespace Sale_platform_ele.Services
 {
     public class SOSv:BillSv
     {
-        private SaleDBDataContext db = new SaleDBDataContext();        
 
         public override string GetBillType()
         {            
             return "销售订单";
         }
+
+        
     }
 }

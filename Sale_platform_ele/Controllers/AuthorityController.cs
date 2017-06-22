@@ -284,6 +284,53 @@ namespace Sale_platform_ele.Controllers
         #endregion
 
         #region 步骤审核人管理
+        [SessionTimeOutFilter]
+        public ActionResult StepAuditor()
+        {
+            return View();
+        }
+
+        public JsonResult GetAuditorRelations(string value = "")
+        {
+            return Json(new ProcessSv().GetStepAuditors(value.Trim()));
+        }
+
+        public JsonResult SaveAuditorRelation(FormCollection fcl)
+        {
+            MStepAuditor sa = new MStepAuditor();
+            SomeUtils.SetFieldValueToModel(fcl, sa);
+
+            string result = new ProcessSv().SaveStepAuditor(sa);
+            if (!string.IsNullOrEmpty(result)) {
+                return Json(new ResultModel() { suc = false, msg = result });
+            }
+
+            return Json(new ResultModel() { suc = true, msg = "保存成功" }, "text/html");
+
+        }
+
+        public JsonResult UpdateAuditorRelation(int id, FormCollection fcl)
+        {
+            MStepAuditor sa = new MStepAuditor();
+            SomeUtils.SetFieldValueToModel(fcl, sa);
+
+            string result = new ProcessSv().SaveStepAuditor(sa, id);
+            if (!string.IsNullOrEmpty(result)) {
+                return Json(new ResultModel() { suc = false, msg = result });
+            }
+
+            return Json(new ResultModel() { suc = true, msg = "保存成功" }, "text/html");
+        }
+
+        public JsonResult RemoveAuditorRelation(int id)
+        {
+            string result = new ProcessSv().RemoveStepAuditor(id);
+            if (!string.IsNullOrEmpty(result)) {
+                return Json(new ResultModel() { suc = false, msg = result });
+            }
+
+            return Json(new ResultModel() { suc = true, msg = "删除成功" });
+        }
 
         #endregion
 

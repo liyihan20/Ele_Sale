@@ -8,9 +8,9 @@ using Newtonsoft.Json;
 
 namespace Sale_platform_ele.Services
 {
-    public class CommissionSv
-    {
-        SaleDBDataContext db = new SaleDBDataContext();
+    
+    public class CommissionSv:BaseSv
+    {        
         public List<MCommission> GetCommissionList()
         {
             var list = (from c in db.CommissionRate
@@ -116,6 +116,7 @@ namespace Sale_platform_ele.Services
             return price * qty * commissionRate;
         }
 
+        
     }
 
 

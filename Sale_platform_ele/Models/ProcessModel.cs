@@ -30,4 +30,13 @@ namespace Sale_platform_ele.Models
         public string isCountersign { get; set; }
     }
 
+    public class MStepAuditor
+    {
+        public string stepName { get; set; }
+        public int? stepValue { get; set; }
+        public string relateType { get; set; }
+        public int? relateValue { get; set; }
+        public int? auditor { get; set; }
+    }
+
 }

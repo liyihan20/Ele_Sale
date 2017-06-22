@@ -6,9 +6,8 @@ using Sale_platform_ele.Models;
 
 namespace Sale_platform_ele.Services
 {
-    public class UA
+    public class UA:BaseSv
     {
-        SaleDBDataContext db = new SaleDBDataContext();
         int userId;
 
         public UA(int userId)
@@ -37,9 +36,6 @@ namespace Sale_platform_ele.Services
             return powers;
         }
 
-        
-
-
-
+               
     }
 }

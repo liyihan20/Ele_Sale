@@ -6,9 +6,8 @@ using System.Web;
 
 namespace Sale_platform_ele.Services
 {
-    public class DepSv
+    public class DepSv:BaseSv
     {
-        SaleDBDataContext db = new SaleDBDataContext();
 
         public List<DepartmentInfo> GetDepartments(string searchValue)
         {
@@ -119,5 +118,6 @@ namespace Sale_platform_ele.Services
             return result;
         }
 
+       
     }
 }

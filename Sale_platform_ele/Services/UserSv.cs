@@ -6,9 +6,8 @@ using Sale_platform_ele.Models;
 
 namespace Sale_platform_ele.Services
 {
-    public class UserSv
+    public class UserSv:BaseSv
     {
-        SaleDBDataContext db = new SaleDBDataContext();
         public List<UsersInfo> GetUsers(string searchValue)
         {
             var result = (from u in db.User
@@ -127,6 +126,6 @@ namespace Sale_platform_ele.Services
                         }).ToList();
             return list;
         }
-
+                
     }
 }

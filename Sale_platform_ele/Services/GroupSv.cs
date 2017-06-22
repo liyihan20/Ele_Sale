@@ -6,9 +6,8 @@ using System.Web;
 
 namespace Sale_platform_ele.Services
 {
-    public class GroupSv
+    public class GroupSv:BaseSv
     {
-        SaleDBDataContext db = new SaleDBDataContext();
 
         public List<GroupInfo> GetAllGroups()
         {
@@ -180,5 +179,6 @@ namespace Sale_platform_ele.Services
             return "";
         }
 
+        
     }
 }

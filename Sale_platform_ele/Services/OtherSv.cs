@@ -6,9 +6,8 @@ using Sale_platform_ele.Models;
 
 namespace Sale_platform_ele.Services
 {    
-    public class OtherSv
+    public class OtherSv:BaseSv
     {
-        SaleDBDataContext db = new SaleDBDataContext();
         public List<ComboResult> GetItems(string what)
         {
             var result = (from i in db.vwItems
@@ -20,5 +19,6 @@ namespace Sale_platform_ele.Services
                           }).ToList();
             return result;
         }
+                
     }
 }

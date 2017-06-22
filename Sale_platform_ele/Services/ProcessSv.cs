@@ -7,9 +7,8 @@ using Sale_platform_ele.Utils;
 
 namespace Sale_platform_ele.Services
 {
-    public class ProcessSv
+    public class ProcessSv:BaseSv
     {
-        SaleDBDataContext db = new SaleDBDataContext();
         public List<ProInfo> GetProcesses()
         {
             var list = (from p in db.Process
@@ -121,6 +120,75 @@ namespace Sale_platform_ele.Services
                           orderby v.step_value
                           select v).ToList();
             return result;
+        }
+
+        public string SaveStepAuditor(MStepAuditor sa, int id = 0)
+        {
+            if (sa.stepValue == null) {
+                sa.stepValue = db.AuditorsRelation.Max(a => a.step_value) + 1;
+            }
+            if (db.AuditorsRelation.Where(a => a.auditor_id == sa.auditor && a.step_value == sa.stepValue
+                && a.relate_type == sa.relateType && a.relate_value == sa.relateValue).Count() > 0) {
+                return "对应关系已存在";
+            }
+
+            try {
+                AuditorsRelation ar;
+                if (id == 0) {
+                    ar = new AuditorsRelation();
+                    db.AuditorsRelation.InsertOnSubmit(ar);
+                }
+                else {
+                    ar = db.AuditorsRelation.Single(a => a.id == id);
+                }
+                ar.auditor_id = sa.auditor;
+                ar.step_name = sa.stepName;
+                ar.step_value = sa.stepValue;
+                ar.relate_value = sa.relateValue;
+                ar.relate_type = sa.relateType;
+
+                db.SubmitChanges();
+            }
+            catch (Exception ex) {
+                return ex.Message;
+            }
+
+            return "";
+        }
+
+        public string RemoveStepAuditor(int id)
+        {
+            try {
+                db.AuditorsRelation.DeleteOnSubmit(db.AuditorsRelation.Single(a => a.id == id));
+                db.SubmitChanges();
+            }
+            catch (Exception ex) {
+                return ex.Message;
+            }
+
+            return "";
+        }
+
+        public List<ComboResult> GetAuditorRelateTypes()
+        {
+            var list = (from a in db.AuditorsRelation
+                        select new ComboResult()
+                        {
+                            value = a.relate_type,
+                            name = a.relate_type
+                        }).Distinct().ToList();
+            return list;
+        }
+
+        public List<ComboResult> GetProcessStepName()
+        {
+            var list = (from a in db.AuditorsRelation
+                        select new ComboResult()
+                        {
+                            value = a.step_value.ToString(),
+                            name = a.step_name
+                        }).Distinct().ToList();
+            return list;
         }
 
     }

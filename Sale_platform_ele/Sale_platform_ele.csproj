@@ -152,6 +152,7 @@
     <Compile Include="Models\UAModels.cs" />
     <Compile Include="Models\UserInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\BaseSv.cs" />
     <Compile Include="Services\BillSv.cs" />
     <Compile Include="Services\CommissionSv.cs" />
     <Compile Include="Services\DepSv.cs" />
@@ -290,6 +291,7 @@
     <Content Include="Views\Authority\Processes.cshtml" />
     <Content Include="Views\Authority\Commission.cshtml" />
     <Content Include="Views\Authority\CreateCommission.cshtml" />
+    <Content Include="Views\Authority\StepAuditor.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

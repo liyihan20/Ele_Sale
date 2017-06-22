@@ -202,13 +202,13 @@
         }
         var this_row={
                 step:$("#step").numberbox("getValue"),
-                stepName:$("#step_name").val(),
-                stepType: $("#step_type").combobox("getValue"),
+                stepName: $("#stepName").val(),
+                stepType: $("#stepType").combobox("getValue"),
                 userId: $("#auditor").combobox("getValue"),
                 auditor:$("#auditor").combobox("getText"),
-                canModify:$("#can_modify").combobox("getValue"),
-                canBeNull:$("#can_be_null").combobox("getValue"),
-                isCountersign:$("#is_countersign").combobox("getValue")
+                canModify: $("#canModify").combobox("getValue"),
+                canBeNull: $("#canBeNull").combobox("getValue"),
+                isCountersign: $("#isCountersign").combobox("getValue")
             };
         if(row_index==-1){
             $("#tbDet").datagrid("appendRow",this_row);
@@ -260,13 +260,13 @@
             <label>
                 步骤名称:
             </label>
-            <input type="text" id="step_name" name="step_name" style="width: 140px;" require="true" />
+            <input type="text" id="stepName" name="stepName" style="width: 140px;" require="true" />
         </div>
         <div class="fitem">
             <label>
                 步骤类型:
             </label>
-            <input class="easyui-combobox" name="step_type" id="step_type" style="width: 140px;"
+            <input class="easyui-combobox" name="stepType" id="stepType" style="width: 140px;"
                    panelheight="100px" valuefield="value" textfield="name" url="@Url.Content("~/Items/GetProcessStepName")" require="true" />
         </div>
         <div class="fitem">
@@ -277,7 +277,7 @@
             <label>
                 可否修改:
             </label>
-            <select class="easyui-combobox" name="can_modify" id="can_modify" style="width: 140px;"
+            <select class="easyui-combobox" name="canModify" id="canModify" style="width: 140px;"
                     panelheight="60px" require="true">
                 <option value="true">YES</option>
                 <option value="false">NO</option>
@@ -287,7 +287,7 @@
             <label>
                 审核人可为空:
             </label>
-            <select class="easyui-combobox" name="can_be_null" id="can_be_null" style="width: 140px;"
+            <select class="easyui-combobox" name="canBeNull" id="canBeNull" style="width: 140px;"
                     panelheight="60px" require="true">
                 <option value="true">YES</option>
                 <option value="false">NO</option>
@@ -297,7 +297,7 @@
             <label>
                 是否会签:
             </label>
-            <select class="easyui-combobox" name="is_countersign" id="is_countersign" style="width: 140px;"
+            <select class="easyui-combobox" name="isCountersign" id="isCountersign" style="width: 140px;"
                     panelheight="60px" require="true">
                 <option value="true">YES</option>
                 <option value="false">NO</option>

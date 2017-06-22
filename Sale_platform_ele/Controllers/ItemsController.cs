@@ -34,5 +34,10 @@ namespace Sale_platform_ele.BaseControllers
             return Json(new OtherSv().GetItems(what));
         }
 
+        public JsonResult GetAuditorRelateTypes()
+        {
+            return Json(new ProcessSv().GetAuditorRelateTypes());
+        }
+
     }
 }
