@@ -30,5 +30,11 @@ namespace Sale_platform_ele.Controllers
                 return _currentUser;
             }
         }
+
+        public string GetIPAddr()
+        {
+            return Request.UserHostAddress;
+        }
+
     }
 }
