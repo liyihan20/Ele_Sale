@@ -1,8 +1,7 @@
-﻿using System;
+﻿using Sale_platform_ele.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
-using Sale_platform_ele.Models;
 
 namespace Sale_platform_ele.Services
 {

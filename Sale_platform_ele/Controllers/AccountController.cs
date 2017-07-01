@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 using System.Web.Mvc;
 
 namespace Sale_platform_ele.Controllers
 {
-    public class AccountController : Controller
+    public class AccountController : BaseController
     {
         //
         // GET: /Account/
@@ -24,6 +21,7 @@ namespace Sale_platform_ele.Controllers
                 cookie.Expires = DateTime.Now.AddSeconds(-1);
                 Response.AppendCookie(cookie);
             }
+            Wlog("登出模块", "成功登出");
             return RedirectToAction("Login");
         }
     }

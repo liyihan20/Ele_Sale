@@ -50,6 +50,7 @@ namespace Sale_platform_ele.Models
 
     public class SalerSearchParamModel
     {
+        public string billType { get; set; }
         public string searchValue { get; set; }
         public string fromDate { get; set; }
         public string toDate { get; set; }

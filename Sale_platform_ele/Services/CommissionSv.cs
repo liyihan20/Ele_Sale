@@ -1,10 +1,8 @@
-﻿using System;
+﻿using Sale_platform_ele.Models;
+using Sale_platform_ele.Utils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
-using Sale_platform_ele.Models;
-using Sale_platform_ele.Utils;
-using Newtonsoft.Json;
 
 namespace Sale_platform_ele.Services
 {

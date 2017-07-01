@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Sale_platform_ele.Services;
+using Sale_platform_ele.Utils;
+using System;
 using System.Configuration;
 using System.IO;
-using System.Linq;
 using System.Web;
 using System.Web.Mvc;
-using Sale_platform_ele.Utils;
-using Sale_platform_ele.Models;
-using Sale_platform_ele.Services;
 
 namespace Sale_platform_ele.Controllers
 {

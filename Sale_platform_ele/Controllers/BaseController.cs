@@ -1,7 +1,7 @@
-﻿using System;
-using System.Web.Mvc;
-using Sale_platform_ele.Models;
+﻿using Sale_platform_ele.Models;
 using Sale_platform_ele.Services;
+using System;
+using System.Web.Mvc;
 
 namespace Sale_platform_ele.Controllers
 {
@@ -34,6 +34,20 @@ namespace Sale_platform_ele.Controllers
         public string GetIPAddr()
         {
             return Request.UserHostAddress;
+        }
+
+        public void Wlog(string model, string log , string sysNo="", int unusual = 0)
+        {
+            new BaseSv().WriteEventLog(new EventLog()
+            {
+                sysNum = sysNo,
+                username = currentUser.realName,
+                model = model,
+                ip = GetIPAddr(),
+                @event = log,
+                op_time = DateTime.Now,
+                unusual = unusual
+            });
         }
 
     }

@@ -90,6 +90,9 @@ namespace Sale_platform_ele.Models
     partial void InsertApply(Apply instance);
     partial void UpdateApply(Apply instance);
     partial void DeleteApply(Apply instance);
+    partial void InsertEventLog(EventLog instance);
+    partial void UpdateEventLog(EventLog instance);
+    partial void DeleteEventLog(EventLog instance);
     #endregion
 		
 		public SaleDBDataContext() : 
@@ -311,6 +314,14 @@ namespace Sale_platform_ele.Models
 			get
 			{
 				return this.GetTable<Apply>();
+			}
+		}
+		
+		public System.Data.Linq.Table<EventLog> EventLog
+		{
+			get
+			{
+				return this.GetTable<EventLog>();
 			}
 		}
 		
@@ -1747,7 +1758,7 @@ namespace Sale_platform_ele.Models
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="User_Sale_order", Storage="_Order", ThisKey="id", OtherKey="original_id")]
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="User_Order", Storage="_Order", ThisKey="id", OtherKey="original_id")]
 		public EntitySet<Order> Order
 		{
 			get
@@ -1760,7 +1771,7 @@ namespace Sale_platform_ele.Models
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="User_Sale_apply", Storage="_Apply", ThisKey="id", OtherKey="user_id")]
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="User_Apply", Storage="_Apply", ThisKey="id", OtherKey="user_id")]
 		public EntitySet<Apply> Apply
 		{
 			get
@@ -4010,7 +4021,7 @@ namespace Sale_platform_ele.Models
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Sale_order_OrderDetail", Storage="_Order", ThisKey="order_id", OtherKey="id", IsForeignKey=true)]
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Order_OrderDetail", Storage="_Order", ThisKey="order_id", OtherKey="id", IsForeignKey=true)]
 		public Order Order
 		{
 			get
@@ -4552,7 +4563,7 @@ namespace Sale_platform_ele.Models
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Sale_apply_ApplyDetails", Storage="_Apply", ThisKey="apply_id", OtherKey="id", IsForeignKey=true)]
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Apply_ApplyDetails", Storage="_Apply", ThisKey="apply_id", OtherKey="id", IsForeignKey=true)]
 		public Apply Apply
 		{
 			get
@@ -6062,7 +6073,7 @@ namespace Sale_platform_ele.Models
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Sale_order_OrderDetail", Storage="_OrderDetail", ThisKey="id", OtherKey="order_id")]
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Order_OrderDetail", Storage="_OrderDetail", ThisKey="id", OtherKey="order_id")]
 		public EntitySet<OrderDetail> OrderDetail
 		{
 			get
@@ -6075,7 +6086,7 @@ namespace Sale_platform_ele.Models
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="User_Sale_order", Storage="_User", ThisKey="original_id", OtherKey="id", IsForeignKey=true)]
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="User_Order", Storage="_User", ThisKey="original_id", OtherKey="id", IsForeignKey=true)]
 		public User User
 		{
 			get
@@ -6409,7 +6420,7 @@ namespace Sale_platform_ele.Models
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Sale_apply_ApplyDetails", Storage="_ApplyDetails", ThisKey="id", OtherKey="apply_id")]
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Apply_ApplyDetails", Storage="_ApplyDetails", ThisKey="id", OtherKey="apply_id")]
 		public EntitySet<ApplyDetails> ApplyDetails
 		{
 			get
@@ -6422,7 +6433,7 @@ namespace Sale_platform_ele.Models
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="User_Sale_apply", Storage="_User", ThisKey="user_id", OtherKey="id", IsForeignKey=true)]
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="User_Apply", Storage="_User", ThisKey="user_id", OtherKey="id", IsForeignKey=true)]
 		public User User
 		{
 			get
@@ -6486,6 +6497,236 @@ namespace Sale_platform_ele.Models
 		{
 			this.SendPropertyChanging();
 			entity.Apply = null;
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Sale_event_log")]
+	public partial class EventLog : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _id;
+		
+		private string _username;
+		
+		private string _ip;
+		
+		private System.Nullable<System.DateTime> _op_time;
+		
+		private string _model;
+		
+		private string _sysNum;
+		
+		private string _event;
+		
+		private System.Nullable<int> _unusual;
+		
+    #region 可扩展性方法定义
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnidChanging(int value);
+    partial void OnidChanged();
+    partial void OnusernameChanging(string value);
+    partial void OnusernameChanged();
+    partial void OnipChanging(string value);
+    partial void OnipChanged();
+    partial void Onop_timeChanging(System.Nullable<System.DateTime> value);
+    partial void Onop_timeChanged();
+    partial void OnmodelChanging(string value);
+    partial void OnmodelChanged();
+    partial void OnsysNumChanging(string value);
+    partial void OnsysNumChanged();
+    partial void OneventChanging(string value);
+    partial void OneventChanged();
+    partial void OnunusualChanging(System.Nullable<int> value);
+    partial void OnunusualChanged();
+    #endregion
+		
+		public EventLog()
+		{
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_id", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int id
+		{
+			get
+			{
+				return this._id;
+			}
+			set
+			{
+				if ((this._id != value))
+				{
+					this.OnidChanging(value);
+					this.SendPropertyChanging();
+					this._id = value;
+					this.SendPropertyChanged("id");
+					this.OnidChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_username", DbType="VarChar(50)")]
+		public string username
+		{
+			get
+			{
+				return this._username;
+			}
+			set
+			{
+				if ((this._username != value))
+				{
+					this.OnusernameChanging(value);
+					this.SendPropertyChanging();
+					this._username = value;
+					this.SendPropertyChanged("username");
+					this.OnusernameChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ip", DbType="VarChar(50)")]
+		public string ip
+		{
+			get
+			{
+				return this._ip;
+			}
+			set
+			{
+				if ((this._ip != value))
+				{
+					this.OnipChanging(value);
+					this.SendPropertyChanging();
+					this._ip = value;
+					this.SendPropertyChanged("ip");
+					this.OnipChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_op_time", DbType="SmallDateTime")]
+		public System.Nullable<System.DateTime> op_time
+		{
+			get
+			{
+				return this._op_time;
+			}
+			set
+			{
+				if ((this._op_time != value))
+				{
+					this.Onop_timeChanging(value);
+					this.SendPropertyChanging();
+					this._op_time = value;
+					this.SendPropertyChanged("op_time");
+					this.Onop_timeChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_model", DbType="VarChar(50)")]
+		public string model
+		{
+			get
+			{
+				return this._model;
+			}
+			set
+			{
+				if ((this._model != value))
+				{
+					this.OnmodelChanging(value);
+					this.SendPropertyChanging();
+					this._model = value;
+					this.SendPropertyChanged("model");
+					this.OnmodelChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_sysNum", DbType="VarChar(50)")]
+		public string sysNum
+		{
+			get
+			{
+				return this._sysNum;
+			}
+			set
+			{
+				if ((this._sysNum != value))
+				{
+					this.OnsysNumChanging(value);
+					this.SendPropertyChanging();
+					this._sysNum = value;
+					this.SendPropertyChanged("sysNum");
+					this.OnsysNumChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Name="event", Storage="_event", DbType="VarChar(500)")]
+		public string @event
+		{
+			get
+			{
+				return this._event;
+			}
+			set
+			{
+				if ((this._event != value))
+				{
+					this.OneventChanging(value);
+					this.SendPropertyChanging();
+					this._event = value;
+					this.SendPropertyChanged("@event");
+					this.OneventChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_unusual", DbType="Int")]
+		public System.Nullable<int> unusual
+		{
+			get
+			{
+				return this._unusual;
+			}
+			set
+			{
+				if ((this._unusual != value))
+				{
+					this.OnunusualChanging(value);
+					this.SendPropertyChanging();
+					this._unusual = value;
+					this.SendPropertyChanged("unusual");
+					this.OnunusualChanged();
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
 		}
 	}
 	

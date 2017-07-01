@@ -72,8 +72,8 @@
       <Association Name="User_ProcessDetail" Member="ProcessDetail" ThisKey="id" OtherKey="userId" Type="ProcessDetail" />
       <Association Name="User_ApplyDetails" Member="ApplyDetails" ThisKey="id" OtherKey="user_id" Type="ApplyDetails" />
       <Association Name="User_BlockOrder" Member="BlockOrder" ThisKey="id" OtherKey="operator" Type="BlockOrder" />
-      <Association Name="User_Sale_order" Member="Order" ThisKey="id" OtherKey="original_id" Type="Order" />
-      <Association Name="User_Sale_apply" Member="Apply" ThisKey="id" OtherKey="user_id" Type="Apply" />
+      <Association Name="User_Order" Member="Order" ThisKey="id" OtherKey="original_id" Type="Order" />
+      <Association Name="User_Apply" Member="Apply" ThisKey="id" OtherKey="user_id" Type="Apply" />
     </Type>
   </Table>
   <Table Name="dbo.Sale_auditorsRelation" Member="AuditorsRelation">
@@ -193,7 +193,7 @@
       <Column Name="MU" Type="System.Decimal" DbType="Decimal(18,4)" CanBeNull="true" />
       <Column Name="fetch_date" Type="System.DateTime" DbType="SmallDateTime" CanBeNull="true" />
       <Column Name="comment" Type="System.String" DbType="VarChar(500)" CanBeNull="true" />
-      <Association Name="Sale_order_OrderDetail" Member="Order" ThisKey="order_id" OtherKey="id" Type="Order" IsForeignKey="true" />
+      <Association Name="Order_OrderDetail" Member="Order" ThisKey="order_id" OtherKey="id" Type="Order" IsForeignKey="true" />
     </Type>
   </Table>
   <Table Name="dbo.Sale_system_no" Member="SystemNo">
@@ -219,7 +219,7 @@
       <Column Name="parent_step" Type="System.Int32" DbType="Int" CanBeNull="true" />
       <Column Name="countersign" Type="System.Boolean" DbType="Bit" CanBeNull="true" />
       <Association Name="User_ApplyDetails" Member="User" ThisKey="user_id" OtherKey="id" Type="User" IsForeignKey="true" />
-      <Association Name="Sale_apply_ApplyDetails" Member="Apply" ThisKey="apply_id" OtherKey="id" Type="Apply" IsForeignKey="true" />
+      <Association Name="Apply_ApplyDetails" Member="Apply" ThisKey="apply_id" OtherKey="id" Type="Apply" IsForeignKey="true" />
     </Type>
   </Table>
   <Table Name="dbo.Sale_block_order" Member="BlockOrder">
@@ -292,8 +292,8 @@
       <Column Name="produce_way_no" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
       <Column Name="produce_way_name" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
       <Column Name="order_no" Type="System.String" DbType="VarChar(100)" CanBeNull="true" />
-      <Association Name="Sale_order_OrderDetail" Member="OrderDetail" ThisKey="id" OtherKey="order_id" Type="OrderDetail" />
-      <Association Name="User_Sale_order" Member="User" ThisKey="original_id" OtherKey="id" Type="User" IsForeignKey="true" />
+      <Association Name="Order_OrderDetail" Member="OrderDetail" ThisKey="id" OtherKey="order_id" Type="OrderDetail" />
+      <Association Name="User_Order" Member="User" ThisKey="original_id" OtherKey="id" Type="User" IsForeignKey="true" />
     </Type>
   </Table>
   <Table Name="dbo.Sale_apply" Member="Apply">
@@ -308,8 +308,20 @@
       <Column Name="sys_no" Type="System.String" DbType="VarChar(20)" CanBeNull="true" />
       <Column Name="p_model" Type="System.String" DbType="VarChar(100)" CanBeNull="true" />
       <Column Name="user_name" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
-      <Association Name="Sale_apply_ApplyDetails" Member="ApplyDetails" ThisKey="id" OtherKey="apply_id" Type="ApplyDetails" />
-      <Association Name="User_Sale_apply" Member="User" ThisKey="user_id" OtherKey="id" Type="User" IsForeignKey="true" />
+      <Association Name="Apply_ApplyDetails" Member="ApplyDetails" ThisKey="id" OtherKey="apply_id" Type="ApplyDetails" />
+      <Association Name="User_Apply" Member="User" ThisKey="user_id" OtherKey="id" Type="User" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Sale_event_log" Member="EventLog">
+    <Type Name="EventLog">
+      <Column Name="id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="username" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="ip" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="op_time" Type="System.DateTime" DbType="SmallDateTime" CanBeNull="true" />
+      <Column Name="model" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="sysNum" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="event" Type="System.String" DbType="VarChar(500)" CanBeNull="true" />
+      <Column Name="unusual" Type="System.Int32" DbType="Int" CanBeNull="true" />
     </Type>
   </Table>
   <Function Name="dbo.getCustomer" Method="getCustomer">

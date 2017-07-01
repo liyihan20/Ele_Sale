@@ -1,6 +1,6 @@
-﻿using System.Web.Mvc;
+﻿using Sale_platform_ele.Models;
 using Sale_platform_ele.Services;
-using Sale_platform_ele.Models;
+using System.Web.Mvc;
 
 namespace Sale_platform_ele.Controllers
 {

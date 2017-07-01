@@ -1,19 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Newtonsoft.Json;
+using Sale_platform_ele.Filters;
+using Sale_platform_ele.Models;
+using Sale_platform_ele.Services;
+using Sale_platform_ele.Utils;
+using System;
 using System.Web;
 using System.Web.Mvc;
-using Sale_platform_ele.Models;
-using Sale_platform_ele.Utils;
-using Sale_platform_ele.Services;
-using Sale_platform_ele.Filters;
-using Newtonsoft.Json;
 
 namespace Sale_platform_ele.Controllers
 {
     public class SalerController : BaseController
     {
         BillSv bill;
+        private const string TAG = "申请者模块";
 
         /// <summary>
         /// 根据单据类型设置单据空的对象实例
@@ -36,6 +35,8 @@ namespace Sale_platform_ele.Controllers
         [SessionTimeOutFilter]
         public ActionResult CreateBill(string billType)
         {
+            Wlog(TAG, "新建单据，billType:" + billType);
+
             SetBillByType(billType);
             ViewData["bill"] = bill.GetNewBill(currentUser.userId);
 
@@ -44,12 +45,16 @@ namespace Sale_platform_ele.Controllers
 
         public JsonResult SaveBill(FormCollection fc)
         {
-            SetBillByType(new BillUtils().GetBillEnType(fc.Get("sys_no")));
+            string sysNo=fc.Get("sys_no");
+            SetBillByType(new BillUtils().GetBillEnType(sysNo));
 
             string result = bill.SaveBill(fc, currentUser.userId);
             if (!string.IsNullOrEmpty(result)) {
                 return Json(new ResultModel() { suc = false, msg = result },"text/html");
             }
+
+            Wlog(TAG, "保存单据，result:" + result, sysNo, string.IsNullOrEmpty(result) ? 0 : -100);
+
             return Json(new ResultModel() { suc = true },"text/html");
 
         }
@@ -57,18 +62,19 @@ namespace Sale_platform_ele.Controllers
         [SessionTimeOutFilter]
         public ActionResult CheckBillList(string billType)
         {
-            
+            Wlog(TAG, "打开单据列表视图,billType:" + billType);
+
             SalerSearchParamModel pm;
-            var queryData = Request.Cookies["ele_sa_qd"];
+            var queryData = Request.Cookies["ele_sa_" + billType + "_qd"];
             if (queryData != null) {
                 pm = JsonConvert.DeserializeObject<SalerSearchParamModel>(SomeUtils.DecodeToUTF8(queryData.Value));
             }
             else {
                 pm = new SalerSearchParamModel();
                 pm.auditResult = 0;
+                pm.billType = billType;
             }
             ViewData["queryParams"] = pm;
-            ViewData["billType"] = billType;
 
             SetBillByType(billType);
             return View(bill.CheckListViewName);
@@ -79,16 +85,18 @@ namespace Sale_platform_ele.Controllers
             SalerSearchParamModel pm = new SalerSearchParamModel();
             SomeUtils.SetFieldValueToModel(fc, pm);
 
-            var queryData = Request.Cookies["ele_sa_qd"];
+            var queryData = Request.Cookies["ele_sa_" + pm.billType + "_qd"];
             if (queryData == null) {
-                queryData = new HttpCookie("ele_sa_qd");
+                queryData = new HttpCookie("ele_sa_" + pm.billType + "_qd");
             }
             queryData.Expires = DateTime.Now.AddDays(20);
             queryData.Value = SomeUtils.EncodeToUTF8(JsonConvert.SerializeObject(pm));
-            Response.AppendCookie(queryData);            
+            Response.AppendCookie(queryData);
 
-            SetBillByType(fc.Get("bill_type"));
-            return Json(bill.GetBillList(pm, currentUser.userId),"text/html");
+            Wlog(TAG, "获取列表数据:" + JsonConvert.SerializeObject(pm));
+
+            SetBillByType(pm.billType);
+            return Json(bill.GetBillList(pm, currentUser.userId), "text/html");
         }
 
         public JsonResult ApplyHasBegan(string sysNo)
@@ -99,6 +107,8 @@ namespace Sale_platform_ele.Controllers
         [SessionTimeOutFilter]
         public ActionResult ModifyBill(string sysNo,int stepVersion)
         {
+            Wlog(TAG, "进入单据修改视图", sysNo + ":" + stepVersion);
+
             SetBillBySysNo(sysNo);
             ViewData["bill"] = bill.GetBill(stepVersion);
             if (new ApplySv().ApplyHasBegan(sysNo)) {
@@ -110,6 +120,8 @@ namespace Sale_platform_ele.Controllers
         [SessionTimeOutFilter]
         public ActionResult CheckBill(string sysNo)
         {
+            Wlog(TAG, "进入单据查看视图", sysNo);
+
             SetBillBySysNo(sysNo);
             ViewData["bill"] = bill.GetBill(0);
             if (new ApplySv().ApplyHasBegan(sysNo)) {
@@ -121,6 +133,8 @@ namespace Sale_platform_ele.Controllers
         [SessionTimeOutFilter]
         public ActionResult CreateNewBillFromOld(string sysNo)
         {
+            Wlog(TAG, "从旧模板新增", sysNo);
+
             SetBillBySysNo(sysNo);
             ViewData["bill"] = bill.GetNewBillFromOld();
             return View(bill.CreateViewName);
@@ -131,6 +145,7 @@ namespace Sale_platform_ele.Controllers
         {
             SetBillBySysNo(sysNo);
             if (!bill.HasOrderSaved(sysNo)) {
+                Wlog(TAG, "没有保存单据就提交", sysNo, -10);
                 return Json(new ResultModel() { suc = false, msg = "请先保存单据再提交" });
             }
             
@@ -147,9 +162,11 @@ namespace Sale_platform_ele.Controllers
                         );
             }
             catch (Exception ex) {
+                Wlog(TAG, "提交失败：" + ex.Message, sysNo, -10);
                 return Json(new ResultModel() { suc = false, msg = "提交失败：" + ex.Message });
             }
 
+            Wlog(TAG, "提交成功", sysNo);
             return Json(new ResultModel() { suc = true, msg = "提交成功！等待跳转..." });
         }
 
