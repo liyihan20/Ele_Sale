@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.Mvc;
+﻿using System.Web.Mvc;
 using Sale_platform_ele.Services;
+using Sale_platform_ele.Models;
 
-namespace Sale_platform_ele.BaseControllers
+namespace Sale_platform_ele.Controllers
 {
-    public class ItemsController : Controller
+    public class ItemsController : BaseController
     {
         public JsonResult GetDepTypes()
         {
@@ -37,6 +34,42 @@ namespace Sale_platform_ele.BaseControllers
         public JsonResult GetAuditorRelateTypes()
         {
             return Json(new ProcessSv().GetAuditorRelateTypes());
+        }
+
+        public JsonResult GetCustomers(string q)
+        {
+            return Json(new OtherSv().GetCustomers(q));
+        }
+
+        public JsonResult GetClerks(string q)
+        {
+            return Json(new OtherSv().GetClerks(q));
+        }
+
+        public JsonResult GetExchangeRate(string currencyNo)
+        {
+            return Json(new OtherSv().GetExchangeRate(currencyNo));
+        }
+
+        public JsonResult GetProducts(string q)
+        {
+            return Json(new OtherSv().GetProducts(q));
+        }
+
+        public JsonResult GetUnitGroup(int groupId)
+        {
+            return Json(new OtherSv().GetUnitGroup(groupId));
+        }
+
+        public JsonResult GetMUAndCommisson(decimal price, decimal cost, int feeRate, decimal exchangeRate, string productType, decimal qty)
+        {
+            MUAndCommissionModel mc = new MUAndCommissionModel();
+            CommissionSv csv = new CommissionSv();
+            mc.MU = csv.GetMU(price, cost, feeRate, exchangeRate);
+            mc.commissionRate = csv.GetCommissionRate(mc.MU, productType);
+            mc.commission = csv.GetCommissionMoney(price, qty, mc.commissionRate);
+
+            return Json(mc);
         }
 
     }

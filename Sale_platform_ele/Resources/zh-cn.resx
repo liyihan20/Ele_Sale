@@ -277,12 +277,12 @@
     <comment>成交价</comment>
   </data>
   <data name="delivery_place" xml:space="preserve">
-    <value>交货地点</value>
-    <comment>交货地点</comment>
+    <value>发货地点</value>
+    <comment>发货地点</comment>
   </data>
   <data name="del_item" xml:space="preserve">
     <value>删除条目</value>
-    <comment>删除项目</comment>
+    <comment>删除条目</comment>
   </data>
   <data name="description" xml:space="preserve">
     <value>说明</value>
@@ -373,7 +373,7 @@
     <comment>外包箱带"TRULY"标示</comment>
   </data>
   <data name="upload_file" xml:space="preserve">
-    <value>上传附件(一张订单只能上传一个后缀是.rar的压缩文件，并且文件大小不得超过10M，重复上传会覆盖掉旧文件)</value>
+    <value>上传附件</value>
     <comment>上传附件(一张订单只能上传一个后缀是.rar的压缩文件，并且文件大小不得超过10M，重复上传会覆盖掉旧文件)</comment>
   </data>
   <data name="upload_time" xml:space="preserve">
@@ -1382,5 +1382,61 @@
   <data name="data_manage" xml:space="preserve">
     <value>资料管理</value>
     <comment>资料管理</comment>
+  </data>
+  <data name="bill_hang_up_info" xml:space="preserve">
+    <value>单据挂起信息</value>
+  </data>
+  <data name="buy_customer" xml:space="preserve">
+    <value>购货客户</value>
+  </data>
+  <data name="foreign_customer" xml:space="preserve">
+    <value>国外客户</value>
+  </data>
+  <data name="hang_up" xml:space="preserve">
+    <value>挂起</value>
+  </data>
+  <data name="hang_up_reason" xml:space="preserve">
+    <value>挂起原因</value>
+  </data>
+  <data name="hang_up_time" xml:space="preserve">
+    <value>挂起时间</value>
+  </data>
+  <data name="loading" xml:space="preserve">
+    <value>加载中...</value>
+    <comment>加载中...</comment>
+  </data>
+  <data name="payment_rule" xml:space="preserve">
+    <value>付款条款</value>
+  </data>
+  <data name="receive_pro" xml:space="preserve">
+    <value>交货属性</value>
+  </data>
+  <data name="save_before_submit" xml:space="preserve">
+    <value>提交之前请先保存</value>
+  </data>
+  <data name="submit_wait" xml:space="preserve">
+    <value>正在提交，请等待跳转。。。</value>
+  </data>
+  <data name="tax_price" xml:space="preserve">
+    <value>含税单价</value>
+    <comment>含税单价</comment>
+  </data>
+  <data name="upload_file_info" xml:space="preserve">
+    <value>注意：一张订单只能上传一个后缀是.rar的压缩文件，并且文件大小不得超过10M，重复上传会覆盖掉旧文件</value>
+  </data>
+  <data name="audit_apply" xml:space="preserve">
+    <value>审核单据申请</value>
+  </data>
+  <data name="next_step_name" xml:space="preserve">
+    <value>下一审核步骤名称</value>
+  </data>
+  <data name="select_currency_first" xml:space="preserve">
+    <value>请先选择币别</value>
+  </data>
+  <data name="select_product_type_first" xml:space="preserve">
+    <value>请先选择产品类别</value>
+  </data>
+  <data name="step_auditor" xml:space="preserve">
+    <value>步骤审核人</value>
   </data>
 </root>

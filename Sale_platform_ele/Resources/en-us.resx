@@ -283,7 +283,7 @@
   </data>
   <data name="del_item" xml:space="preserve">
     <value>Delete Item</value>
-    <comment>删除项目</comment>
+    <comment>删除条目</comment>
   </data>
   <data name="description" xml:space="preserve">
     <value>Description</value>
@@ -374,7 +374,7 @@
     <comment>外包箱带"TRULY"标示</comment>
   </data>
   <data name="upload_file" xml:space="preserve">
-    <value>Upload File(Just one Zip file(.rar) can be upload in one order; The size of file should less than 10 MB, New file will cover the old file when Repeat upload.)</value>
+    <value>Upload File</value>
     <comment>上传附件(一张订单只能上传一个后缀是.rar的压缩文件，并且文件大小不得超过10M，重复上传会覆盖掉旧文件)</comment>
   </data>
   <data name="upload_time" xml:space="preserve">
@@ -1383,5 +1383,61 @@
   <data name="data_manage" xml:space="preserve">
     <value>Data Management</value>
     <comment>资料管理</comment>
+  </data>
+  <data name="bill_hang_up_info" xml:space="preserve">
+    <value>Bill Hang-up Info</value>
+  </data>
+  <data name="buy_customer" xml:space="preserve">
+    <value>Customer</value>
+  </data>
+  <data name="foreign_customer" xml:space="preserve">
+    <value>Foreign Customer</value>
+  </data>
+  <data name="hang_up" xml:space="preserve">
+    <value>Hang UP</value>
+  </data>
+  <data name="hang_up_reason" xml:space="preserve">
+    <value>Hang-up Reason</value>
+  </data>
+  <data name="hang_up_time" xml:space="preserve">
+    <value>Hang-up Time</value>
+  </data>
+  <data name="loading" xml:space="preserve">
+    <value>loading...</value>
+    <comment>加载中...</comment>
+  </data>
+  <data name="payment_rule" xml:space="preserve">
+    <value>Payment Rule</value>
+  </data>
+  <data name="receive_pro" xml:space="preserve">
+    <value>Receiving Property</value>
+  </data>
+  <data name="save_before_submit" xml:space="preserve">
+    <value>Please save the form before submit it</value>
+  </data>
+  <data name="submit_wait" xml:space="preserve">
+    <value>Please wait while submitting...</value>
+  </data>
+  <data name="tax_price" xml:space="preserve">
+    <value>Taxed Price</value>
+    <comment>含税单价</comment>
+  </data>
+  <data name="upload_file_info" xml:space="preserve">
+    <value>Attention: Just one Zip file(.rar) can be upload in one order; The size of file should less than 10 MB, New file will cover the old file when Repeat upload.)</value>
+  </data>
+  <data name="audit_apply" xml:space="preserve">
+    <value>Audit Bill Application</value>
+  </data>
+  <data name="next_step_name" xml:space="preserve">
+    <value>Next Step Name</value>
+  </data>
+  <data name="select_currency_first" xml:space="preserve">
+    <value>Please select currency first</value>
+  </data>
+  <data name="select_product_type_first" xml:space="preserve">
+    <value>Please select product type first</value>
+  </data>
+  <data name="step_auditor" xml:space="preserve">
+    <value>Next Auditors</value>
   </data>
 </root>

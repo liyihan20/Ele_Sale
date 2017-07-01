@@ -17,7 +17,8 @@ namespace Sale_platform_ele.Controllers
         }
 
         public ActionResult LogOut()
-        {
+        {            
+            Session.Clear();
             var cookie = Request.Cookies["order_ele_cookie"];
             if (cookie != null) {                
                 cookie.Expires = DateTime.Now.AddSeconds(-1);

@@ -1,0 +1,270 @@
+﻿@using Sale_platform_ele.Models;
+@{
+    Order order = (Order)ViewData["bill"];
+}
+
+<script type="text/javascript">
+    $(function () {
+
+        $("#dg_detail").datagrid({
+            width: 1800,
+            loadMsg: "@Html.Lang("loading")",
+            rownumbers: true,
+            singleSelect: true,
+            fitColumns: true,
+            columns: [[
+                { field: 'item_no', title: '@Html.Lang("pro_num")', width: 120 },
+                { field: 'item_name', title: '@Html.Lang("pro_name")', width: 140 },
+                { field: 'item_model', title: '@Html.Lang("pro_model")', width: 180 },
+                { field: 'unit_no', title: 'unit_no', hidden: true },
+                { field: 'unit_name', title: '@Html.Lang("unit")', width: 60, align: 'center' },
+                { field: 'qty', title: '@Html.Lang("qty")', width: 80, align: 'right' },
+                { field: 'unit_price', title: '@Html.Lang("price")', width: 80, align: 'right' },
+                { field: 'tax_price', title: '@Html.Lang("tax_price")', width: 80, align: 'right' },
+                { field: 'deal_price', title: '@Html.Lang("deal_price")', width: 80, align: 'right' },
+                { field: 'cost', title: '@Html.Lang("cost")', width: 80, align: 'right' },
+                { field: 'fee_rate', title: '@Html.Lang("fee_rate")%', width: 80, align: 'right' },
+                { field: 'commission_rate', title: '@Html.Lang("commission_rate")', width: 80, align: 'right' },
+                { field: 'commission', title: '@Html.Lang("commission")', width: 80, align: 'right' },
+                { field: 'MU', title: 'MU%', width: 80, align: 'right' },
+                { field: 'tax_rate', title: '@Html.Lang("tax_rate")%', width: 80, align: 'center' },
+                { field: 'fetch_date', title: '@Html.Lang("delivery_date")', width: 100, align: 'center' },
+                { field: 'comment', title: '@Html.Lang("comment")', width: 160 }
+            ]]
+        });
+
+        $("#order_div input[type='text']").attr("readonly", "readonly");
+        $("#order_div textarea").attr("readonly", "readonly");
+    });
+</script>
+<div class="easyui-layout" data-options="fit:true">    
+    <div data-options="region:'center'">
+<div id="order_div" class="easyui-panel" title="@Html.Lang("check") @Html.Lang("sale_order")" style="width: 840px; padding: 10px; background: #fafafa;">
+    <div>
+        <table border="0" cellpadding="1" cellspacing="3" width="800">
+            @if (!string.IsNullOrEmpty(order.order_no)) { 
+            <tr>
+                <td>@Html.Lang("order_no")</td>
+                <td>@order.order_no</td>
+                <td></td><td></td><td></td><td></td>
+            </tr>
+            }
+            <tr>
+                <td>
+                    @Html.Lang("order_date"):
+                </td>
+                <td>
+                    <input class="easyui-textbox" style="width: 120px" value="@(((DateTime)order.order_date).ToString("yyyy-MM-dd"))" />
+                </td>
+                <td>
+                    @Html.Lang("sys_num"):
+                </td>
+                <td>
+                    <input class="easyui-textbox" style="width:120px" value="@order.sys_no" />
+                </td>
+                <td>
+                    @Html.Lang("order_type"):
+                </td>
+                <td>
+                    <input class="easyui-textbox" style="width: 120px" value="@order.order_type_name" />
+                </td>
+                <td>
+                    @Html.Lang("contract_num"):
+                </td>
+                <td>
+                    <input class="easyui-textbox" style="width:120px" value="@order.contract_no" />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    @Html.Lang("buy_customer"):
+                </td>
+                <td>
+                    <input class="easyui-textbox" style="width: 120px" value="@order.customer_name" />
+                </td>
+                <td>
+                    @Html.Lang("foreign_customer"):
+                </td>
+                <td>
+                    <input class="easyui-textbox" style="width: 120px" value="@order.oversea_customer_name" />
+                </td>
+                <td>
+                    @Html.Lang("pro_type"):
+                </td>
+                <td>
+                    <input class="easyui-textbox" style="width: 120px" value="@order.product_type_name" />
+                </td>
+                <td>
+                    @Html.Lang("pro_use"):
+                </td>
+                <td>
+                    <input class="easyui-textbox" style="width:120px" value="@order.product_use" />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    @Html.Lang("sale_type"):
+                </td>
+                <td>
+                    <input class="easyui-textbox" style="width: 120px" value="@order.sale_way_name" />
+                </td>
+                <td>
+                    @Html.Lang("payment_rule"):
+                </td>
+                <td>
+                    <input class="easyui-textbox" style="width:120px" value="@order.payment_rull" />
+                </td>
+                <td>
+                    @Html.Lang("currency"):
+                </td>
+                <td>
+                    <input class="easyui-textbox" style="width: 120px" value="@order.currency_name" />
+                </td>
+                <td>
+                    @Html.Lang("exchange"):
+                </td>
+                <td>
+                    <input class="easyui-textbox" style="width:120px" value="@order.exchange_rate" />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    @Html.Lang("trade_rule"):
+                </td>
+                <td>
+                    <input class="easyui-textbox" style="width:120px" value="@order.trade_rull" />
+                </td>
+                <td>
+                    @Html.Lang("agency"):
+                </td>
+                <td>
+                    <input class="easyui-textbox" style="width: 120px" value="@order.agency_name" />
+                </td>
+                <td>
+                    @Html.Lang("biller"):
+                </td>
+                <td>
+                    <input class="easyui-textbox" style="width:120px" value="@order.User.real_name" />
+                </td>
+                <td></td>
+                <td></td>
+            </tr>
+        </table>
+        <br />
+        <div id="detail_div" class="easyui-panel" title="@Html.Lang("sale_order_detail")" style="width: 815px; height: 240px">
+            <table id="dg_detail">
+                @foreach (var det in order.OrderDetail) {
+                    <tr>
+                        <td>@det.item_no</td>
+                        <td>@det.item_name</td>
+                        <td>@det.item_model</td>
+                        <td>@det.unit_no</td>
+                        <td>@det.unit_name</td>
+                        <td>@det.qty</td>
+                        <td>@det.unit_price</td>
+                        <td>@det.tax_price</td>
+                        <td>@det.deal_price</td>
+                        <td>@det.cost</td>
+                        <td>@det.fee_rate</td>
+                        <td>@det.commission_rate</td>
+                        <td>@det.commission</td>
+                        <td>@det.MU</td>
+                        <td>@det.tax_rate</td>
+                        <td>@(det.fetch_date == null ? "" : ((DateTime)det.fetch_date).ToString("yyyy-MM-dd"))</td>
+                        <td>@det.comment</td>
+                    </tr>
+                }
+            </table>
+        </div>
+        <br />
+        <table border="0" cellpadding="1" cellspacing="3" width="800">
+            <tr>
+                <td>
+                    @Html.Lang("clerk1"):
+                </td>
+                <td>
+                    <input class="easyui-textbox" style="width: 120px" value="@order.clerk1_name" />
+                </td>
+                <td>
+                    @Html.Lang("percent1"):
+                </td>
+                <td>
+                    <input class="easyui-textbox" style="width: 120px"  value="@order.percent1" />
+                </td>
+                <td>
+                    @Html.Lang("group1"):
+                </td>
+                <td>
+                    <input class="easyui-textbox" style="width:120px" value="@order.group1" />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    @Html.Lang("clerk2"):
+                </td>
+                <td>
+                    <input class="easyui-textbox" style="width: 120px" value="@order.clerk2_name" />
+                </td>
+                <td>
+                    @Html.Lang("percent2"):
+                </td>
+                <td>
+                    <input class="easyui-textbox" style="width: 120px" value="@order.percent2" />
+                </td>
+                <td>
+                    @Html.Lang("group2"):
+                </td>
+                <td>
+                    <input class="easyui-textbox" style="width:120px" value="@order.group2" />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    @Html.Lang("delivery_place"):
+                </td>
+                <td>
+                    <input class="easyui-textbox" style="width: 120px" value="@order.delivery_place_name" />
+                </td>
+                <td>
+                    @Html.Lang("receive_pro"):
+                </td>
+                <td>
+                    <input class="easyui-textbox" style="width: 120px" value="@order.receive_place_name" />
+                </td>
+                <td>
+                    @Html.Lang("backPaper"):
+                </td>
+                <td>
+                    <input class="easyui-textbox" style="width: 120px" value="@order.backpaper_confirm_name" />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    @Html.Lang("produce_way"):
+                </td>
+                <td>
+                    <input class="easyui-textbox" style="width: 120px" value="@order.produce_way_name" />
+                </td>
+            </tr>
+            <tr>
+                <td>@Html.Lang("summary"):</td>
+                <td colspan="5">
+                    <input class="easyui-textbox" multiline="true" style="width:660px;height:60px;" value="@order.summary" />
+                </td>
+            </tr>
+        </table>
+        <br />
+        <div id="downloadPanel">
+            <div class="easyui-panel" style="background: #fafafa; padding: 10px; width: 800px;"
+                    title="@Html.Lang("download_file")" href="@Url.Content("~/File/DownloadFileView?sysNo=" + order.sys_no)">
+            </div>
+        </div>
+    </div>
+</div>
+    </div>    
+    @Html.Partial("_BlockInfoPartial")
+</div>
+
+
+  
+

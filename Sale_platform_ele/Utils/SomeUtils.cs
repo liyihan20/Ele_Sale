@@ -10,37 +10,7 @@ namespace Sale_platform_ele.Utils
 {
     public class SomeUtils
     {
-        //通过系统流水号获得已经转移到正式文件夹的附件路径
-        public static string getOrderPath(string sysNum)
-        {
-            string p = ConfigurationManager.AppSettings["AttachmentPath2"];
-            string p1 = sysNum.Substring(0, 2);
-            string p2 = sysNum.Substring(2, 4);
-            string p3 = sysNum.Substring(6, 2);
-            string p4 = sysNum.Substring(8, 2);
-            string path = Path.Combine(p, p1, p2, p3, p4);
-            return path;
-        }
 
-        //将附件移动到正式文件夹
-        public static void moveToFormalDir(string sysNum)
-        {
-            string fileName = sysNum + ".rar";
-            string oldPath = Path.Combine(ConfigurationManager.AppSettings["AttachmentPath1"], fileName);
-            if (System.IO.File.Exists(oldPath)) {
-                FileInfo info = new FileInfo(oldPath);
-                string newPath = SomeUtils.getOrderPath(sysNum);
-                if (!Directory.Exists(newPath)) {
-                    Directory.CreateDirectory(newPath);
-                }
-                string newFile = Path.Combine(newPath, fileName);
-                //如果正式目录已存在，则先删除
-                if (File.Exists(newFile)) {
-                    File.Delete(newFile);
-                }
-                info.MoveTo(newFile);
-            }
-        }
         public static string getMD5(string str)
         {
             //HashAlgorithm hash = HashAlgorithm.Create("MD5");

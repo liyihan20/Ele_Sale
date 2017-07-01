@@ -26,4 +26,34 @@ namespace Sale_platform_ele.Models
         public string iconCls { get; set; }
     }
 
+    public class ProductModel
+    {
+        public string number { get; set; }
+        public string name { get; set; }
+        public string model { get; set; }
+        public string unitNo { get; set; }
+        public string unitName { get; set; }
+        public int unitGroupId { get; set; }
+
+    }
+
+    public class AuditSearchParamModel
+    {
+        public string sysNo { get; set; }
+        public string saler { get; set; }
+        public string fromDate { get; set; }
+        public string toDate { get; set; }
+        public string proModel { get; set; }
+        public int auditResult { get; set; }
+        public int finalResult { get; set; }
+    }
+
+    public class SalerSearchParamModel
+    {
+        public string searchValue { get; set; }
+        public string fromDate { get; set; }
+        public string toDate { get; set; }
+        public int auditResult { get; set; }
+    }
+
 }

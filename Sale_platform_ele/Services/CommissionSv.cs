@@ -90,7 +90,7 @@ namespace Sale_platform_ele.Services
         public decimal GetMU(decimal price, decimal cost, int feeRate, decimal exchangeRate)
         {
             if (price == 0 || exchangeRate == 0) return 0;
-            return 100 * (1 - cost / (price * exchangeRate)) - feeRate;
+            return Math.Round(100 * (1 - cost / (price * exchangeRate)) - feeRate,2);
         }
 
         public decimal GetCommissionRate(decimal MU, string productType)
@@ -111,7 +111,7 @@ namespace Sale_platform_ele.Services
             }
         }
 
-        public decimal GetCommissionMoney(decimal price,decimal qty, int commissionRate)
+        public decimal GetCommissionMoney(decimal price, decimal qty, decimal commissionRate)
         {
             return price * qty * commissionRate;
         }

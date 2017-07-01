@@ -6,21 +6,14 @@ using Sale_platform_ele.Models;
 
 namespace Sale_platform_ele.Services
 {
-    public class BaseSv:IDisposable
+    public class BaseSv
     {
-        public SaleDBDataContext db = new SaleDBDataContext();
+        public SaleDBDataContext db;
 
-        protected virtual void Dispose(bool disposing)
+        public BaseSv()
         {
-            if (disposing) {
-                db.Dispose();
-            }
+            db = new SaleDBDataContext();
         }
 
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
     }
 }

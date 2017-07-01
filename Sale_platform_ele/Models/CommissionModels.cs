@@ -15,4 +15,12 @@ namespace Sale_platform_ele.Models
         public string beginDate { get; set; }
         public string endDate { get; set; }
     }
+
+    public class MUAndCommissionModel
+    {
+        public decimal MU { get; set; }
+        public decimal commissionRate { get; set; }
+        public decimal commission { get; set; }
+    }
+
 }

@@ -126,6 +126,6 @@ namespace Sale_platform_ele.Services
                         }).ToList();
             return list;
         }
-                
+                        
     }
 }

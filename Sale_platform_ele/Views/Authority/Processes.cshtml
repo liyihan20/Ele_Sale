@@ -73,21 +73,22 @@
             rownumbers: true,
             singleSelect: true,
             columns: [[
-                        { field: 'step', title: '审批步骤', width: 120, align: "center" },
+                        { field: 'step', title: '审批步骤', width: 70, align: "center" },
                         { field: 'stepName', title: '步骤名称', width: 120, align: "center" },
-                        { field: 'stepType', title: '步骤类型', width: 120, align: "center",
-                            formatter: function(value,row,index){
-				                for(var i=0;i<stepTypeArray.length;i++){
-				                    if (stepTypeArray[i].value == value) {
-				                        return stepTypeArray[i].name;
-				                    }
+                        {
+                            field: 'stepType', title: '步骤类型', width: 120, align: "center",
+                            formatter: function (value, row, index) {
+                                for (var i = 0; i < stepTypeArray.length; i++) {
+                                    if (stepTypeArray[i].value == value) {
+                                        return stepTypeArray[i].name;
+                                    }
                                 }
-			                }
+                            }
                         },
                          { field: 'userId', title: '审批人ID', hidden: true },
-                         { field: 'auditor', title: '审批人', width: 120, align: "center" },
+                         { field: 'auditor', title: '审批人', width: 100, align: "center" },
                          {
-                             field: 'canModify', title: '修改权限', width: 120, align: "center",
+                             field: 'canModify', title: '修改权限', width: 100, align: "center",
                              formatter: function (value, row, index) {
                                  if (value == "true") {
                                      return "Y";
@@ -97,7 +98,7 @@
                              }
                          },
                          {
-                             field: 'canBeNull', title: '审核人可为空', width: 140, align: "center",
+                             field: 'canBeNull', title: '审核人可为空', width: 100, align: "center",
                              formatter: function (value, row, index) {
                                  if (value == "true") {
                                      return "Y";
@@ -107,7 +108,7 @@
                              }
                          },
                          {
-                             field: 'isCounterSign', title: '是否会签', width: 120, align: "center",
+                             field: 'isCounterSign', title: '是否会签', width: 100, align: "center",
                              formatter: function (value, row, index) {
                                  if (value == "true") {
                                      return "Y";

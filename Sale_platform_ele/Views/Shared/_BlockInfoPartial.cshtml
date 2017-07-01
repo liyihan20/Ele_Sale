@@ -1,0 +1,43 @@
+﻿@{
+    Layout = null;
+    List<Sale_platform_ele.Models.BlockOrder> blocks = (List<Sale_platform_ele.Models.BlockOrder>)ViewData["blockInfo"];
+}
+
+@*挂起信息*@
+@if (blocks != null && blocks.Count() > 0) {
+    <div data-options="region:'north',title:'@Html.Lang("bill_hang_up_info")',split:true" style="background: #fafafa; height: 78px;
+            padding: 3px 10px;">
+        <table style="border: 0;  text-align: center" cellspacing="0">
+            <tr style="font-weight:bold;">
+                <td style="width: 100px;border-bottom:1px solid;">
+                    @Html.Lang("audit_step")
+                </td>
+                <td style="width: 80px;border-bottom:1px solid;">
+                    @Html.Lang("operator")
+                </td>
+                <td style="width: 120px;border-bottom:1px solid;">
+                    @Html.Lang("hang_up_time")
+                </td>
+                <td style="width:500px;border-bottom:1px solid;">
+                    @Html.Lang("hang_up_reason")
+                </td>
+            </tr>
+            @foreach (var blo in blocks) {
+                <tr>
+                    <td>
+                        @blo.step_name
+                    </td>
+                    <td>
+                        @blo.User.real_name
+                    </td>
+                    <td>
+                        @(((DateTime)(blo.block_time)).ToString("yyyy-MM-dd HH:mm"))
+                    </td>
+                    <td>
+                        @blo.reason
+                    </td>
+                </tr>
+            }
+        </table>
+    </div>
+}

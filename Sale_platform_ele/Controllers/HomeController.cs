@@ -14,6 +14,7 @@ namespace Sale_platform_ele.Controllers
         [SessionTimeOutFilter]
         public ActionResult Main(string url)
         {
+            Session.Clear();
             var ua = new UA(currentUser.userId);
             ViewData["url"] = string.IsNullOrEmpty(url) ? "" : SomeUtils.MyUrlDecoder(url);
             ViewData["powers"] = ua.GetUserPowers();

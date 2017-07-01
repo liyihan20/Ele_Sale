@@ -1,0 +1,67 @@
+﻿@{
+    string sysNo = (string)ViewData["sysNo"];
+}
+
+<script type="text/javascript">
+    $(function () {
+        //动态加载uplodify js文件。静态加载的话，因为是内嵌html，在chrome里面会出现警告，且无法正常上传文件。
+        $.getScript("@Url.Content("~/Scripts/uploadify/jquery.uploadify.min.js")", function () {
+            console.log("load uplodify js success.");
+            //上传插件
+            $('#uploadify').uploadify({
+                'formData': { 'num': '@sysNo' },
+                'buttonText': '@Html.Lang("select_file")',
+                'buttonClass': 'browser',
+                'swf': '@Url.Content("~/Scripts/uploadify/uploadify.swf")',
+                'uploader': '@Url.Content("~/File/BeginUploadFile")',
+                'multi': false,
+                'fileTypeExts': '*.rar',
+                'fileSizeLimit': '10MB',
+                'onUploadStart': function (file) {
+                    $.messager.progress();
+                    $('#uploadify').uploadify('settings', 'formData', { 'num': '@sysNo' });
+                },
+                'onUploadSuccess': function (file, data, response) {
+                    $.messager.progress("close");
+                    if (data == "NOFILE") {
+                        alert("上传失败，流水编号为空！");
+                        return;
+                    }
+                    var d = new Date();
+                    var time = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate() + ' ' + d.getHours() + ":" + d.getMinutes();
+                    $("#up_name").html(file.name);
+                    $("#up_size").html(file.size / 1000 + "K");
+                    $("#up_time").html(time);
+
+                }
+            });
+        });
+
+        
+
+        //附件信息
+        $.post("@Url.Content("~/File/GetFileInfo")",{sysNo:"@sysNo"},function(data){
+            if(data.success){
+                $("#up_name").html(data.am.file_name);
+                $("#up_size").html(data.am.file_size);
+                $("#up_time").html(data.am.upload_time);
+            }
+        });
+
+    });
+
+</script>
+
+<div id="uploadDiv" style="width: 450px; float: left;padding-left:20px;">
+    <div id="fileQueue">
+    </div>
+    <input type="file" name="uploadify" id="uploadify" />
+</div>
+<div id="uploadInfo" style="width: 300px; margin-left: 20px; float: left;">
+    @Html.Lang("file_name")：<span id="up_name" style="color: red"></span><br />
+    @Html.Lang("file_size")：<span id="up_size" style="color: red"></span><br />
+    @Html.Lang("upload_time")：<span id="up_time" style="color: red"></span>
+</div>
+<div style="clear:both">
+    <p style="color:red;padding-top:10px;padding-left:10px;">@Html.Lang("upload_file_info")</p>
+</div>
