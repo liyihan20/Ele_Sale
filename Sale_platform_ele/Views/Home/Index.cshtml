@@ -1,0 +1,17 @@
+﻿<script type="text/javascript">
+    var browserType = window.ActiveXObject ? "IE" :
+        document.getBoxObjectFor ? "FireFox" :
+        window.opera ? "Opera" : "";
+    $(function(){
+        if(browserType!=""){
+            $("#browserCheck").show();
+            $("#clientBrowserName").html(browserType);
+        }
+    });
+
+</script>
+<div id="browserCheck" style="margin:10px 12px;display:none;line-height:24px;">
+    系统检测到你当前使用的浏览器内核是<span id="clientBrowserName" style="color:red"></span>,为了系统的兼容性以及响应速度，请安装Google公司的Chrome浏览器。<br />
+    外网用户：<a href="http://dl.pconline.com.cn/download/51614.html" target="_blank">请点击此链接下载</a><br />
+    内网用户：请直接联系管理员安装。<br />
+</div>
