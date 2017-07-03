@@ -4,6 +4,7 @@ using Sale_platform_ele.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using org.in2bits.MyXls;
 
 namespace Sale_platform_ele.Services
 {
@@ -75,15 +76,19 @@ namespace Sale_platform_ele.Services
         }
 
         public override object GetBill(int stepVersion)
-        {            
-            order.step_version = stepVersion;
-
+        {
             if (string.IsNullOrEmpty(order.order_no)) {
                 if (db.Apply.Where(a => a.sys_no == order.sys_no && a.success == true).Count() > 0) {
                     //如果订单号为空，并且已申请结束OK的，去K3把订单号带过来。
+                    var k3Orders = db.getK3OrderNo(order.sys_no).ToList();
+                    if (k3Orders.Count() > 0) {
+                        order.order_no = k3Orders.First().FBillNo;
+                    }
+                    db.SubmitChanges();
                 }
             }
 
+            order.step_version = stepVersion;
             return order;
         }
 
@@ -294,9 +299,203 @@ namespace Sale_platform_ele.Services
         /// <summary>
         /// (有参构造) 完成申请之后需要做的事
         /// </summary>
-        public override void DoWhenFinishAudit()
+        public override void DoWhenFinishAudit(bool isPass)
         {
-            MoveToFormalDir(order.sys_no);
+            if (isPass) {
+                MoveToFormalDir(order.sys_no); //成功结束的申请，将附件移动到正式目录
+            }
+            
+        }
+
+        /// <summary>
+        /// 导出excel数据的模型
+        /// </summary>
+        private class ExcelData
+        {
+            public Order h { get; set; }
+            public OrderDetail e { get; set; }
+            public string auditStatus { get; set; }
+        }
+
+        /// <summary>
+        /// 导出SO的excel通用方法
+        /// </summary>
+        /// <param name="myData">导出的数据</param>
+        private void ExportExcel(List<ExcelData> myData)
+        {
+            //列宽：
+            ushort[] colWidth = new ushort[] {16,16,16,14,18,16,28,28,16,20,
+                                            16,14,18,24,32,14,14,14,14,14,
+                                            14,14,14,14,18,18,60};
+
+            //列名：
+            string[] colName = new string[] { "审核结果","流水号","订单号","下单日期","办事处","订单类型","购货客户","国外客户","产品类别","产品用途",
+                                            "币别","汇率","产品代码","产品名称","规格型号","单位","数量","单价","含税单价","成交价",
+                                            "成本","费用率%","MU%","税率%","发货地点","交货属性","摘要" };
+
+            //設置excel文件名和sheet名
+            XlsDocument xls = new XlsDocument();
+            xls.FileName = string.Format("销售订单_{0}.xls", DateTime.Now.ToString("yyyyMMdd"));
+            Worksheet sheet = xls.Workbook.Worksheets.Add("订单信息列表");
+
+            //设置各种样式
+
+            //标题样式
+            XF boldXF = xls.NewXF();
+            boldXF.HorizontalAlignment = HorizontalAlignments.Centered;
+            boldXF.Font.Height = 12 * 20;
+            boldXF.Font.FontName = "宋体";
+            boldXF.Font.Bold = true;
+
+            //设置列宽
+            ColumnInfo col;
+            for (ushort i = 0; i < colWidth.Length; i++) {
+                col = new ColumnInfo(xls, sheet);
+                col.ColumnIndexStart = i;
+                col.ColumnIndexEnd = i;
+                col.Width = (ushort)(colWidth[i] * 256);
+                sheet.AddColumnInfo(col);
+            }
+
+            Cells cells = sheet.Cells;
+            int rowIndex = 1;
+            int colIndex = 1;
+
+            //设置标题
+            foreach (var name in colName) {
+                cells.Add(rowIndex, colIndex++, name, boldXF);
+            }
+            //{ "审核结果","流水号","订单号","下单日期","办事处","订单类型","购货客户","国外客户","产品类别","产品用途",
+            //                                "币别","汇率","产品代码","产品名称","规格型号","单位","数量","单价","含税单价","成交价",
+            //                                "成本","费用率%","MU%","税率%","发货地点","交货属性","摘要" }
+            foreach (var d in myData) {
+                colIndex = 1;
+
+                cells.Add(++rowIndex, colIndex, d.auditStatus);
+                cells.Add(rowIndex, ++colIndex, d.h.sys_no);
+                cells.Add(rowIndex, ++colIndex, d.h.order_no);
+                cells.Add(rowIndex, ++colIndex, ((DateTime)d.h.order_date).ToString("yyyy-MM-dd"));
+                cells.Add(rowIndex, ++colIndex, d.h.agency_name);
+                cells.Add(rowIndex, ++colIndex, d.h.order_type_name);
+                cells.Add(rowIndex, ++colIndex, d.h.customer_name);
+                cells.Add(rowIndex, ++colIndex, d.h.oversea_customer_name);
+                cells.Add(rowIndex, ++colIndex, d.h.product_type_name);
+                cells.Add(rowIndex, ++colIndex, d.h.product_use);
+
+                cells.Add(rowIndex, ++colIndex, d.h.currency_name);
+                cells.Add(rowIndex, ++colIndex, d.h.exchange_rate);
+                cells.Add(rowIndex, ++colIndex, d.e.item_no);
+                cells.Add(rowIndex, ++colIndex, d.e.item_name);
+                cells.Add(rowIndex, ++colIndex, d.e.item_model);
+                cells.Add(rowIndex, ++colIndex, d.e.unit_name);
+                cells.Add(rowIndex, ++colIndex, d.e.qty);
+                cells.Add(rowIndex, ++colIndex, d.e.unit_price);
+                cells.Add(rowIndex, ++colIndex, d.e.tax_price);
+                cells.Add(rowIndex, ++colIndex, d.e.deal_price);
+
+                cells.Add(rowIndex, ++colIndex, d.e.cost);
+                cells.Add(rowIndex, ++colIndex, d.e.fee_rate);
+                cells.Add(rowIndex, ++colIndex, d.e.MU);
+                cells.Add(rowIndex, ++colIndex, d.e.tax_rate);
+                cells.Add(rowIndex, ++colIndex, d.h.delivery_place_name);
+                cells.Add(rowIndex, ++colIndex, d.h.receive_place_name);
+                cells.Add(rowIndex, ++colIndex, d.h.summary);
+            }
+
+            xls.Send();
+        }
+
+        /// <summary>
+        /// 营业员导出excel
+        /// </summary>
+        /// <param name="pm">查询参数模型</param>
+        /// <param name="userId">用户id</param>
+        public override void ExportSalerExcle(SalerSearchParamModel pm,int userId)
+        {
+            pm.searchValue=pm.searchValue??"";
+            DateTime fd, td;
+            if (!DateTime.TryParse(pm.fromDate, out fd)) {
+                fd = DateTime.Parse("2017-01-01");
+            }
+            if (!DateTime.TryParse(pm.toDate, out td)) {
+                td = DateTime.Parse("2049-09-09");
+            }
+            td = td.AddDays(1);
+
+            var result = (from o in db.Order
+                          from d in o.OrderDetail
+                          join a in db.Apply on o.sys_no equals a.sys_no into X
+                          from Y in X.DefaultIfEmpty()
+                          where o.original_id == userId
+                          && o.order_date >= fd
+                          && o.order_date <= td
+                          && (o.sys_no.Contains(pm.searchValue) || d.item_model.Contains(pm.searchValue))
+                          && (pm.auditResult == 10 || (pm.auditResult == 0 && (Y == null || (Y != null && Y.success == null))) || (pm.auditResult == 1 && Y != null && Y.success == true) || pm.auditResult == -1 && Y != null && Y.success == false)
+                          orderby o.order_date descending
+                          select new ExcelData()
+                          {
+                              h = o,
+                              e = d,
+                              auditStatus = (Y == null ? "未开始申请" : Y.success == true ? "申请成功" : Y.success == false ? "申请失败" : "审批之中")
+                          }).Take(200).ToList();
+
+            ExportExcel(result);
+        }
+
+        /// <summary>
+        /// 审核人导出Excel
+        /// </summary>
+        /// <param name="pm">查询参数模型</param>
+        /// <param name="userId">用户ID</param>
+        public override void ExportAuditorExcle(AuditSearchParamModel pm, int userId)
+        {
+            DateTime fDate, tDate;
+            if (!DateTime.TryParse(pm.fromDate, out fDate)) {
+                fDate = DateTime.Parse("2010-6-1");
+            }
+            if (!DateTime.TryParse(pm.toDate, out tDate)) {
+                tDate = DateTime.Parse("2049-9-9");
+            }
+            tDate = tDate.AddDays(1);
+
+            pm.saler = pm.saler ?? "";
+            pm.proModel = pm.proModel ?? "";
+            pm.sysNo = pm.sysNo ?? "";
+
+            var result = (from a in db.Apply
+                          from ad in a.ApplyDetails
+                          join o in db.Order on a.sys_no equals o.sys_no
+                          from d in o.OrderDetail
+                          where ad.user_id == userId
+                          && a.order_type==BILL_TYPE
+                          && a.sys_no.Contains(pm.sysNo)
+                          && a.user_name.Contains(pm.saler)
+                          && a.p_model.Contains(pm.proModel)
+                          && a.start_date >= fDate
+                          && a.start_date <= tDate
+                          && (pm.finalResult == 10
+                          || (pm.finalResult == 1 && a.success == true)
+                          || (pm.finalResult == 0 && a.success == null)
+                          || (pm.finalResult == -1 && a.success == false))
+                          && (pm.auditResult == 10
+                          || (pm.auditResult == 1 && ad.pass == true)
+                          || (pm.auditResult == 0 && ad.pass == null
+                               && ((ad.countersign == true && a.ApplyDetails.Where(ads => ads.step == ad.step && ads.pass == false).Count() == 0)
+                                   || ((ad.countersign == false || ad.countersign == null) && a.ApplyDetails.Where(ads => ads.step == ad.step && ads.pass == true).Count() == 0)
+                               )
+                             )
+                          || (pm.auditResult == -1 && ad.pass == false)
+                          )
+                          && (ad.step == 1 || a.ApplyDetails.Where(ads => ads.step == ad.step - 1 && ads.pass == true).Count() > 0)
+                          orderby a.start_date descending
+                          select new ExcelData()
+                          {
+                              h=o,
+                              e=d,
+                              auditStatus = a.success == true ? "PASS" : a.success == false ? "NG" : "----"
+                          }).Take(200).ToList();
+
+            ExportExcel(result);
         }
     }
 }

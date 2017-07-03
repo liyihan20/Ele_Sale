@@ -263,7 +263,7 @@ namespace Sale_platform_ele.Services
                 IS_INNER_FRAME,
                 OUT_ADDRESS
                 );
-            return new EmailUtil().SendEmail(emailContent, ap.User.email, null, billType + "审批");
+            return new EmailUtil().SendEmail(emailContent, emailAddrs, null, billType + "审批");
         }
 
         /// <summary>
@@ -711,10 +711,10 @@ namespace Sale_platform_ele.Services
             if (!isPass || isLastStep) {
                 ap.success = isPass;
                 ap.finish_date = DateTime.Now;
-                if (isPass) {
-                    //审批完成之后需要做的事情
-                    bill.DoWhenFinishAudit();
-                }
+          
+                //审批完成之后需要做的事情
+                bill.DoWhenFinishAudit(isPass);
+                
             }
             try {
                 db.SubmitChanges();

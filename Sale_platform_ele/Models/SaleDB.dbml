@@ -355,4 +355,10 @@
       <Column Name="unit_group_id" Type="System.Int32" DbType="Int" CanBeNull="true" />
     </ElementType>
   </Function>
+  <Function Name="dbo.getK3OrderNo" Method="getK3OrderNo">
+    <Parameter Name="sysNo" Type="System.String" DbType="VarChar(20)" />
+    <ElementType Name="getK3OrderNoResult">
+      <Column Name="FBillNo" Type="System.String" DbType="NVarChar(255) NOT NULL" CanBeNull="false" />
+    </ElementType>
+  </Function>
 </Database>

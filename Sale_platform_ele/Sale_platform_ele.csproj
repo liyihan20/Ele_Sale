@@ -40,6 +40,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="org.in2bits.MyXls, Version=0.6.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\org.in2bits.MyXls.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.Entity" />
@@ -51,7 +55,9 @@
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="System.Web.Helpers, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Web.Helpers, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Extensions" />
@@ -174,6 +180,7 @@
     <Compile Include="Utils\SomeUtils.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="bin\org.in2bits.MyXls.dll" />
     <Content Include="Content\MyCSS.css" />
     <Content Include="Content\Site.css" />
     <Content Include="Content\themes\black\accordion.css" />
@@ -399,16 +406,23 @@
     <Content Include="Content\themes\gray\validatebox.css" />
     <Content Include="Content\themes\gray\window.css" />
     <Content Include="Content\themes\icon.css" />
+    <Content Include="Content\themes\icons\auth.png" />
     <Content Include="Content\themes\icons\back.png" />
     <Content Include="Content\themes\icons\blank.gif" />
     <Content Include="Content\themes\icons\cancel.png" />
     <Content Include="Content\themes\icons\clear.png" />
+    <Content Include="Content\themes\icons\comment.png" />
     <Content Include="Content\themes\icons\cut.png" />
+    <Content Include="Content\themes\icons\document.png" />
+    <Content Include="Content\themes\icons\down.png" />
     <Content Include="Content\themes\icons\edit_add.png" />
     <Content Include="Content\themes\icons\edit_remove.png" />
+    <Content Include="Content\themes\icons\email.png" />
+    <Content Include="Content\themes\icons\examiner.png" />
     <Content Include="Content\themes\icons\filesave.png" />
     <Content Include="Content\themes\icons\filter.png" />
     <Content Include="Content\themes\icons\help.png" />
+    <Content Include="Content\themes\icons\home.png" />
     <Content Include="Content\themes\icons\large_chart.png" />
     <Content Include="Content\themes\icons\large_clipart.png" />
     <Content Include="Content\themes\icons\large_picture.png" />
@@ -423,13 +437,17 @@
     <Content Include="Content\themes\icons\no.png" />
     <Content Include="Content\themes\icons\ok.png" />
     <Content Include="Content\themes\icons\pencil.png" />
+    <Content Include="Content\themes\icons\pencil2.png" />
     <Content Include="Content\themes\icons\print.png" />
     <Content Include="Content\themes\icons\redo.png" />
     <Content Include="Content\themes\icons\reload.png" />
     <Content Include="Content\themes\icons\search.png" />
+    <Content Include="Content\themes\icons\star.png" />
     <Content Include="Content\themes\icons\sum.png" />
     <Content Include="Content\themes\icons\tip.png" />
     <Content Include="Content\themes\icons\undo.png" />
+    <Content Include="Content\themes\icons\user.png" />
+    <Content Include="Content\themes\icons\xls.png" />
     <Content Include="Content\themes\material\accordion.css" />
     <Content Include="Content\themes\material\calendar.css" />
     <Content Include="Content\themes\material\combo.css" />
@@ -547,6 +565,7 @@
       <SubType>Designer</SubType>
     </Content>
     <Content Include="Content\themes\material\images\Thumbs.db" />
+    <None Include="Properties\PublishProfiles\ele_90100.pubxml" />
     <None Include="Scripts\jquery-1.8.2.intellisense.js" />
     <Content Include="Scripts\img\uploadify-cancel.png" />
     <Content Include="Scripts\jquery-1.11.3.min.js" />
@@ -612,8 +631,8 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\en-us.resx" />
-    <EmbeddedResource Include="Resources\zh-cn.resx" />
+    <Content Include="Resources\en-us.resx" />
+    <Content Include="Resources\zh-cn.resx" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

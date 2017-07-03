@@ -7,6 +7,7 @@ namespace Sale_platform_ele.Controllers
 {
     public class BaseController : Controller
     {
+        
         private UserInfo _currentUser;
         public UserInfo currentUser
         {
@@ -36,13 +37,13 @@ namespace Sale_platform_ele.Controllers
             return Request.UserHostAddress;
         }
 
-        public void Wlog(string model, string log , string sysNo="", int unusual = 0)
+        public void Wlog(string tag, string log , string sysNo="", int unusual = 0)
         {
             new BaseSv().WriteEventLog(new EventLog()
             {
                 sysNum = sysNo,
                 username = currentUser.realName,
-                model = model,
+                model = tag,
                 ip = GetIPAddr(),
                 @event = log,
                 op_time = DateTime.Now,

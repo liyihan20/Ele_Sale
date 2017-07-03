@@ -353,6 +353,13 @@ namespace Sale_platform_ele.Models
 			IExecuteResult result = this.ExecuteMethodCall(this, ((MethodInfo)(MethodInfo.GetCurrentMethod())), queryString);
 			return ((ISingleResult<getProductsResult>)(result.ReturnValue));
 		}
+		
+		[global::System.Data.Linq.Mapping.FunctionAttribute(Name="dbo.getK3OrderNo")]
+		public ISingleResult<getK3OrderNoResult> getK3OrderNo([global::System.Data.Linq.Mapping.ParameterAttribute(DbType="VarChar(20)")] string sysNo)
+		{
+			IExecuteResult result = this.ExecuteMethodCall(this, ((MethodInfo)(MethodInfo.GetCurrentMethod())), sysNo);
+			return ((ISingleResult<getK3OrderNoResult>)(result.ReturnValue));
+		}
 	}
 	
 	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Sale_authority")]
@@ -6947,6 +6954,32 @@ namespace Sale_platform_ele.Models
 				if ((this._unit_group_id != value))
 				{
 					this._unit_group_id = value;
+				}
+			}
+		}
+	}
+	
+	public partial class getK3OrderNoResult
+	{
+		
+		private string _FBillNo;
+		
+		public getK3OrderNoResult()
+		{
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_FBillNo", DbType="NVarChar(255) NOT NULL", CanBeNull=false)]
+		public string FBillNo
+		{
+			get
+			{
+				return this._FBillNo;
+			}
+			set
+			{
+				if ((this._FBillNo != value))
+				{
+					this._FBillNo = value;
 				}
 			}
 		}

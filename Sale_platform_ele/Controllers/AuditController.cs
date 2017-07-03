@@ -11,9 +11,15 @@ namespace Sale_platform_ele.Controllers
     public class AuditController : BaseController
     {
         private const string TAG = "审核者模块";
+
+        private void Wlog(string log, string sysNo = "", int unusual = 0)
+        {
+            base.Wlog(TAG, log, sysNo, unusual);
+        }
+
         public JsonResult CheckAuditStatus(string sysNo)
         {
-            Wlog(TAG, "查看审核记录", sysNo);
+            Wlog("查看审核记录", sysNo);
 
             if (!new ApplySv().ApplyHasBegan(sysNo)) {
                 return Json(new { suc = false });
@@ -24,7 +30,7 @@ namespace Sale_platform_ele.Controllers
 
         public ActionResult CheckAuditList()
         {
-            Wlog(TAG, "打开审核列表视图");
+            Wlog("打开审核列表视图");
 
             AuditSearchParamModel pm;
             var queryData = Request.Cookies["ele_au_qd"];
@@ -52,7 +58,7 @@ namespace Sale_platform_ele.Controllers
                 pm.auditResult = 0;
                 pm.finalResult = 0;
             }
-            Wlog(TAG, "自动获取默认数据：" + JsonConvert.SerializeObject(pm));
+            Wlog("自动获取默认数据：" + JsonConvert.SerializeObject(pm));
 
             return Json(new ApplySv().GetAuditList(currentUser.userId, pm));
         }
@@ -70,7 +76,7 @@ namespace Sale_platform_ele.Controllers
             queryData.Value = SomeUtils.EncodeToUTF8(JsonConvert.SerializeObject(pm));
             Response.AppendCookie(queryData);
 
-            Wlog(TAG, "审核列表查询：" + JsonConvert.SerializeObject(pm));
+            Wlog("审核列表查询：" + JsonConvert.SerializeObject(pm));
 
             return Json(new ApplySv().GetAuditList(currentUser.userId, pm), "text/html");
         }
@@ -92,7 +98,7 @@ namespace Sale_platform_ele.Controllers
             ViewData["step"] = step;
             ViewData["applyId"] = applyId;
 
-            Wlog(TAG, "进入审核页面，applyID:" + applyId + ";step:" + step + ";info:" + info);
+            Wlog("进入审核页面，applyID:" + applyId + ";step:" + step + ";info:" + info);
 
             return View();
         }
@@ -104,12 +110,12 @@ namespace Sale_platform_ele.Controllers
             string comment = fc.Get("auditor_comment");
 
             string result = new ApplySv(applyId).BlockOrder(step, currentUser.userId, currentUser.realName, comment);
-            if (!string.IsNullOrEmpty(result)) {
-                
+
+            Wlog(string.Format("挂起操作，applyID:{0},step:{1},comment:{2},result:{3}", applyId, step, comment, result), "", string.IsNullOrEmpty(result) ? 0 : -100);
+
+            if (!string.IsNullOrEmpty(result)) {                
                 return Json(new ResultModel() { suc = false, msg = result }, "text/html");
             }
-            Wlog(TAG, string.Format("挂起操作，applyID:{0},step:{1},comment:{2},result:{3}", applyId, step, comment, result), "", string.IsNullOrEmpty(result) ? 0 : -100);
-
             return Json(new ResultModel() { suc = true, msg = "挂起成功" }, "text/html");
 
         }
@@ -127,10 +133,11 @@ namespace Sale_platform_ele.Controllers
             bool isPass = bool.Parse(fc.Get("okFlag"));
 
             string result = new ApplySv(applyId).HandleAudit(step, currentUser.userId, isPass, comment, GetIPAddr());
+            Wlog(string.Format("审批单据，applyID:{0},step:{1},comment:{2},isPass:{3},result:{4}", applyId, step, comment, isPass, result), "", string.IsNullOrEmpty(result) ? 0 : -100);
+
             if (!string.IsNullOrEmpty(result)) {
                 return Json(new ResultModel() { suc = false, msg = result }, "text/html");
             }
-            Wlog(TAG, string.Format("审批单据，applyID:{0},step:{1},comment:{2},isPass:{3},result:{4}", applyId, step, comment, isPass, result), "", string.IsNullOrEmpty(result) ? 0 : -100);
 
             return Json(new ResultModel() { suc = true, msg = "审批成功" });
 

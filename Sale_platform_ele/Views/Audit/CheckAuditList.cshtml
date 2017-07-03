@@ -80,37 +80,15 @@
         }
     }        
 
-    function ExportAuditorExcel(typ, method) {
-        $.messager.show({
-            title: '@Html.Lang("tip")',
-            msg: "正在导出符合查询条件且已审核的数据，请稍等..."
+    function ExportAuditorExcel(typ) {
+        showTip("正在导出符合查询条件且已审核的数据，请稍等...");
+
+        $("#fm").form("submit", {
+            url: "@Url.Content("~/File/ExportAuditorExcel?billType=")" + typ,
+            success: function () {
+
+            }
         });
-        var rows = $("#AuditList").datagrid("getRows");
-        if (rows.length == 0) {
-            $.messager.show({
-                title: '@Html.Lang("tip")',
-                msg: "列表中无数据，请先搜索之后再导出Excel报表"
-            });
-        } else {
-            var ids = "";
-            for (var i = 0; i < rows.length; i++) {
-                if (rows[i].orderType.indexOf(typ) >= 0) {
-                    if (ids == "") {
-                        ids += rows[i].applyId;
-                    } else {
-                        ids += "," + rows[i].applyId;
-                    }
-                }
-            }
-            if (ids == "") {
-                $.messager.show({
-                    title: '@Html.Lang("tip")',
-                    msg: "列表中没有任何" + typ + "的单据，不能导出。"
-                });
-            } else {
-                window.location.href = '@Url.Content("~/Excels/")' + method + '?ids=' + ids;
-            }
-        }
     }
 </script>
 <div class="easyui-layout" data-options="fit:true" style="visibility:hidden" id="contDiv">
@@ -226,7 +204,7 @@
         <a href="#" class="easyui-menubutton" data-options="menu:'#xls_mm',iconCls:'icon-xls',plain:true"> 导出Excel </a>
     </div>
     <div id="xls_mm" style="width:150px;">
-        <div onclick="ExportSOExcel()" data-options="iconCls:'icon-xls'">@Html.Lang("export_so_excel")</div>
+        <div onclick="ExportAuditorExcel('SO')" data-options="iconCls:'icon-xls'">@Html.Lang("export_so_excel")</div>
     </div>
 </div>
 

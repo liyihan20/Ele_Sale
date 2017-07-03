@@ -112,10 +112,32 @@ namespace Sale_platform_ele.Services
         /// <returns></returns>
         public abstract string GetSpecificBillTypeName();
 
-
+        /// <summary>
+        /// 开始审核之前需要做的事情
+        /// </summary>
+        /// <param name="step">步骤</param>
+        /// <param name="stepName">步骤名</param>
+        /// <param name="isPass">是否通过</param>
+        /// <param name="userId">审核人ID</param>
         public abstract void DoWhenBeforeAudit(int step,string stepName,bool isPass, int userId);
         
-        public abstract void DoWhenFinishAudit();
+        /// <summary>
+        /// 申请结束需要做的事情
+        /// </summary>
+        /// <param name="isPass">是否通过</param>
+        public abstract void DoWhenFinishAudit(bool isPass);
+
+        /// <summary>
+        /// 营业员导出Excel
+        /// </summary>
+        /// <param name="pm">搜索参数模型</param>
+        public abstract void ExportSalerExcle(SalerSearchParamModel pm, int userId);
+
+        /// <summary>
+        /// 审核人导出Excel
+        /// </summary>
+        /// <param name="pm">搜索参数模型</param>
+        public abstract void ExportAuditorExcle(AuditSearchParamModel pm, int userId);
 
         // --------------------------  虚方法  -------------------------- //
 
