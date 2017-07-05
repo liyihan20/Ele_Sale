@@ -190,12 +190,13 @@
         $("#det_fm").form("clear");
         $("#det_dlg").dialog("setTitle","新建步骤").dialog("open");
     }
-    function editDet(){
+    function editDet() {
         var row = $('#tbDet').datagrid('getSelected');
-        if(!row){return;}
-        row_index=$('#tbDet').datagrid("getRowIndex",row);
-        $("#det_fm").form("load",row);
-        $("#det_dlg").dialog("setTitle","编辑步骤").dialog("open");
+        if (!row) { return; }
+        row_index = $('#tbDet').datagrid("getRowIndex", row);
+        $("#det_fm").form("load", row);
+        $("#auditor").combobox("setValue", row.userId);
+        $("#det_dlg").dialog("setTitle", "编辑步骤").dialog("open");
     }
     function saveDet(){
         if(!$('#fm').form('validate')){
