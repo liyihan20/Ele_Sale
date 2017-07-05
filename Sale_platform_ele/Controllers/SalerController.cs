@@ -148,12 +148,13 @@ namespace Sale_platform_ele.Controllers
         [SessionTimeOutFilter]
         public JsonResult BeginApply(string sysNo)
         {
-            SetBillBySysNo(sysNo);
+            SetBillByType(new BillUtils().GetBillEnType(sysNo));
             if (!bill.HasOrderSaved(sysNo)) {
                 Wlog("没有保存单据就提交", sysNo, -10);
                 return Json(new ResultModel() { suc = false, msg = "请先保存单据再提交" });
             }
-            
+
+            SetBillBySysNo(sysNo);
             try {
                 new ApplySv().BeginApply(
                         bill.BillType,

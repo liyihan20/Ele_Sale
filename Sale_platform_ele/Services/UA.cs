@@ -33,6 +33,14 @@ namespace Sale_platform_ele.Services
             return powers;
         }
 
-               
+        public bool HasGotPower(string powerName)
+        {
+            return GetUserPowers().Contains(powerName);
+        }
+
+        public bool CanCheckAllBill()
+        {
+            return HasGotPower("check_all");
+        }
     }
 }

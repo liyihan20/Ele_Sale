@@ -16,11 +16,18 @@ namespace Sale_platform_ele.Services
         const string CHECK_VIEW_NAME = "CheckOrder";
         private Order order;
 
+        /// <summary>
+        /// 无参构造
+        /// </summary>
         public SOSv()
         {
 
         }
 
+        /// <summary>
+        /// 有参构造
+        /// </summary>
+        /// <param name="sysNo">流水号</param>
         public SOSv(string sysNo)
         {
             try {
@@ -31,6 +38,9 @@ namespace Sale_platform_ele.Services
             }
         }
 
+        /// <summary>
+        /// 单据类型EN
+        /// </summary>
         public override string BillType
         {
             get
@@ -39,11 +49,25 @@ namespace Sale_platform_ele.Services
             }
         }
 
+        /// <summary>
+        /// 单据类型中文
+        /// </summary>
+        public override string BillTypeName
+        {
+            get { return BILL_TYPE_NAME; }
+        }        
+
+        /// <summary>
+        /// 新建单据视图
+        /// </summary>
         public override string CreateViewName
         {
             get { return CREATE_VIEW_NAME; }
         }
 
+        /// <summary>
+        /// 查看单据视图
+        /// </summary>
         public override string CheckViewName
         {
             get
@@ -52,15 +76,16 @@ namespace Sale_platform_ele.Services
             }
         }
 
-        public override string BillTypeName
-        {
-            get { return BILL_TYPE_NAME; }
-        }        
-
+        
+        /// <summary>
+        /// (无参构造)获取新建单据的对象实例
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns></returns>
         public override object GetNewBill(int userId)
         {
             UA ua = new UA(userId);
-            Order order = new Order();
+            order = new Order();
             order.sys_no = GetNextSysNo(BILL_TYPE);
             order.order_date = DateTime.Now;
             order.step_version = 0;
@@ -75,6 +100,11 @@ namespace Sale_platform_ele.Services
             return order;
         }
 
+        /// <summary>
+        /// (有参构造)获得已有单据的对象实例
+        /// </summary>
+        /// <param name="stepVersion"></param>
+        /// <returns></returns>
         public override object GetBill(int stepVersion)
         {
             if (string.IsNullOrEmpty(order.order_no)) {
@@ -92,15 +122,25 @@ namespace Sale_platform_ele.Services
             return order;
         }
 
-
+        /// <summary>
+        /// (无参构造)单据是否已保存
+        /// </summary>
+        /// <param name="sysNo"></param>
+        /// <returns></returns>
         public override bool HasOrderSaved(string sysNo)
         {
             return db.Order.Where(o => o.sys_no == sysNo).Count() > 0;
         }
 
+        /// <summary>
+        /// (无参构造)保存单据
+        /// </summary>
+        /// <param name="fc">表单form</param>
+        /// <param name="userId">用户id</param>
+        /// <returns></returns>
         public override string SaveBill(System.Web.Mvc.FormCollection fc, int userId)
         {
-            Order order = new Order();
+            order = new Order();
             SomeUtils.SetFieldValueToModel(fc, order);
             order.OrderDetail.AddRange(JsonConvert.DeserializeObject<List<OrderDetail>>(fc.Get("Sale_order_details")));
 
@@ -136,7 +176,7 @@ namespace Sale_platform_ele.Services
                 foreach (var d in order.OrderDetail) {
                     d.MU = csv.GetMU((decimal)d.unit_price, (decimal)d.cost, (int)d.fee_rate, (decimal)order.exchange_rate);
                     d.commission_rate = csv.GetCommissionRate((decimal)d.MU, order.product_type_no);
-                    d.commission = csv.GetCommissionMoney((decimal)d.unit_price, (decimal)d.qty, (decimal)d.commission_rate);
+                    d.commission = csv.GetCommissionMoney((decimal)d.tax_price , (decimal)d.qty, (decimal)d.commission_rate);
                 }
 
                 db.Order.InsertOnSubmit(order);
@@ -150,6 +190,11 @@ namespace Sale_platform_ele.Services
             return "";
         }
 
+        /// <summary>
+        /// 保存时验证订单合法性
+        /// </summary>
+        /// <param name="order"></param>
+        /// <returns></returns>
         private string ValidateSO(Order order)
         {
             if (order.OrderDetail.Count() == 0) {
@@ -164,12 +209,11 @@ namespace Sale_platform_ele.Services
                 if (string.IsNullOrEmpty(order.oversea_customer_no)) {
                     return "订单类型为生产单的国外订单，国外客户不能为空";
                 }
+                if (!order.oversea_customer_no.StartsWith("04.2")) {
+                    return "订单类型为生产单的国外订单，国外客户必须是04.2开头";
+                }
             }
-            //if (order.step_version > 0 && !isForeignOrder) {
-            //    if (string.IsNullOrEmpty(order.contract_no)) {
-            //        return "国内单的合同编号不能为空";
-            //    }
-            //}
+            
 
             if (Math.Abs((order.percent1 ?? 0m) + (order.percent2 ?? 0m) - 100m) > 0.000001m) {
                 return "比例1和比例2之和必须等于100！";
@@ -190,9 +234,15 @@ namespace Sale_platform_ele.Services
             return "";
         }
 
-
+        /// <summary>
+        /// 获得单据列表
+        /// </summary>
+        /// <param name="pm">查询条件模型</param>
+        /// <param name="userId">用户id</param>
+        /// <returns></returns>
         public override List<object> GetBillList(SalerSearchParamModel pm, int userId)
-        {       
+        {
+            bool canCheckAll = new UA(userId).CanCheckAllBill();
             pm.searchValue = pm.searchValue ?? "";
 
             DateTime fd, td;
@@ -208,7 +258,7 @@ namespace Sale_platform_ele.Services
                           from d in o.OrderDetail
                           join a in db.Apply on o.sys_no equals a.sys_no into X
                           from Y in X.DefaultIfEmpty()
-                          where o.original_id == userId
+                          where (canCheckAll || o.original_id == userId)
                           && o.order_date >= fd
                           && o.order_date <= td
                           && (o.sys_no.Contains(pm.searchValue) || d.item_model.Contains(pm.searchValue))
@@ -233,11 +283,20 @@ namespace Sale_platform_ele.Services
             return list;
         }
 
+        /// <summary>
+        /// (有参构造)获取流程代码
+        /// </summary>
+        /// <returns></returns>
         public override string GetProcessNo()
         {
             return BILL_TYPE;
         }
 
+
+        /// <summary>
+        /// (有参构造)从旧的订单实例新建一张新的
+        /// </summary>
+        /// <returns></returns>
         public override object GetNewBillFromOld()
         {
             order.sys_no = GetNextSysNo(BILL_TYPE);
@@ -249,7 +308,10 @@ namespace Sale_platform_ele.Services
         }
 
 
-
+        /// <summary>
+        /// (有参构造)获取单据详细类型名（单据类别）
+        /// </summary>
+        /// <returns></returns>
         public override string GetSpecificBillTypeName()
         {
             if (!string.IsNullOrEmpty(order.order_type_name)) {
@@ -260,6 +322,10 @@ namespace Sale_platform_ele.Services
             }
         }
 
+        /// <summary>
+        /// (有参构造)取得流程所需要的审核人对应部门字典
+        /// </summary>
+        /// <returns></returns>
         public override Dictionary<string, int?> GetProcessDic()
         {
             Dictionary<string, int?> dic = new Dictionary<string, int?>();
@@ -268,6 +334,10 @@ namespace Sale_platform_ele.Services
             return dic;
         }
 
+        /// <summary>
+        /// (有参构造)取得产品型号
+        /// </summary>
+        /// <returns></returns>
         public override string GetProductModel()
         {
             var detailsCount = order.OrderDetail.Count();
@@ -281,7 +351,7 @@ namespace Sale_platform_ele.Services
 
 
         /// <summary>
-        /// 审批之前需要做的事
+        /// (有参构造)审批之前需要做的事
         /// </summary>
         /// <param name="step">步骤</param>
         /// <param name="stepName">步骤名称</param>
@@ -365,9 +435,6 @@ namespace Sale_platform_ele.Services
             foreach (var name in colName) {
                 cells.Add(rowIndex, colIndex++, name, boldXF);
             }
-            //{ "审核结果","流水号","订单号","下单日期","办事处","订单类型","购货客户","国外客户","产品类别","产品用途",
-            //                                "币别","汇率","产品代码","产品名称","规格型号","单位","数量","单价","含税单价","成交价",
-            //                                "成本","费用率%","MU%","税率%","发货地点","交货属性","摘要" }
             foreach (var d in myData) {
                 colIndex = 1;
 

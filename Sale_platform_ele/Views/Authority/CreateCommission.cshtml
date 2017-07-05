@@ -35,6 +35,14 @@
                     var index = $('#dg_detail').datagrid('getRowIndex', row);
                     $('#dg_detail').datagrid('deleteRow', index);
                 }
+            }, '-', {
+                text: "保存表格",
+                iconCls: 'icon-save',
+                handler: function () {
+                    if (endEditing()) {
+                        $('#dg_detail').datagrid('acceptChanges');
+                    }
+                }
             }],
             onClickRow: onClickRow
         });
@@ -60,7 +68,7 @@
             $.messager.progress("close");
         });
 
-        $("#div_cr").click(function () { endEditing(); });
+        //$("#div_cr").click(function () { endEditing(); });
         if ("@cr.product_type" != "") {
             $("#product_type").combobox("setValues", "@cr.product_type".split(","));
             $("#product_type").combobox("setText", "@cr.product_type");
@@ -80,11 +88,11 @@
         }
     }
     function onClickRow(index) {
-        if (editIndex != index) {
-            if (endEditing()) {
-                $('#dg_detail').datagrid('selectRow', index)
-                    .datagrid('beginEdit', index);
+        if (editIndex != index) {            
+            if (endEditing()) {                
                 editIndex = index;
+                $('#dg_detail').datagrid('selectRow', index);
+                $('#dg_detail').datagrid('beginEdit', index);                
             } else {
                 $('#dg_detail').datagrid('selectRow', editIndex);
             }
@@ -120,7 +128,7 @@
                 <tr>
                     <td>备注:</td>
                     <td colspan="5">
-                        <textarea cols="90" rows="3" spellcheck="false" name="comment" id="comment" style="margin: 0;">@cr.comment</textarea>
+                        <input class="easyui-textbox" name="comment"  multiline="true" style="width:660px;height:60px;" value="@cr.comment" />
                     </td>
                 </tr>
             </table>

@@ -36,8 +36,8 @@
             onClickRow: function (rowIndex, rowData) {
                 $("#item_no").combogrid('setValue', rowData.number);
                 $("#item_no").combogrid('setText', rowData.number);
-                $("#item_name").textbox("setText",rowData.name);
-                $("#item_model").textbox("setText", rowData.model);
+                $("#item_name").textbox("setValue",rowData.name);
+                $("#item_model").textbox("setValue", rowData.model);
 
                 $.post("@Url.Content("~/Items/GetUnitGroup")", { groupId: rowData.unitGroupId }, function (data) {
                     $("#unit_no").combobox("loadData", data);
@@ -176,7 +176,7 @@
                 if (newValue != oldValue && newValue != "") {
                     setTaxRat(newValue);
                     $.post("@Url.Content("~/Items/GetExchangeRate")", { currencyNo: newValue }, function (data) {
-                        $("#exchange_rate").textbox("setText", data);
+                        $("#exchange_rate").textbox("setValue", data);
                     });
                 }
             }
@@ -215,7 +215,7 @@
                     param.sale_way_name = $("#sale_way_no").combobox("getText");
                     param.delivery_place_name = $("#delivery_place_no").combobox("getText");
                     param.receive_place_name = $("#receive_place_no").combobox("getText");
-                    param.agency_name = $("#agency_no").combobox("getText");
+                    //param.agency_name = $("#agency_no").combobox("getText");
                     param.currency_name = $("#currency_no").combobox("getText");
                     param.clerk1_name = $("#clerk1_no").combobox("getText");
                     param.clerk2_name = $("#clerk2_no").combobox("getText");
@@ -252,11 +252,12 @@
     function setTaxRat(currencyNo) {
         if ("RMB" == currencyNo) {
             taxRate = 17;
-        } else if ("" == currency_no || null == currency_no) {
+        } else if ("" == currencyNo || null == currencyNo) {
             taxRate = undefined;
         } else {
             taxRate = 0;
         }
+        
     }
 
     function saveDetail() {
@@ -264,20 +265,25 @@
             var mu, commissionRate, commission;
             $.post("@Url.Content("~/Items/GetMUAndCommisson")", {
                 price: $("#unit_price").numberbox("getValue"),
+                taxPrice: $("#tax_price").numberbox("getValue"),
                 cost: $("#cost").numberbox("getValue"),
                 feeRate: $("#fee_rate").numberbox("getValue"),
-                exchangeRate: $("#exchange_rate").textbox("getText"),
+                exchangeRate: $("#exchange_rate").textbox("getValue"),
                 productType: $("#product_type_no").combobox("getText"),
                 qty: $("#qty").numberbox("getValue")
             }, function (data) {
-                mu = data.MU;
-                commissionRate = data.commissionRate;
-                commission = data.commission;
+                if (!data.suc) {
+                    showTip(data.msg);
+                    return;
+                }
+                mu = data.extra.MU;
+                commissionRate = data.extra.commissionRate;
+                commission = data.extra.commission;
 
                 var currentRow = {
                     item_no: $("#item_no").combogrid("getValue"),
-                    item_name: $("#item_name").textbox("getText"),
-                    item_model: $("#item_model").textbox("getText"),
+                    item_name: $("#item_name").textbox("getValue"),
+                    item_model: $("#item_model").textbox("getValue"),
                     unit_no: $("#unit_no").combobox("getValue"),
                     unit_name: $("#unit_no").combobox("getText"),
                     qty: $("#qty").numberbox("getValue"),
@@ -291,7 +297,7 @@
                     MU: mu,
                     tax_rate: taxRate,
                     fetch_date: $("#fetch_date").datebox("getValue"),
-                    comment: $("#comment").textbox("getText")
+                    comment: $("#comment").textbox("getValue")
                 }
                 $("#dlg_details").dialog("close");
                 if (editRowIndex > -1) {
@@ -311,11 +317,10 @@
     $(function () {        
 
         //提交申请按钮
-        $("#submitApply").click(function () {
-            //首先检测订单是否已保存
+        $("#submitApply").click(function () {            
             $("#submitApply").linkbutton('disable');
             $('#saveAllBut').linkbutton('disable');
-            $.post("@Url.Content("~/Saler/BeginApply")", { sysNo: $("#sys_no").textbox("getText") },
+            $.post("@Url.Content("~/Saler/BeginApply")", { sysNo: $("#sys_no").textbox("getValue") },
                 function (data) {
                     if (data.suc) {
                         showTip(data.msg);
@@ -430,18 +435,20 @@
                             <td>
                                 <input class="easyui-textbox" name="trade_rull" id="trade_rull" style="width:120px" value="@order.trade_rull" />
                             </td>
-                            <td>
+                            @*<td>
                                 @Html.Lang("agency"):
                             </td>
                             <td>
                                 <input class="easyui-combobox" id="agency_no" name="agency_no" style="width: 120px" panelwidth="120" valuefield="value" textfield="name" url="@Url.Content("~/Items/getItems?what=agency")" required="true" value="@order.agency_no" />
-                            </td>
+                            </td>*@
                             <td>
                                 @Html.Lang("biller"):
                             </td>
                             <td>
                                 <input class="easyui-textbox" readonly="readonly" style="width:120px" value="@order.User.real_name" />
                             </td>
+                            <td></td>
+                            <td></td>
                             <td></td>
                             <td></td>
                         </tr>
@@ -485,7 +492,7 @@
                                 @Html.Lang("percent1"):
                             </td>
                             <td>
-                                <input class="easyui-numberbox" id="percent1" name="percent1" precision="1" style="width: 120px" required="true" value="@order.percent1" />
+                                <input class="easyui-numberbox" id="percent1" name="percent1" style="width: 120px" required="true" value="@order.percent1" />
                             </td>
                             <td>
                                 @Html.Lang("group1"):
@@ -505,7 +512,7 @@
                                 @Html.Lang("percent2"):
                             </td>
                             <td>
-                                <input class="easyui-numberbox" id="percent2" name="percent2" precision="1" style="width: 120px" value="@order.percent2" />
+                                <input class="easyui-numberbox" id="percent2" name="percent2" style="width: 120px" value="@order.percent2" />
                             </td>
                             <td>
                                 @Html.Lang("group2"):
@@ -549,7 +556,7 @@
                         <tr>
                             <td>@Html.Lang("summary"):</td>
                             <td colspan="5">
-                                <textarea cols="80" rows="4" spellcheck="false" name="summary" id="summary" style="margin: 0;">@order.summary</textarea>
+                                <input class="easyui-textbox" name="summary" id="summary" multiline="true" style="width:660px;height:60px;" value="@order.summary" />
                             </td>
                         </tr>
                     </table>

@@ -102,16 +102,26 @@ namespace Sale_platform_ele.Services
                           orderby crd.MU descending
                           select crd).ToList();
             if (result.Count() == 0) {
+                if ("FPC,PCB,软硬结合板,HDI".Contains(productType)) {
+                    return -1;  //这几类必须要有佣金率
+                }
                 return 0;
             }
             else {
-                return (decimal)result.First().rate_value/100;
+                return (decimal)result.First().rate_value / 100;
             }
         }
 
-        public decimal GetCommissionMoney(decimal price, decimal qty, decimal commissionRate)
+        /// <summary>
+        /// 含税单价*数量*佣金率
+        /// </summary>
+        /// <param name="price"></param>
+        /// <param name="qty"></param>
+        /// <param name="commissionRate"></param>
+        /// <returns></returns>
+        public decimal GetCommissionMoney(decimal taxPrice, decimal qty, decimal commissionRate)
         {
-            return price * qty * commissionRate;
+            return Math.Round(taxPrice * qty * commissionRate,4);
         }
 
         

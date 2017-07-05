@@ -45,7 +45,9 @@
             @if (!string.IsNullOrEmpty(order.order_no)) { 
             <tr>
                 <td>@Html.Lang("order_no")</td>
-                <td>@order.order_no</td>
+                <td>
+                    <input class="easyui-textbox" style="width:120px" value="@order.order_no" />
+                </td>
                 <td></td><td></td><td></td><td></td>
             </tr>
             }
@@ -134,18 +136,20 @@
                 <td>
                     <input class="easyui-textbox" style="width:120px" value="@order.trade_rull" />
                 </td>
-                <td>
+                @*<td>
                     @Html.Lang("agency"):
                 </td>
                 <td>
                     <input class="easyui-textbox" style="width: 120px" value="@order.agency_name" />
-                </td>
+                </td>*@
                 <td>
                     @Html.Lang("biller"):
                 </td>
                 <td>
                     <input class="easyui-textbox" style="width:120px" value="@order.User.real_name" />
                 </td>
+                <td></td>
+                <td></td>
                 <td></td>
                 <td></td>
             </tr>
