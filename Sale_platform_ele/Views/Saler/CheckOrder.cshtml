@@ -45,10 +45,9 @@
             @if (!string.IsNullOrEmpty(order.order_no)) { 
             <tr>
                 <td>@Html.Lang("order_no")</td>
-                <td>
-                    <input class="easyui-textbox" style="width:120px" value="@order.order_no" />
+                <td colspan="7">
+                    <input class="easyui-textbox" style="width:322px" value="@order.order_no" />
                 </td>
-                <td></td><td></td><td></td><td></td>
             </tr>
             }
             <tr>
@@ -193,7 +192,7 @@
                     @Html.Lang("percent1"):
                 </td>
                 <td>
-                    <input class="easyui-textbox" style="width: 120px"  value="@order.percent1" />
+                    <input class="easyui-textbox" style="width: 120px"  value="@((int)order.percent1)" />
                 </td>
                 <td>
                     @Html.Lang("group1"):
@@ -213,7 +212,7 @@
                     @Html.Lang("percent2"):
                 </td>
                 <td>
-                    <input class="easyui-textbox" style="width: 120px" value="@order.percent2" />
+                    <input class="easyui-textbox" style="width: 120px" value="@(order.percent2==null?0:(int)order.percent2)" />
                 </td>
                 <td>
                     @Html.Lang("group2"):

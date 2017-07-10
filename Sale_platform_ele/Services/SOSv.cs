@@ -201,6 +201,19 @@ namespace Sale_platform_ele.Services
                 return "订单明细至少应录入一行，保存失败！";
             }
 
+            if (string.IsNullOrEmpty(order.customer_no)) {
+                return "购货单位不能为空，请输入编码或名称后按回车后在列表中选择";
+            }
+            if (string.IsNullOrEmpty(order.oversea_customer_no) && !string.IsNullOrEmpty(order.oversea_customer_name)) {
+                return "海外客户请输入编码或名称后按回车后在列表中选择";
+            }
+            if (string.IsNullOrEmpty(order.clerk1_no)) {
+                return "业务员1不能为空，请输入厂牌或姓名后按回车后在列表中选择";
+            }
+            if (string.IsNullOrEmpty(order.clerk2_no) && !string.IsNullOrEmpty(order.clerk2_name)) {
+                return "业务员2请输入厂牌或姓名后按回车后在列表中选择";
+            }
+
             bool isForeignOrder = !order.currency_no.Equals("RMB");
             if (order.order_type_name.Equals("生产单") && isForeignOrder) {
                 if (!order.customer_no.Equals("00.01")) {
@@ -359,9 +372,9 @@ namespace Sale_platform_ele.Services
         /// <param name="userId">用户ID</param>
         public override void DoWhenBeforeAudit(int step, string stepName, bool isPass, int userId)
         {
-            if (isPass && stepName.Contains("下单组")) {
+            if (isPass && stepName.Contains("总经理")) {
                 if (string.IsNullOrEmpty(order.contract_no) && order.currency_no.Equals("RMB")) {
-                    throw new Exception("国内单的合同编号必须由下单组填写");
+                    throw new Exception("国内单的合同编号必须填写");
                 }
             }
         }        

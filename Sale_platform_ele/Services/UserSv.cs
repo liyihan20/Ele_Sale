@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Sale_platform_ele.Utils;
 
 namespace Sale_platform_ele.Services
 {
@@ -45,7 +46,8 @@ namespace Sale_platform_ele.Services
                         department_no = db.Department.Single(d => d.name == uInfo.depName && d.dep_type == "部门").dep_no,
                         is_forbit = false,
                         in_date = DateTime.Now,
-                        error_times = 0
+                        error_times = 0,
+                        password=SomeUtils.getMD5("000000")
                     };
                 db.User.InsertOnSubmit(user);
                 db.SubmitChanges();
