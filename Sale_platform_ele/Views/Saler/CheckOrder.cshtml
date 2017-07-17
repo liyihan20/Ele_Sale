@@ -23,6 +23,7 @@
                 { field: 'tax_price', title: '@Html.Lang("tax_price")', width: 80, align: 'right' },
                 { field: 'deal_price', title: '@Html.Lang("deal_price")', width: 80, align: 'right' },
                 { field: 'cost', title: '@Html.Lang("cost")', width: 80, align: 'right' },
+                { field: 'total', title: '@Html.Lang("all_sum")', width: 100, align: 'right' },
                 { field: 'fee_rate', title: '@Html.Lang("fee_rate")%', width: 80, align: 'right' },
                 { field: 'commission_rate', title: '@Html.Lang("commission_rate")', width: 80, align: 'right' },
                 { field: 'commission', title: '@Html.Lang("commission")', width: 80, align: 'right' },
@@ -168,6 +169,7 @@
                         <td>@det.tax_price</td>
                         <td>@det.deal_price</td>
                         <td>@det.cost</td>
+                        <td>@(det.qty * det.tax_price)</td>
                         <td>@det.fee_rate</td>
                         <td>@det.commission_rate</td>
                         <td>@det.commission</td>

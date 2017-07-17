@@ -36,7 +36,7 @@
             onClickRow: function (rowIndex, rowData) {
                 $("#item_no").combogrid('setValue', rowData.number);
                 $("#item_no").combogrid('setText', rowData.number);
-                $("#item_name").textbox("setValue",rowData.name);
+                $("#item_name").textbox("setValue", rowData.name);
                 $("#item_model").textbox("setValue", rowData.model);
 
                 $.post("@Url.Content("~/Items/GetUnitGroup")", { groupId: rowData.unitGroupId }, function (data) {
@@ -88,6 +88,7 @@
                 { field: 'tax_price', title: '@Html.Lang("tax_price")', width: 80, align: 'right' },
                 { field: 'deal_price', title: '@Html.Lang("deal_price")', width: 80, align: 'right' },
                 { field: 'cost', title: '@Html.Lang("cost")', width: 80, align: 'right' },
+                { field: 'total', title: '@Html.Lang("all_sum")', width: 100, align: 'right' },
                 { field: 'fee_rate', title: '@Html.Lang("fee_rate")%', width: 80, align: 'right' },
                 { field: 'commission_rate', title: '@Html.Lang("commission_rate")', width: 80, align: 'right' },
                 { field: 'commission', title: '@Html.Lang("commission")', width: 80, align: 'right' },
@@ -257,7 +258,7 @@
         } else {
             taxRate = 0;
         }
-        
+
     }
 
     function saveDetail() {
@@ -291,6 +292,7 @@
                     tax_price: $("#tax_price").numberbox("getValue"),
                     deal_price: $("#deal_price").numberbox("getValue"),
                     cost: $("#cost").numberbox("getValue"),
+                    total:$("#qty").numberbox("getValue") * $("#tax_price").numberbox("getValue"),
                     fee_rate: $("#fee_rate").numberbox("getValue"),
                     commission_rate: commissionRate,
                     commission: commission,
