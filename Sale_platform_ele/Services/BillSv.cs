@@ -113,6 +113,11 @@ namespace Sale_platform_ele.Services
         public abstract string GetSpecificBillTypeName();
 
         /// <summary>
+        /// 提交之前需要做的验证
+        /// </summary>
+        public abstract void DoWhenBeforeApply();
+
+        /// <summary>
         /// 开始审核之前需要做的事情
         /// </summary>
         /// <param name="step">步骤</param>

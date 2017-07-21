@@ -72,6 +72,15 @@ namespace Sale_platform_ele.Services
                 throw new Exception("单据已提交，不能重复操作");
             }
 
+            try {
+                BillSv bill = (BillSv)new BillUtils().GetBillSvInstanceBySysNo(sysNo);
+                bill.DoWhenBeforeApply();
+            }
+            catch (Exception ex) {
+
+                throw new Exception(ex.Message);
+            }
+
             ap = new Apply();
             ap.user_id = userId;
             ap.user_name = userName;
@@ -195,7 +204,11 @@ namespace Sale_platform_ele.Services
                         <tr><td style='width:100px'>公司:</td><td style='width:300px'>{1}</td></tr>
                         <tr><td>单据类型:</td><td>{2}</td></tr>
                         <tr><td>规格型号:</td><td>{3}</td></tr>
-                        <tr><td>申请结果:</td><td>{4}</td></tr>
+                        <tr><td>申请结果:</td><td>{4}</td></tr>"
+                + (ap.success == true ? "{5}" : @"
+                        <tr><td>失败原因:</td><td>{5}</td></tr>                   
+                ")
+                + @"
                     </table>
                 </div>
             ";
@@ -207,7 +220,8 @@ namespace Sale_platform_ele.Services
                 COP_NAME,
                 billType,
                 ap.p_model,
-                ap.success == true ? "申请成功" : "申请失败"
+                ap.success == true ? "申请成功" : "申请失败",
+                ap.success == true ? "" : ap.ApplyDetails.Where(ad => ad.pass == false).First().comment
                 );
 
             return new EmailUtil().SendEmail(emailContent, ap.User.email, null, billType + "申请完成");
@@ -540,7 +554,7 @@ namespace Sale_platform_ele.Services
             }
             var ad = ads.OrderBy(a => a.pass).First();
 
-            if (ap.success == false && ap.ApplyDetails.Where(a => a.step == ad.step && a.pass == true).Count() == 0) {
+            if (ap.success == false && ap.ApplyDetails.Where(a => a.step == ad.step && a.pass != null).Count() == 0) {
                 throw new Exception("没有权限审核");
             }
 
@@ -553,10 +567,9 @@ namespace Sale_platform_ele.Services
                 bool hasEdited = false;
                 if (ap.success != null || ad.pass != null) {
                     hasEdited = true;
-                }
-                if (ad.countersign == false || ad.countersign == null) {
+                }else if (ad.countersign == false || ad.countersign == null) {
                     //不是会签，如果同组的人审核了，他也被当作已审核
-                    hasEdited = ap.ApplyDetails.Where(a => a.step == ad.step && a.pass == true).Count() > 0;
+                    hasEdited = ap.ApplyDetails.Where(a => a.step == ad.step && a.pass != null).Count() > 0;
                 }
                 if (!hasEdited) {
                     return "m|" + ap.sys_no; //m表示可编辑

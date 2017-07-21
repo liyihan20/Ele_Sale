@@ -149,6 +149,15 @@ namespace Sale_platform_ele.Services
                 return validateResult;
             }
 
+            if (string.IsNullOrEmpty(order.oversea_customer_name) || string.IsNullOrEmpty(order.oversea_customer_no)) {
+                order.oversea_customer_no = "";
+                order.oversea_customer_name = "";
+            }
+            if (string.IsNullOrEmpty(order.clerk2_name) || string.IsNullOrEmpty(order.clerk2_no)) {
+                order.clerk2_no = "";
+                order.clerk2_name = "";
+            }
+
             try {
                 var existed = db.Order.Where(o => o.sys_no == order.sys_no);
                 order.update_user_id = userId;
@@ -174,9 +183,9 @@ namespace Sale_platform_ele.Services
                 //在后台再计算一次佣金、MU等
                 CommissionSv csv = new CommissionSv();
                 foreach (var d in order.OrderDetail) {
-                    d.MU = csv.GetMU((decimal)d.unit_price, (decimal)d.cost, (int)d.fee_rate, (decimal)order.exchange_rate);
+                    d.MU = csv.GetMU((decimal)d.deal_price, (decimal)d.cost,(int)d.tax_rate, (int)d.fee_rate, (decimal)order.exchange_rate);
                     d.commission_rate = csv.GetCommissionRate((decimal)d.MU, order.product_type_no);
-                    d.commission = csv.GetCommissionMoney((decimal)d.tax_price , (decimal)d.qty, (decimal)d.commission_rate);
+                    d.commission = csv.GetCommissionMoney((decimal)d.deal_price , (decimal)d.qty, (decimal)d.commission_rate);
                 }
 
                 db.Order.InsertOnSubmit(order);
@@ -225,8 +234,7 @@ namespace Sale_platform_ele.Services
                 if (!order.oversea_customer_no.StartsWith("04.2")) {
                     return "订单类型为生产单的国外订单，国外客户必须是04.2开头";
                 }
-            }
-            
+            }            
 
             if (Math.Abs((order.percent1 ?? 0m) + (order.percent2 ?? 0m) - 100m) > 0.000001m) {
                 return "比例1和比例2之和必须等于100！";
@@ -372,11 +380,7 @@ namespace Sale_platform_ele.Services
         /// <param name="userId">用户ID</param>
         public override void DoWhenBeforeAudit(int step, string stepName, bool isPass, int userId)
         {
-            if (isPass && stepName.Contains("总经理")) {
-                if (string.IsNullOrEmpty(order.contract_no) && order.currency_no.Equals("RMB")) {
-                    throw new Exception("国内单的合同编号必须填写");
-                }
-            }
+            
         }        
 
         /// <summary>
@@ -409,12 +413,12 @@ namespace Sale_platform_ele.Services
             //列宽：
             ushort[] colWidth = new ushort[] {16,16,16,14,18,16,28,28,16,20,
                                             16,14,18,24,32,14,14,14,14,14,
-                                            14,14,14,14,18,18,60};
+                                            14,16,14,14,14,14,14,18,18,60};
 
             //列名：
             string[] colName = new string[] { "审核结果","流水号","订单号","下单日期","办事处","订单类型","购货客户","国外客户","产品类别","产品用途",
                                             "币别","汇率","产品代码","产品名称","规格型号","单位","数量","单价","含税单价","成交价",
-                                            "成本","费用率%","MU%","税率%","发货地点","交货属性","摘要" };
+                                            "成本","价税合计","费用率%","MU%","税率%","佣金率%","佣金","发货地点","交货属性","摘要" };
 
             //設置excel文件名和sheet名
             XlsDocument xls = new XlsDocument();
@@ -474,13 +478,21 @@ namespace Sale_platform_ele.Services
                 cells.Add(rowIndex, ++colIndex, d.e.deal_price);
 
                 cells.Add(rowIndex, ++colIndex, d.e.cost);
+                cells.Add(rowIndex, ++colIndex, d.e.qty * d.e.tax_price);
                 cells.Add(rowIndex, ++colIndex, d.e.fee_rate);
                 cells.Add(rowIndex, ++colIndex, d.e.MU);
                 cells.Add(rowIndex, ++colIndex, d.e.tax_rate);
+                cells.Add(rowIndex, ++colIndex, d.e.commission_rate);
+                cells.Add(rowIndex, ++colIndex, d.e.commission);
                 cells.Add(rowIndex, ++colIndex, d.h.delivery_place_name);
                 cells.Add(rowIndex, ++colIndex, d.h.receive_place_name);
                 cells.Add(rowIndex, ++colIndex, d.h.summary);
             }
+
+            //合计行
+            cells.Add(++rowIndex, 1, "合计:");
+            cells.Add(rowIndex, 17, myData.Sum(d => d.e.qty));
+            cells.Add(rowIndex, 22, myData.Sum(d => d.e.qty * d.e.tax_price));
 
             xls.Send();
         }
@@ -576,6 +588,18 @@ namespace Sale_platform_ele.Services
                           }).Take(200).ToList();
 
             ExportExcel(result);
+        }
+
+
+        public override void DoWhenBeforeApply()
+        {
+            if (string.IsNullOrEmpty(order.contract_no)) {
+                if (order.customer_no.StartsWith("04.1")) {
+                    if (order.OrderDetail.Sum(d => d.deal_price) > 0) {
+                        throw new Exception("客户为04.1开头的收费单，合同编号不能为空");
+                    }
+                }
+            }
         }
     }
 }
