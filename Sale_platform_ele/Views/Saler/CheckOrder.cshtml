@@ -12,6 +12,7 @@
             rownumbers: true,
             singleSelect: true,
             fitColumns: true,
+            showFooter: true,
             columns: [[
                 { field: 'item_no', title: '@Html.Lang("pro_num")', width: 120 },
                 { field: 'item_name', title: '@Html.Lang("pro_name")', width: 140 },
@@ -31,12 +32,28 @@
                 { field: 'tax_rate', title: '@Html.Lang("tax_rate")%', width: 80, align: 'center' },
                 { field: 'fetch_date', title: '@Html.Lang("delivery_date")', width: 100, align: 'center' },
                 { field: 'comment', title: '@Html.Lang("comment")', width: 160 }
-            ]]
+            ]],
+            onLoadSuccess: function (data) {
+                updateGridFooter();
+            }
         });
 
         $("#order_div input[type='text']").attr("readonly", "readonly");
         $("#order_div textarea").attr("readonly", "readonly");
     });
+    function updateGridFooter() {
+        var rows = $("#dg_detail").datagrid("getRows");
+
+        var totalQty = 0;
+        var totalSum = 0;
+        for (var i = 0; i < rows.length; i++) {
+            totalQty += parseFloat(rows[i].qty);
+            totalSum += parseFloat(rows[i].total);
+        }
+        $('#dg_detail').datagrid('reloadFooter', [
+	        { item_no: "合计:", qty: totalQty, total: totalSum }
+        ]);
+    }
 </script>
 <div class="easyui-layout" data-options="fit:true">    
     <div data-options="region:'center'">
@@ -169,7 +186,7 @@
                         <td>@det.tax_price</td>
                         <td>@det.deal_price</td>
                         <td>@det.cost</td>
-                        <td>@(det.qty * det.tax_price)</td>
+                        <td>@(Math.Round((decimal)(det.qty * det.tax_price),4))</td>
                         <td>@det.fee_rate</td>
                         <td>@det.commission_rate</td>
                         <td>@det.commission</td>

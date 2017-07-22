@@ -1440,4 +1440,10 @@
   <data name="step_auditor" xml:space="preserve">
     <value>Next Auditors</value>
   </data>
+  <data name="all_sum" xml:space="preserve">
+    <value>Levied in total</value>
+  </data>
+  <data name="sale_range" xml:space="preserve">
+    <value>Sale Range</value>
+  </data>
 </root>

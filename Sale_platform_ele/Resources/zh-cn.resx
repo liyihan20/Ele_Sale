@@ -1439,4 +1439,10 @@
   <data name="step_auditor" xml:space="preserve">
     <value>步骤审核人</value>
   </data>
+  <data name="all_sum" xml:space="preserve">
+    <value>价税合计</value>
+  </data>
+  <data name="sale_range" xml:space="preserve">
+    <value>销售范围</value>
+  </data>
 </root>

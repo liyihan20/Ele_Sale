@@ -85,10 +85,11 @@ namespace Sale_platform_ele.Services
             return "";
         }
 
-        public decimal GetMU(decimal price, decimal cost, int feeRate, decimal exchangeRate)
+        public decimal GetMU(decimal dealPrice, decimal cost,int taxRate, int feeRate, decimal exchangeRate)
         {
-            if (price == 0 || exchangeRate == 0) return 0;
-            return Math.Round(100 * (1 - cost / (price * exchangeRate)) - feeRate,2);
+            if (dealPrice == 0 || exchangeRate == 0) return 0;
+            decimal price = dealPrice / (1m + taxRate / 100m); //不含税成交价
+            return Math.Round(100 * (1 - cost / (price * exchangeRate)) - feeRate, 2);
         }
 
         public decimal GetCommissionRate(decimal MU, string productType)
@@ -119,9 +120,9 @@ namespace Sale_platform_ele.Services
         /// <param name="qty"></param>
         /// <param name="commissionRate"></param>
         /// <returns></returns>
-        public decimal GetCommissionMoney(decimal taxPrice, decimal qty, decimal commissionRate)
+        public decimal GetCommissionMoney(decimal dealPrice, decimal qty, decimal commissionRate)
         {
-            return Math.Round(taxPrice * qty * commissionRate,4);
+            return Math.Round(dealPrice * qty * commissionRate, 4);
         }
 
         

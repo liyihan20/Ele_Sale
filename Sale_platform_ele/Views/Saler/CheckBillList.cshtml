@@ -81,6 +81,15 @@
             });
 
         });
+
+        $.post("@Url.Content("~/Items/getItems")", { what: "product_type" }, function (data) {
+            var pTypes = [{ name: "所有", value: "" }];
+            for (var i = 0; i < data.length; i++) {
+                pTypes.push({ name: data[i].name, value: data[i].value });
+            }
+            $("#productType").combobox("loadData", pTypes);
+        });
+
     });
 
     function ApplierCheckStatus() {
@@ -121,37 +130,52 @@
 
 </script>
 <div class="easyui-layout" data-options="fit:true">
-    <div data-options="region:'north',collapsed:false,split:true" style="height: 40px; background: #fafafa;
+    <div data-options="region:'north',collapsed:false,split:true" style="height: 66px; background: #fafafa;
         padding: 1px;">
         <form id="fm" method="post" style="padding:2px 5px;">
-            <input type="hidden" name="billType" value="@pm.billType"/>
-            @Html.Lang("sys_num")/@Html.Lang("pro_model"):
-            <input class="easyui-textbox" id="searchValue" name="searchValue" style="width: 100px" value="@pm.searchValue" />
-            @Html.Lang("order_date"):<input id="fromDate" class="easyui-datebox" name="fromDate" style="width: 90px" value="@pm.fromDate" />
-            @Html.Lang("to")
-            <input id="toDate" class="easyui-datebox" name="toDate" style="width: 90px" value="@pm.toDate" />
-            @Html.Lang("audit_result"): <input id="auditResult" name="auditResult" style="width: 80px" class="easyui-combobox" data-options="
-               valueField: 'value' ,
-               textField: 'label' ,
-               panelHeight: 100,
-               editable:false,
-               value:'@pm.auditResult',
-               data: [{
-               label: '@Html.Lang("all")' ,
-               value: '10'
-               },{
-               label: '@Html.Lang("not_finish")' ,
-               value: '0'
-               },{
-               label: '@Html.Lang("success")' ,
-               value: '1'
-               },{
-               label: '@Html.Lang("failure")' ,
-               value: '-1'
-               }]" />
-            <a id="checkBt" href="#" class="easyui-linkbutton" data-options="iconCls:'icon-search'">
-                @Html.Lang("search")
-            </a>
+            <div>
+                <input type="hidden" name="billType" value="@pm.billType"/>
+                @Html.Lang("sys_num")/@Html.Lang("pro_model"):
+                <input class="easyui-textbox" id="searchValue" name="searchValue" style="width: 100px" value="@pm.searchValue" />
+                @Html.Lang("order_date"):<input id="fromDate" class="easyui-datebox" name="fromDate" style="width: 90px" value="@pm.fromDate" />
+                @Html.Lang("to")
+                <input id="toDate" class="easyui-datebox" name="toDate" style="width: 90px" value="@pm.toDate" />
+                @Html.Lang("audit_result"): <input id="auditResult" name="auditResult" style="width: 80px" class="easyui-combobox" data-options="
+                   valueField: 'value' ,
+                   textField: 'label' ,
+                   panelHeight: 'auto',
+                   editable:false,
+                   value:'@pm.auditResult',
+                   data: [{
+                   label: '@Html.Lang("all")' ,
+                   value: '10'
+                   },{
+                   label: '@Html.Lang("not_finish")' ,
+                   value: '0'
+                   },{
+                   label: '@Html.Lang("success")' ,
+                   value: '1'
+                   },{
+                   label: '@Html.Lang("failure")' ,
+                   value: '-1'
+                   }]" />
+            </div>
+            <div style="margin-top:2px;">
+                @Html.Lang("buy_customer"):
+                <input class="easyui-textbox" id="customerName" name="customerName" style="width: 140px" value="@pm.customerName" />
+                @Html.Lang("pro_type"):
+                <input class="easyui-combobox" id="productType" name="productType" style="width: 80px" editable="false" 
+                                           panelheight="auto" valuefield="value" textfield="name" value="@pm.productType" />
+                @Html.Lang("sale_range"):
+                <input class="easyui-combobox" style="width: 80px" name="saleRange" id="saleRange" value="@pm.saleRange"
+                            data-options="textField:'name',valueField:'value',panelHeight:'auto', editable:false,
+                                               data:[
+                                               {name:'所有', value:''},{name:'内销',value:'内销'},{name:'外销',value:'外销'}
+                                               ]" />            
+                <a id="checkBt" href="#" class="easyui-linkbutton" data-options="iconCls:'icon-search'" style="padding-left:24px;padding-right:24px;">
+                    @Html.Lang("search")
+                </a>
+           </div>
         </form>
     </div>
     <div data-options="region:'center'">

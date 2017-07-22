@@ -7,7 +7,9 @@
         var trs=$("#status_table tbody tr");
         if(trs.length > 1)
         {
-            var tr1=trs[0];
+            var tr1 = trs[0];
+            $("#nextStepName").html("");
+            $("#nextAuditors").html("");
             $("#status_table tbody").empty();
             $("#status_table tbody").append(tr1);
         }

@@ -265,6 +265,7 @@ namespace Sale_platform_ele.Services
         {
             bool canCheckAll = new UA(userId).CanCheckAllBill();
             pm.searchValue = pm.searchValue ?? "";
+            pm.customerName = pm.customerName ?? "";            
 
             DateTime fd, td;
             if (!DateTime.TryParse(pm.fromDate, out fd)) {
@@ -283,6 +284,9 @@ namespace Sale_platform_ele.Services
                           && o.order_date >= fd
                           && o.order_date <= td
                           && (o.sys_no.Contains(pm.searchValue) || d.item_model.Contains(pm.searchValue))
+                          && o.customer_name.Contains(pm.customerName)
+                          && (pm.productType==null || o.product_type_name.Contains(pm.productType))
+                          && (pm.saleRange==null || (pm.saleRange=="内销" && o.currency_no=="RMB") ||(pm.saleRange=="外销" && o.currency_no!="RMB"))
                           && (pm.auditResult == 10 || (pm.auditResult == 0 && (Y == null || (Y != null && Y.success == null))) || (pm.auditResult == 1 && Y != null && Y.success == true) || pm.auditResult == -1 && Y != null && Y.success == false)
                           orderby o.order_date descending
                           select new SOListModel()
@@ -504,7 +508,8 @@ namespace Sale_platform_ele.Services
         /// <param name="userId">用户id</param>
         public override void ExportSalerExcle(SalerSearchParamModel pm,int userId)
         {
-            pm.searchValue=pm.searchValue??"";
+            pm.searchValue = pm.searchValue ?? "";
+            pm.customerName = pm.customerName ?? "";     
             DateTime fd, td;
             if (!DateTime.TryParse(pm.fromDate, out fd)) {
                 fd = DateTime.Parse("2017-01-01");
@@ -522,6 +527,9 @@ namespace Sale_platform_ele.Services
                           && o.order_date >= fd
                           && o.order_date <= td
                           && (o.sys_no.Contains(pm.searchValue) || d.item_model.Contains(pm.searchValue))
+                          && o.customer_name.Contains(pm.customerName)
+                          && (pm.productType == null || o.product_type_name.Contains(pm.productType))
+                          && (pm.saleRange == null || (pm.saleRange == "内销" && o.currency_no == "RMB") || (pm.saleRange == "外销" && o.currency_no != "RMB"))
                           && (pm.auditResult == 10 || (pm.auditResult == 0 && (Y == null || (Y != null && Y.success == null))) || (pm.auditResult == 1 && Y != null && Y.success == true) || pm.auditResult == -1 && Y != null && Y.success == false)
                           orderby o.order_date descending
                           select new ExcelData()

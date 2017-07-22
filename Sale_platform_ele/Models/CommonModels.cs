@@ -55,6 +55,10 @@ namespace Sale_platform_ele.Models
         public string fromDate { get; set; }
         public string toDate { get; set; }
         public int auditResult { get; set; }
+        public string customerName { get; set; }
+        public string productType { get; set; }
+        public string saleRange { get; set; }
+        
     }
 
 }
