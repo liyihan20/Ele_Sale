@@ -214,6 +214,13 @@
                     $.post("@Url.Content("~/Items/GetExchangeRate")", { currencyNo: newValue }, function (data) {
                         $("#exchange_rate").textbox("setValue", data);
                     });
+                    if (newValue == "RMB") {
+                        $("#delivery_place_no").combobox("setValue", "SW");
+                        $("#receive_place_no").combobox("setValue", "GN");
+                    } else {
+                        $("#delivery_place_no").combobox("setValue", "HK");
+                        $("#receive_place_no").combobox("setValue", "HK");
+                    }
                 }
             }
         });

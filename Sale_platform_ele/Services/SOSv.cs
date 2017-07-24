@@ -224,17 +224,33 @@ namespace Sale_platform_ele.Services
             }
 
             bool isForeignOrder = !order.currency_no.Equals("RMB");
-            if (order.order_type_name.Equals("生产单") && isForeignOrder) {
-                if (!order.customer_no.Equals("00.01")) {
-                    return "订单类型为生产单的国外订单，购货客户必须为香港信利电子有限公司（00.01）";
+            if (isForeignOrder) {
+                if (order.order_type_name.Equals("生产单")) {
+                    if (!order.customer_no.Equals("00.01")) {
+                        return "订单类型为生产单的国外订单，购货客户必须为香港信利电子有限公司（00.01）";
+                    }
+                    if (string.IsNullOrEmpty(order.oversea_customer_no)) {
+                        return "订单类型为生产单的国外订单，国外客户不能为空";
+                    }
+                    if (!order.oversea_customer_no.StartsWith("04.2")) {
+                        return "订单类型为生产单的国外订单，国外客户必须是04.2开头";
+                    }
                 }
-                if (string.IsNullOrEmpty(order.oversea_customer_no)) {
-                    return "订单类型为生产单的国外订单，国外客户不能为空";
+                if (!order.delivery_place_no.Equals("HK")) {
+                    return "国外单的发货地点必须选择香港货仓";
                 }
-                if (!order.oversea_customer_no.StartsWith("04.2")) {
-                    return "订单类型为生产单的国外订单，国外客户必须是04.2开头";
+                if (!order.receive_place_no.Equals("HK")) {
+                    return "国外单的交货属性必须选择香港";
                 }
-            }            
+            }
+            else {
+                if (!order.delivery_place_no.Equals("SW")) {
+                    return "国内单的发货地点必须选择汕尾物流中心";
+                }
+                if (!order.receive_place_no.Equals("GN")) {
+                    return "国内单的交货属性必须选择国内";
+                }
+            }
 
             if (Math.Abs((order.percent1 ?? 0m) + (order.percent2 ?? 0m) - 100m) > 0.000001m) {
                 return "比例1和比例2之和必须等于100！";

@@ -27,13 +27,14 @@
                         { field: 'dealPrice', title: '@Html.Lang("deal_price")', width: 70, align: 'right' },
                         {
                             field: 'auditStatus', title: '@Html.Lang("apply_status")', width: 60, align: 'center',
-                            styler: function(value,row,index){
-                                if (value == '申请失败'){
+                            styler: function (value, row, index) {
+                                if (value == '申请失败') {
                                     return 'color:red;';
                                 } else if (value == '申请成功') {
                                     return 'color:green;';
                                 }
-                            }}
+                            }
+                        }
             ]],
             toolbar: [{
                 text: "@Html.Lang("check_detail")",
@@ -66,7 +67,7 @@
                     });
                 }
             }],
-            onDblClickRow:CheckDetail
+            onDblClickRow: CheckDetail
         });
 
         $("#checkBt").click(function () {
@@ -99,25 +100,25 @@
         }
     }
 
-    function CheckDetail(){
-        var row=$("#orderList").datagrid("getSelected");
-        if(row){
+    function CheckDetail() {
+        var row = $("#orderList").datagrid("getSelected");
+        if (row) {
             window.location.href = "@Url.Content("~/Saler/CheckBill")" + "?sysNo=" + row.sysNo;
         }
     }
 
-    function EditOrder(){
+    function EditOrder() {
         var row = $("#orderList").datagrid("getSelected");
         if (row) {
             //编辑之前检测是否已开始申请
             $.post("@Url.Content("~/Saler/ApplyHasBegan")", { sysNo: row.sysNo },
-            function(data){
-                if(!data.suc){
+            function (data) {
+                if (!data.suc) {
                     window.location.href = "@Url.Content("~/Saler/ModifyBill?sysNo=")" + row.sysNo + "&stepVersion=0";
                 } else {
                     showTip("@Html.Lang("order_cannot_edit")");
                 }
-            },"json");
+            }, "json");
         }
     }
 
@@ -134,48 +135,36 @@
         padding: 1px;">
         <form id="fm" method="post" style="padding:2px 5px;">
             <div>
-                <input type="hidden" name="billType" value="@pm.billType"/>
+                <input type="hidden" name="billType" value="@pm.billType" />
                 @Html.Lang("sys_num")/@Html.Lang("pro_model"):
                 <input class="easyui-textbox" id="searchValue" name="searchValue" style="width: 100px" value="@pm.searchValue" />
                 @Html.Lang("order_date"):<input id="fromDate" class="easyui-datebox" name="fromDate" style="width: 90px" value="@pm.fromDate" />
                 @Html.Lang("to")
                 <input id="toDate" class="easyui-datebox" name="toDate" style="width: 90px" value="@pm.toDate" />
-                @Html.Lang("audit_result"): <input id="auditResult" name="auditResult" style="width: 80px" class="easyui-combobox" data-options="
-                   valueField: 'value' ,
-                   textField: 'label' ,
-                   panelHeight: 'auto',
-                   editable:false,
-                   value:'@pm.auditResult',
-                   data: [{
-                   label: '@Html.Lang("all")' ,
-                   value: '10'
-                   },{
-                   label: '@Html.Lang("not_finish")' ,
-                   value: '0'
-                   },{
-                   label: '@Html.Lang("success")' ,
-                   value: '1'
-                   },{
-                   label: '@Html.Lang("failure")' ,
-                   value: '-1'
-                   }]" />
+                @Html.Lang("audit_result"):
+                <input id="auditResult" name="auditResult" style="width: 80px" class="easyui-combobox" value="@pm.auditResult"
+                       data-options="valueField: 'value' ,textField: 'label' ,panelHeight: 'auto',editable:false,
+                    data: [
+                       {label: '所有' ,value: '10'},{label: '未完成' ,value: '0'},{label: '成功' ,value: '1'},{label: '失败' ,value: '-1'}
+                       ]" />
             </div>
             <div style="margin-top:2px;">
                 @Html.Lang("buy_customer"):
                 <input class="easyui-textbox" id="customerName" name="customerName" style="width: 140px" value="@pm.customerName" />
                 @Html.Lang("pro_type"):
-                <input class="easyui-combobox" id="productType" name="productType" style="width: 80px" editable="false" 
-                                           panelheight="auto" valuefield="value" textfield="name" value="@pm.productType" />
+                <input class="easyui-combobox" id="productType" name="productType" style="width: 80px" editable="false"
+                       panelheight="auto" valuefield="value" textfield="name" value="@pm.productType" />
                 @Html.Lang("sale_range"):
                 <input class="easyui-combobox" style="width: 80px" name="saleRange" id="saleRange" value="@pm.saleRange"
-                            data-options="textField:'name',valueField:'value',panelHeight:'auto', editable:false,
+                       data-options="textField:'name',valueField:'value',panelHeight:'auto', editable:false,
                                                data:[
                                                {name:'所有', value:''},{name:'内销',value:'内销'},{name:'外销',value:'外销'}
-                                               ]" />            
+                                               ]" />
+
                 <a id="checkBt" href="#" class="easyui-linkbutton" data-options="iconCls:'icon-search'" style="padding-left:24px;padding-right:24px;">
                     @Html.Lang("search")
                 </a>
-           </div>
+            </div>
         </form>
     </div>
     <div data-options="region:'center'">
