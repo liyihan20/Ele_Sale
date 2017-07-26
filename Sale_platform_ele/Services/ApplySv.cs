@@ -467,7 +467,7 @@ namespace Sale_platform_ele.Services
                           {
                               applyId = a.id,
                               applyDetailId = ad.id,
-                              applyTime = DateTime.Parse(a.start_date.ToString()).ToString("yyyy-MM-dd"),
+                              applyTime = DateTime.Parse(a.start_date.ToString()).ToString("yyyy-MM-dd HH:mm"),
                               salerName = a.user_name,
                               model = a.p_model,
                               depName = new UA((int)a.user_id).GetUserDepartmentName(),

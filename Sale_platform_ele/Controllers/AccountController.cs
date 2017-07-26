@@ -20,8 +20,8 @@ namespace Sale_platform_ele.Controllers
             if (cookie != null) {                
                 cookie.Expires = DateTime.Now.AddSeconds(-1);
                 Response.AppendCookie(cookie);
-            }
-            Wlog("登出模块", "成功登出");
+                Wlog("登出模块", "成功登出");
+            }            
             return RedirectToAction("Login");
         }
     }
