@@ -70,6 +70,9 @@ namespace Sale_platform_ele.Controllers
                 try {
                     fileName = Path.GetFileName(FileData.FileName);//获得文件名    
                     string ext = Path.GetExtension(fileName);//获取拓展名
+                    if (!".rar".Equals(ext)) {
+                        return Content("FILETYPE");
+                    }
                     finalName = num + ext;
                     SaveFile(FileData, finalName);
                 }
