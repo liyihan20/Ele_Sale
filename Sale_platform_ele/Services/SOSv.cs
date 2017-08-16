@@ -266,6 +266,9 @@ namespace Sale_platform_ele.Services
                 if (!isForeignOrder && d.tax_rate != 17) {
                     return "国内单的税率必须是17，请重新编辑订单明细";
                 }
+                if (d.tax_price == 0) {
+                    return "规格型号为【" + d.item_model + "】的产品，含税单价不能为0。如果是免费单，请在成交价录入0，含税单价录入成本价";
+                }
             }
 
             return "";
@@ -400,7 +403,15 @@ namespace Sale_platform_ele.Services
         /// <param name="userId">用户ID</param>
         public override void DoWhenBeforeAudit(int step, string stepName, bool isPass, int userId)
         {
-            
+            if (isPass) {
+                //审批ok之前再检查一次产品是否被禁用
+                var otherSv = new OtherSv();
+                foreach (var d in order.OrderDetail) {
+                    if (otherSv.GetProducts(d.item_no).Count() < 1) {
+                        throw new Exception("以下产品编码已被禁用或变更为历史资料：["+d.item_no+"]");                        
+                    }
+                }
+            }
         }        
 
         /// <summary>
