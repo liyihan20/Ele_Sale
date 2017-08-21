@@ -84,15 +84,15 @@ namespace Sale_platform_ele.Models
     partial void InsertHasAttachment(HasAttachment instance);
     partial void UpdateHasAttachment(HasAttachment instance);
     partial void DeleteHasAttachment(HasAttachment instance);
-    partial void InsertOrder(Order instance);
-    partial void UpdateOrder(Order instance);
-    partial void DeleteOrder(Order instance);
     partial void InsertApply(Apply instance);
     partial void UpdateApply(Apply instance);
     partial void DeleteApply(Apply instance);
     partial void InsertEventLog(EventLog instance);
     partial void UpdateEventLog(EventLog instance);
     partial void DeleteEventLog(EventLog instance);
+    partial void InsertOrder(Order instance);
+    partial void UpdateOrder(Order instance);
+    partial void DeleteOrder(Order instance);
     #endregion
 		
 		public SaleDBDataContext() : 
@@ -301,14 +301,6 @@ namespace Sale_platform_ele.Models
 			}
 		}
 		
-		public System.Data.Linq.Table<Order> Order
-		{
-			get
-			{
-				return this.GetTable<Order>();
-			}
-		}
-		
 		public System.Data.Linq.Table<Apply> Apply
 		{
 			get
@@ -322,6 +314,14 @@ namespace Sale_platform_ele.Models
 			get
 			{
 				return this.GetTable<EventLog>();
+			}
+		}
+		
+		public System.Data.Linq.Table<Order> Order
+		{
+			get
+			{
+				return this.GetTable<Order>();
 			}
 		}
 		
@@ -1428,9 +1428,9 @@ namespace Sale_platform_ele.Models
 		
 		private EntitySet<BlockOrder> _BlockOrder;
 		
-		private EntitySet<Order> _Order;
-		
 		private EntitySet<Apply> _Apply;
+		
+		private EntitySet<Order> _Order;
 		
     #region 可扩展性方法定义
     partial void OnLoaded();
@@ -1468,8 +1468,8 @@ namespace Sale_platform_ele.Models
 			this._ProcessDetail = new EntitySet<ProcessDetail>(new Action<ProcessDetail>(this.attach_ProcessDetail), new Action<ProcessDetail>(this.detach_ProcessDetail));
 			this._ApplyDetails = new EntitySet<ApplyDetails>(new Action<ApplyDetails>(this.attach_ApplyDetails), new Action<ApplyDetails>(this.detach_ApplyDetails));
 			this._BlockOrder = new EntitySet<BlockOrder>(new Action<BlockOrder>(this.attach_BlockOrder), new Action<BlockOrder>(this.detach_BlockOrder));
-			this._Order = new EntitySet<Order>(new Action<Order>(this.attach_Order), new Action<Order>(this.detach_Order));
 			this._Apply = new EntitySet<Apply>(new Action<Apply>(this.attach_Apply), new Action<Apply>(this.detach_Apply));
+			this._Order = new EntitySet<Order>(new Action<Order>(this.attach_Order), new Action<Order>(this.detach_Order));
 			OnCreated();
 		}
 		
@@ -1765,19 +1765,6 @@ namespace Sale_platform_ele.Models
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="User_Order", Storage="_Order", ThisKey="id", OtherKey="original_id")]
-		public EntitySet<Order> Order
-		{
-			get
-			{
-				return this._Order;
-			}
-			set
-			{
-				this._Order.Assign(value);
-			}
-		}
-		
 		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="User_Apply", Storage="_Apply", ThisKey="id", OtherKey="user_id")]
 		public EntitySet<Apply> Apply
 		{
@@ -1788,6 +1775,19 @@ namespace Sale_platform_ele.Models
 			set
 			{
 				this._Apply.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="User_Sale_order", Storage="_Order", ThisKey="id", OtherKey="original_id")]
+		public EntitySet<Order> Order
+		{
+			get
+			{
+				return this._Order;
+			}
+			set
+			{
+				this._Order.Assign(value);
 			}
 		}
 		
@@ -1859,18 +1859,6 @@ namespace Sale_platform_ele.Models
 			entity.User = null;
 		}
 		
-		private void attach_Order(Order entity)
-		{
-			this.SendPropertyChanging();
-			entity.User = this;
-		}
-		
-		private void detach_Order(Order entity)
-		{
-			this.SendPropertyChanging();
-			entity.User = null;
-		}
-		
 		private void attach_Apply(Apply entity)
 		{
 			this.SendPropertyChanging();
@@ -1878,6 +1866,18 @@ namespace Sale_platform_ele.Models
 		}
 		
 		private void detach_Apply(Apply entity)
+		{
+			this.SendPropertyChanging();
+			entity.User = null;
+		}
+		
+		private void attach_Order(Order entity)
+		{
+			this.SendPropertyChanging();
+			entity.User = this;
+		}
+		
+		private void detach_Order(Order entity)
 		{
 			this.SendPropertyChanging();
 			entity.User = null;
@@ -4028,7 +4028,7 @@ namespace Sale_platform_ele.Models
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Order_OrderDetail", Storage="_Order", ThisKey="order_id", OtherKey="id", IsForeignKey=true)]
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Sale_order_OrderDetail", Storage="_Order", ThisKey="order_id", OtherKey="id", IsForeignKey=true)]
 		public Order Order
 		{
 			get
@@ -5021,6 +5021,583 @@ namespace Sale_platform_ele.Models
 		}
 	}
 	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Sale_apply")]
+	public partial class Apply : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _id;
+		
+		private System.Nullable<int> _user_id;
+		
+		private System.Nullable<bool> _success;
+		
+		private string _ip;
+		
+		private System.Nullable<System.DateTime> _start_date;
+		
+		private System.Nullable<System.DateTime> _finish_date;
+		
+		private string _order_type;
+		
+		private string _sys_no;
+		
+		private string _p_model;
+		
+		private string _user_name;
+		
+		private EntitySet<ApplyDetails> _ApplyDetails;
+		
+		private EntityRef<User> _User;
+		
+    #region 可扩展性方法定义
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnidChanging(int value);
+    partial void OnidChanged();
+    partial void Onuser_idChanging(System.Nullable<int> value);
+    partial void Onuser_idChanged();
+    partial void OnsuccessChanging(System.Nullable<bool> value);
+    partial void OnsuccessChanged();
+    partial void OnipChanging(string value);
+    partial void OnipChanged();
+    partial void Onstart_dateChanging(System.Nullable<System.DateTime> value);
+    partial void Onstart_dateChanged();
+    partial void Onfinish_dateChanging(System.Nullable<System.DateTime> value);
+    partial void Onfinish_dateChanged();
+    partial void Onorder_typeChanging(string value);
+    partial void Onorder_typeChanged();
+    partial void Onsys_noChanging(string value);
+    partial void Onsys_noChanged();
+    partial void Onp_modelChanging(string value);
+    partial void Onp_modelChanged();
+    partial void Onuser_nameChanging(string value);
+    partial void Onuser_nameChanged();
+    #endregion
+		
+		public Apply()
+		{
+			this._ApplyDetails = new EntitySet<ApplyDetails>(new Action<ApplyDetails>(this.attach_ApplyDetails), new Action<ApplyDetails>(this.detach_ApplyDetails));
+			this._User = default(EntityRef<User>);
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_id", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int id
+		{
+			get
+			{
+				return this._id;
+			}
+			set
+			{
+				if ((this._id != value))
+				{
+					this.OnidChanging(value);
+					this.SendPropertyChanging();
+					this._id = value;
+					this.SendPropertyChanged("id");
+					this.OnidChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_user_id", DbType="Int")]
+		public System.Nullable<int> user_id
+		{
+			get
+			{
+				return this._user_id;
+			}
+			set
+			{
+				if ((this._user_id != value))
+				{
+					if (this._User.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.Onuser_idChanging(value);
+					this.SendPropertyChanging();
+					this._user_id = value;
+					this.SendPropertyChanged("user_id");
+					this.Onuser_idChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_success", DbType="Bit")]
+		public System.Nullable<bool> success
+		{
+			get
+			{
+				return this._success;
+			}
+			set
+			{
+				if ((this._success != value))
+				{
+					this.OnsuccessChanging(value);
+					this.SendPropertyChanging();
+					this._success = value;
+					this.SendPropertyChanged("success");
+					this.OnsuccessChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ip", DbType="VarChar(32)")]
+		public string ip
+		{
+			get
+			{
+				return this._ip;
+			}
+			set
+			{
+				if ((this._ip != value))
+				{
+					this.OnipChanging(value);
+					this.SendPropertyChanging();
+					this._ip = value;
+					this.SendPropertyChanged("ip");
+					this.OnipChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_start_date", DbType="SmallDateTime")]
+		public System.Nullable<System.DateTime> start_date
+		{
+			get
+			{
+				return this._start_date;
+			}
+			set
+			{
+				if ((this._start_date != value))
+				{
+					this.Onstart_dateChanging(value);
+					this.SendPropertyChanging();
+					this._start_date = value;
+					this.SendPropertyChanged("start_date");
+					this.Onstart_dateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_finish_date", DbType="SmallDateTime")]
+		public System.Nullable<System.DateTime> finish_date
+		{
+			get
+			{
+				return this._finish_date;
+			}
+			set
+			{
+				if ((this._finish_date != value))
+				{
+					this.Onfinish_dateChanging(value);
+					this.SendPropertyChanging();
+					this._finish_date = value;
+					this.SendPropertyChanged("finish_date");
+					this.Onfinish_dateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_order_type", DbType="VarChar(10)")]
+		public string order_type
+		{
+			get
+			{
+				return this._order_type;
+			}
+			set
+			{
+				if ((this._order_type != value))
+				{
+					this.Onorder_typeChanging(value);
+					this.SendPropertyChanging();
+					this._order_type = value;
+					this.SendPropertyChanged("order_type");
+					this.Onorder_typeChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_sys_no", DbType="VarChar(20)")]
+		public string sys_no
+		{
+			get
+			{
+				return this._sys_no;
+			}
+			set
+			{
+				if ((this._sys_no != value))
+				{
+					this.Onsys_noChanging(value);
+					this.SendPropertyChanging();
+					this._sys_no = value;
+					this.SendPropertyChanged("sys_no");
+					this.Onsys_noChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_p_model", DbType="VarChar(100)")]
+		public string p_model
+		{
+			get
+			{
+				return this._p_model;
+			}
+			set
+			{
+				if ((this._p_model != value))
+				{
+					this.Onp_modelChanging(value);
+					this.SendPropertyChanging();
+					this._p_model = value;
+					this.SendPropertyChanged("p_model");
+					this.Onp_modelChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_user_name", DbType="VarChar(50)")]
+		public string user_name
+		{
+			get
+			{
+				return this._user_name;
+			}
+			set
+			{
+				if ((this._user_name != value))
+				{
+					this.Onuser_nameChanging(value);
+					this.SendPropertyChanging();
+					this._user_name = value;
+					this.SendPropertyChanged("user_name");
+					this.Onuser_nameChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Apply_ApplyDetails", Storage="_ApplyDetails", ThisKey="id", OtherKey="apply_id")]
+		public EntitySet<ApplyDetails> ApplyDetails
+		{
+			get
+			{
+				return this._ApplyDetails;
+			}
+			set
+			{
+				this._ApplyDetails.Assign(value);
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="User_Apply", Storage="_User", ThisKey="user_id", OtherKey="id", IsForeignKey=true)]
+		public User User
+		{
+			get
+			{
+				return this._User.Entity;
+			}
+			set
+			{
+				User previousValue = this._User.Entity;
+				if (((previousValue != value) 
+							|| (this._User.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._User.Entity = null;
+						previousValue.Apply.Remove(this);
+					}
+					this._User.Entity = value;
+					if ((value != null))
+					{
+						value.Apply.Add(this);
+						this._user_id = value.id;
+					}
+					else
+					{
+						this._user_id = default(Nullable<int>);
+					}
+					this.SendPropertyChanged("User");
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+		
+		private void attach_ApplyDetails(ApplyDetails entity)
+		{
+			this.SendPropertyChanging();
+			entity.Apply = this;
+		}
+		
+		private void detach_ApplyDetails(ApplyDetails entity)
+		{
+			this.SendPropertyChanging();
+			entity.Apply = null;
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Sale_event_log")]
+	public partial class EventLog : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _id;
+		
+		private string _username;
+		
+		private string _ip;
+		
+		private System.Nullable<System.DateTime> _op_time;
+		
+		private string _model;
+		
+		private string _sysNum;
+		
+		private string _event;
+		
+		private System.Nullable<int> _unusual;
+		
+    #region 可扩展性方法定义
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnidChanging(int value);
+    partial void OnidChanged();
+    partial void OnusernameChanging(string value);
+    partial void OnusernameChanged();
+    partial void OnipChanging(string value);
+    partial void OnipChanged();
+    partial void Onop_timeChanging(System.Nullable<System.DateTime> value);
+    partial void Onop_timeChanged();
+    partial void OnmodelChanging(string value);
+    partial void OnmodelChanged();
+    partial void OnsysNumChanging(string value);
+    partial void OnsysNumChanged();
+    partial void OneventChanging(string value);
+    partial void OneventChanged();
+    partial void OnunusualChanging(System.Nullable<int> value);
+    partial void OnunusualChanged();
+    #endregion
+		
+		public EventLog()
+		{
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_id", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int id
+		{
+			get
+			{
+				return this._id;
+			}
+			set
+			{
+				if ((this._id != value))
+				{
+					this.OnidChanging(value);
+					this.SendPropertyChanging();
+					this._id = value;
+					this.SendPropertyChanged("id");
+					this.OnidChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_username", DbType="VarChar(50)")]
+		public string username
+		{
+			get
+			{
+				return this._username;
+			}
+			set
+			{
+				if ((this._username != value))
+				{
+					this.OnusernameChanging(value);
+					this.SendPropertyChanging();
+					this._username = value;
+					this.SendPropertyChanged("username");
+					this.OnusernameChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ip", DbType="VarChar(50)")]
+		public string ip
+		{
+			get
+			{
+				return this._ip;
+			}
+			set
+			{
+				if ((this._ip != value))
+				{
+					this.OnipChanging(value);
+					this.SendPropertyChanging();
+					this._ip = value;
+					this.SendPropertyChanged("ip");
+					this.OnipChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_op_time", DbType="SmallDateTime")]
+		public System.Nullable<System.DateTime> op_time
+		{
+			get
+			{
+				return this._op_time;
+			}
+			set
+			{
+				if ((this._op_time != value))
+				{
+					this.Onop_timeChanging(value);
+					this.SendPropertyChanging();
+					this._op_time = value;
+					this.SendPropertyChanged("op_time");
+					this.Onop_timeChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_model", DbType="VarChar(50)")]
+		public string model
+		{
+			get
+			{
+				return this._model;
+			}
+			set
+			{
+				if ((this._model != value))
+				{
+					this.OnmodelChanging(value);
+					this.SendPropertyChanging();
+					this._model = value;
+					this.SendPropertyChanged("model");
+					this.OnmodelChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_sysNum", DbType="VarChar(50)")]
+		public string sysNum
+		{
+			get
+			{
+				return this._sysNum;
+			}
+			set
+			{
+				if ((this._sysNum != value))
+				{
+					this.OnsysNumChanging(value);
+					this.SendPropertyChanging();
+					this._sysNum = value;
+					this.SendPropertyChanged("sysNum");
+					this.OnsysNumChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Name="event", Storage="_event", DbType="VarChar(500)")]
+		public string @event
+		{
+			get
+			{
+				return this._event;
+			}
+			set
+			{
+				if ((this._event != value))
+				{
+					this.OneventChanging(value);
+					this.SendPropertyChanging();
+					this._event = value;
+					this.SendPropertyChanged("@event");
+					this.OneventChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_unusual", DbType="Int")]
+		public System.Nullable<int> unusual
+		{
+			get
+			{
+				return this._unusual;
+			}
+			set
+			{
+				if ((this._unusual != value))
+				{
+					this.OnunusualChanging(value);
+					this.SendPropertyChanging();
+					this._unusual = value;
+					this.SendPropertyChanged("unusual");
+					this.OnunusualChanged();
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+	}
+	
 	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Sale_order")]
 	public partial class Order : INotifyPropertyChanging, INotifyPropertyChanged
 	{
@@ -5112,6 +5689,10 @@ namespace Sale_platform_ele.Models
 		private string _produce_way_name;
 		
 		private string _order_no;
+		
+		private string _clear_way_no;
+		
+		private string _clear_way_name;
 		
 		private EntitySet<OrderDetail> _OrderDetail;
 		
@@ -5207,6 +5788,10 @@ namespace Sale_platform_ele.Models
     partial void Onproduce_way_nameChanged();
     partial void Onorder_noChanging(string value);
     partial void Onorder_noChanged();
+    partial void Onclear_way_noChanging(string value);
+    partial void Onclear_way_noChanged();
+    partial void Onclear_way_nameChanging(string value);
+    partial void Onclear_way_nameChanged();
     #endregion
 		
 		public Order()
@@ -6080,7 +6665,47 @@ namespace Sale_platform_ele.Models
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Order_OrderDetail", Storage="_OrderDetail", ThisKey="id", OtherKey="order_id")]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_clear_way_no", DbType="VarChar(50)")]
+		public string clear_way_no
+		{
+			get
+			{
+				return this._clear_way_no;
+			}
+			set
+			{
+				if ((this._clear_way_no != value))
+				{
+					this.Onclear_way_noChanging(value);
+					this.SendPropertyChanging();
+					this._clear_way_no = value;
+					this.SendPropertyChanged("clear_way_no");
+					this.Onclear_way_noChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_clear_way_name", DbType="VarChar(200)")]
+		public string clear_way_name
+		{
+			get
+			{
+				return this._clear_way_name;
+			}
+			set
+			{
+				if ((this._clear_way_name != value))
+				{
+					this.Onclear_way_nameChanging(value);
+					this.SendPropertyChanging();
+					this._clear_way_name = value;
+					this.SendPropertyChanged("clear_way_name");
+					this.Onclear_way_nameChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Sale_order_OrderDetail", Storage="_OrderDetail", ThisKey="id", OtherKey="order_id")]
 		public EntitySet<OrderDetail> OrderDetail
 		{
 			get
@@ -6093,7 +6718,7 @@ namespace Sale_platform_ele.Models
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="User_Order", Storage="_User", ThisKey="original_id", OtherKey="id", IsForeignKey=true)]
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="User_Sale_order", Storage="_User", ThisKey="original_id", OtherKey="id", IsForeignKey=true)]
 		public User User
 		{
 			get
@@ -6157,583 +6782,6 @@ namespace Sale_platform_ele.Models
 		{
 			this.SendPropertyChanging();
 			entity.Order = null;
-		}
-	}
-	
-	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Sale_apply")]
-	public partial class Apply : INotifyPropertyChanging, INotifyPropertyChanged
-	{
-		
-		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
-		
-		private int _id;
-		
-		private System.Nullable<int> _user_id;
-		
-		private System.Nullable<bool> _success;
-		
-		private string _ip;
-		
-		private System.Nullable<System.DateTime> _start_date;
-		
-		private System.Nullable<System.DateTime> _finish_date;
-		
-		private string _order_type;
-		
-		private string _sys_no;
-		
-		private string _p_model;
-		
-		private string _user_name;
-		
-		private EntitySet<ApplyDetails> _ApplyDetails;
-		
-		private EntityRef<User> _User;
-		
-    #region 可扩展性方法定义
-    partial void OnLoaded();
-    partial void OnValidate(System.Data.Linq.ChangeAction action);
-    partial void OnCreated();
-    partial void OnidChanging(int value);
-    partial void OnidChanged();
-    partial void Onuser_idChanging(System.Nullable<int> value);
-    partial void Onuser_idChanged();
-    partial void OnsuccessChanging(System.Nullable<bool> value);
-    partial void OnsuccessChanged();
-    partial void OnipChanging(string value);
-    partial void OnipChanged();
-    partial void Onstart_dateChanging(System.Nullable<System.DateTime> value);
-    partial void Onstart_dateChanged();
-    partial void Onfinish_dateChanging(System.Nullable<System.DateTime> value);
-    partial void Onfinish_dateChanged();
-    partial void Onorder_typeChanging(string value);
-    partial void Onorder_typeChanged();
-    partial void Onsys_noChanging(string value);
-    partial void Onsys_noChanged();
-    partial void Onp_modelChanging(string value);
-    partial void Onp_modelChanged();
-    partial void Onuser_nameChanging(string value);
-    partial void Onuser_nameChanged();
-    #endregion
-		
-		public Apply()
-		{
-			this._ApplyDetails = new EntitySet<ApplyDetails>(new Action<ApplyDetails>(this.attach_ApplyDetails), new Action<ApplyDetails>(this.detach_ApplyDetails));
-			this._User = default(EntityRef<User>);
-			OnCreated();
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_id", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
-		public int id
-		{
-			get
-			{
-				return this._id;
-			}
-			set
-			{
-				if ((this._id != value))
-				{
-					this.OnidChanging(value);
-					this.SendPropertyChanging();
-					this._id = value;
-					this.SendPropertyChanged("id");
-					this.OnidChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_user_id", DbType="Int")]
-		public System.Nullable<int> user_id
-		{
-			get
-			{
-				return this._user_id;
-			}
-			set
-			{
-				if ((this._user_id != value))
-				{
-					if (this._User.HasLoadedOrAssignedValue)
-					{
-						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
-					}
-					this.Onuser_idChanging(value);
-					this.SendPropertyChanging();
-					this._user_id = value;
-					this.SendPropertyChanged("user_id");
-					this.Onuser_idChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_success", DbType="Bit")]
-		public System.Nullable<bool> success
-		{
-			get
-			{
-				return this._success;
-			}
-			set
-			{
-				if ((this._success != value))
-				{
-					this.OnsuccessChanging(value);
-					this.SendPropertyChanging();
-					this._success = value;
-					this.SendPropertyChanged("success");
-					this.OnsuccessChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ip", DbType="VarChar(32)")]
-		public string ip
-		{
-			get
-			{
-				return this._ip;
-			}
-			set
-			{
-				if ((this._ip != value))
-				{
-					this.OnipChanging(value);
-					this.SendPropertyChanging();
-					this._ip = value;
-					this.SendPropertyChanged("ip");
-					this.OnipChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_start_date", DbType="SmallDateTime")]
-		public System.Nullable<System.DateTime> start_date
-		{
-			get
-			{
-				return this._start_date;
-			}
-			set
-			{
-				if ((this._start_date != value))
-				{
-					this.Onstart_dateChanging(value);
-					this.SendPropertyChanging();
-					this._start_date = value;
-					this.SendPropertyChanged("start_date");
-					this.Onstart_dateChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_finish_date", DbType="SmallDateTime")]
-		public System.Nullable<System.DateTime> finish_date
-		{
-			get
-			{
-				return this._finish_date;
-			}
-			set
-			{
-				if ((this._finish_date != value))
-				{
-					this.Onfinish_dateChanging(value);
-					this.SendPropertyChanging();
-					this._finish_date = value;
-					this.SendPropertyChanged("finish_date");
-					this.Onfinish_dateChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_order_type", DbType="VarChar(10)")]
-		public string order_type
-		{
-			get
-			{
-				return this._order_type;
-			}
-			set
-			{
-				if ((this._order_type != value))
-				{
-					this.Onorder_typeChanging(value);
-					this.SendPropertyChanging();
-					this._order_type = value;
-					this.SendPropertyChanged("order_type");
-					this.Onorder_typeChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_sys_no", DbType="VarChar(20)")]
-		public string sys_no
-		{
-			get
-			{
-				return this._sys_no;
-			}
-			set
-			{
-				if ((this._sys_no != value))
-				{
-					this.Onsys_noChanging(value);
-					this.SendPropertyChanging();
-					this._sys_no = value;
-					this.SendPropertyChanged("sys_no");
-					this.Onsys_noChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_p_model", DbType="VarChar(100)")]
-		public string p_model
-		{
-			get
-			{
-				return this._p_model;
-			}
-			set
-			{
-				if ((this._p_model != value))
-				{
-					this.Onp_modelChanging(value);
-					this.SendPropertyChanging();
-					this._p_model = value;
-					this.SendPropertyChanged("p_model");
-					this.Onp_modelChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_user_name", DbType="VarChar(50)")]
-		public string user_name
-		{
-			get
-			{
-				return this._user_name;
-			}
-			set
-			{
-				if ((this._user_name != value))
-				{
-					this.Onuser_nameChanging(value);
-					this.SendPropertyChanging();
-					this._user_name = value;
-					this.SendPropertyChanged("user_name");
-					this.Onuser_nameChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Apply_ApplyDetails", Storage="_ApplyDetails", ThisKey="id", OtherKey="apply_id")]
-		public EntitySet<ApplyDetails> ApplyDetails
-		{
-			get
-			{
-				return this._ApplyDetails;
-			}
-			set
-			{
-				this._ApplyDetails.Assign(value);
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="User_Apply", Storage="_User", ThisKey="user_id", OtherKey="id", IsForeignKey=true)]
-		public User User
-		{
-			get
-			{
-				return this._User.Entity;
-			}
-			set
-			{
-				User previousValue = this._User.Entity;
-				if (((previousValue != value) 
-							|| (this._User.HasLoadedOrAssignedValue == false)))
-				{
-					this.SendPropertyChanging();
-					if ((previousValue != null))
-					{
-						this._User.Entity = null;
-						previousValue.Apply.Remove(this);
-					}
-					this._User.Entity = value;
-					if ((value != null))
-					{
-						value.Apply.Add(this);
-						this._user_id = value.id;
-					}
-					else
-					{
-						this._user_id = default(Nullable<int>);
-					}
-					this.SendPropertyChanged("User");
-				}
-			}
-		}
-		
-		public event PropertyChangingEventHandler PropertyChanging;
-		
-		public event PropertyChangedEventHandler PropertyChanged;
-		
-		protected virtual void SendPropertyChanging()
-		{
-			if ((this.PropertyChanging != null))
-			{
-				this.PropertyChanging(this, emptyChangingEventArgs);
-			}
-		}
-		
-		protected virtual void SendPropertyChanged(String propertyName)
-		{
-			if ((this.PropertyChanged != null))
-			{
-				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-			}
-		}
-		
-		private void attach_ApplyDetails(ApplyDetails entity)
-		{
-			this.SendPropertyChanging();
-			entity.Apply = this;
-		}
-		
-		private void detach_ApplyDetails(ApplyDetails entity)
-		{
-			this.SendPropertyChanging();
-			entity.Apply = null;
-		}
-	}
-	
-	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Sale_event_log")]
-	public partial class EventLog : INotifyPropertyChanging, INotifyPropertyChanged
-	{
-		
-		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
-		
-		private int _id;
-		
-		private string _username;
-		
-		private string _ip;
-		
-		private System.Nullable<System.DateTime> _op_time;
-		
-		private string _model;
-		
-		private string _sysNum;
-		
-		private string _event;
-		
-		private System.Nullable<int> _unusual;
-		
-    #region 可扩展性方法定义
-    partial void OnLoaded();
-    partial void OnValidate(System.Data.Linq.ChangeAction action);
-    partial void OnCreated();
-    partial void OnidChanging(int value);
-    partial void OnidChanged();
-    partial void OnusernameChanging(string value);
-    partial void OnusernameChanged();
-    partial void OnipChanging(string value);
-    partial void OnipChanged();
-    partial void Onop_timeChanging(System.Nullable<System.DateTime> value);
-    partial void Onop_timeChanged();
-    partial void OnmodelChanging(string value);
-    partial void OnmodelChanged();
-    partial void OnsysNumChanging(string value);
-    partial void OnsysNumChanged();
-    partial void OneventChanging(string value);
-    partial void OneventChanged();
-    partial void OnunusualChanging(System.Nullable<int> value);
-    partial void OnunusualChanged();
-    #endregion
-		
-		public EventLog()
-		{
-			OnCreated();
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_id", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
-		public int id
-		{
-			get
-			{
-				return this._id;
-			}
-			set
-			{
-				if ((this._id != value))
-				{
-					this.OnidChanging(value);
-					this.SendPropertyChanging();
-					this._id = value;
-					this.SendPropertyChanged("id");
-					this.OnidChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_username", DbType="VarChar(50)")]
-		public string username
-		{
-			get
-			{
-				return this._username;
-			}
-			set
-			{
-				if ((this._username != value))
-				{
-					this.OnusernameChanging(value);
-					this.SendPropertyChanging();
-					this._username = value;
-					this.SendPropertyChanged("username");
-					this.OnusernameChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_ip", DbType="VarChar(50)")]
-		public string ip
-		{
-			get
-			{
-				return this._ip;
-			}
-			set
-			{
-				if ((this._ip != value))
-				{
-					this.OnipChanging(value);
-					this.SendPropertyChanging();
-					this._ip = value;
-					this.SendPropertyChanged("ip");
-					this.OnipChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_op_time", DbType="SmallDateTime")]
-		public System.Nullable<System.DateTime> op_time
-		{
-			get
-			{
-				return this._op_time;
-			}
-			set
-			{
-				if ((this._op_time != value))
-				{
-					this.Onop_timeChanging(value);
-					this.SendPropertyChanging();
-					this._op_time = value;
-					this.SendPropertyChanged("op_time");
-					this.Onop_timeChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_model", DbType="VarChar(50)")]
-		public string model
-		{
-			get
-			{
-				return this._model;
-			}
-			set
-			{
-				if ((this._model != value))
-				{
-					this.OnmodelChanging(value);
-					this.SendPropertyChanging();
-					this._model = value;
-					this.SendPropertyChanged("model");
-					this.OnmodelChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_sysNum", DbType="VarChar(50)")]
-		public string sysNum
-		{
-			get
-			{
-				return this._sysNum;
-			}
-			set
-			{
-				if ((this._sysNum != value))
-				{
-					this.OnsysNumChanging(value);
-					this.SendPropertyChanging();
-					this._sysNum = value;
-					this.SendPropertyChanged("sysNum");
-					this.OnsysNumChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Name="event", Storage="_event", DbType="VarChar(500)")]
-		public string @event
-		{
-			get
-			{
-				return this._event;
-			}
-			set
-			{
-				if ((this._event != value))
-				{
-					this.OneventChanging(value);
-					this.SendPropertyChanging();
-					this._event = value;
-					this.SendPropertyChanged("@event");
-					this.OneventChanged();
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_unusual", DbType="Int")]
-		public System.Nullable<int> unusual
-		{
-			get
-			{
-				return this._unusual;
-			}
-			set
-			{
-				if ((this._unusual != value))
-				{
-					this.OnunusualChanging(value);
-					this.SendPropertyChanging();
-					this._unusual = value;
-					this.SendPropertyChanged("unusual");
-					this.OnunusualChanged();
-				}
-			}
-		}
-		
-		public event PropertyChangingEventHandler PropertyChanging;
-		
-		public event PropertyChangedEventHandler PropertyChanged;
-		
-		protected virtual void SendPropertyChanging()
-		{
-			if ((this.PropertyChanging != null))
-			{
-				this.PropertyChanging(this, emptyChangingEventArgs);
-			}
-		}
-		
-		protected virtual void SendPropertyChanged(String propertyName)
-		{
-			if ((this.PropertyChanged != null))
-			{
-				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-			}
 		}
 	}
 	

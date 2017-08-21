@@ -242,6 +242,12 @@ namespace Sale_platform_ele.Services
                 if (!order.receive_place_no.Equals("HK")) {
                     return "国外单的交货属性必须选择香港";
                 }
+                if (string.IsNullOrEmpty(order.clear_way_no)) {
+                    return "国外单的结算方式不能为空";
+                }
+                else if(!order.clear_way_no.StartsWith("HK")) {
+                    return "国外单的结算方式编码必须以HK开头";
+                }
             }
             else {
                 if (!order.delivery_place_no.Equals("SW")) {
@@ -408,7 +414,7 @@ namespace Sale_platform_ele.Services
                 var otherSv = new OtherSv();
                 foreach (var d in order.OrderDetail) {
                     if (otherSv.GetProducts(d.item_no).Count() < 1) {
-                        throw new Exception("以下产品编码已被禁用或变更为历史资料：["+d.item_no+"]");                        
+                        throw new Exception("以下产品编码已被禁用或变更为历史资料：["+d.item_no+"],如有问题请联系工程部。");                        
                     }
                 }
             }

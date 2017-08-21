@@ -271,6 +271,7 @@
                     param.clerk2_name = $("#clerk2_no").combobox("getText");
                     param.backpaper_confirm_name = $("#backpaper_confirm_no").combobox("getText");
                     param.produce_way_name = $("#produce_way_no").combobox("getText");
+                    param.clear_way_name = $("#clear_way_no").combogrid("getText");
                     return true;
                 },
                 success: function (data) {
@@ -526,6 +527,24 @@
                             <td>
                                 <input class="easyui-textbox" name="trade_rull" id="trade_rull" style="width:120px" value="@order.trade_rull" />
                             </td>
+                            <td>
+                                @Html.Lang("clear_way"):
+                            </td>
+                            <td>
+                                 <select class="easyui-combogrid" style="width:120px" name="clear_way_no" id="clear_way_no" data-options="
+                                    value:'@order.clear_way_no',
+                                    panelWidth: 360,
+                                    idField: 'value',
+                                    textField: 'name',
+                                    url: '@Url.Content("~/Items/GetItems?what=clear_way")',                                    
+                                    columns: [[
+                                        {field:'value',title:'结算代码',width:100},
+                                        {field:'name',title:'结算名称',width:300},
+                                    ]],
+                                    fitColumns: true,
+                                ">
+                                </select>
+                            </td>
                             @*<td>
                                     @Html.Lang("agency"):
                                 </td>
@@ -538,8 +557,6 @@
                             <td>
                                 <input class="easyui-textbox" readonly="readonly" style="width:120px" value="@order.User.real_name" />
                             </td>
-                            <td></td>
-                            <td></td>
                             <td></td>
                             <td></td>
                         </tr>

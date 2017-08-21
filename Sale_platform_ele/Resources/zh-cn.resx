@@ -1445,4 +1445,8 @@
   <data name="sale_range" xml:space="preserve">
     <value>销售范围</value>
   </data>
+  <data name="clear_way" xml:space="preserve">
+    <value>结算方式</value>
+    <comment>结算方式</comment>
+  </data>
 </root>
