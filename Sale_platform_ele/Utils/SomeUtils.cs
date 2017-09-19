@@ -111,7 +111,7 @@ namespace Sale_platform_ele.Utils
         public static void SetFieldValueToModel(FormCollection col, object obj)
         {
             foreach (var p in obj.GetType().GetProperties()) {
-                string val = col.Get(p.Name);//字段值
+                string val = col.Get(p.Name).Trim();//字段值
                 string pType = p.PropertyType.FullName;//数据类型
                 if (string.IsNullOrEmpty(val) || val.Equals("null")) continue;
                 if (pType.Contains("DateTime")) {

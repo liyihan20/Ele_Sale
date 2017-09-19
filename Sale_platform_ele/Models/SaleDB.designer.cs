@@ -1778,7 +1778,7 @@ namespace Sale_platform_ele.Models
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="User_Sale_order", Storage="_Order", ThisKey="id", OtherKey="original_id")]
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="User_Order", Storage="_Order", ThisKey="id", OtherKey="original_id")]
 		public EntitySet<Order> Order
 		{
 			get
@@ -4028,7 +4028,7 @@ namespace Sale_platform_ele.Models
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Sale_order_OrderDetail", Storage="_Order", ThisKey="order_id", OtherKey="id", IsForeignKey=true)]
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Order_OrderDetail", Storage="_Order", ThisKey="order_id", OtherKey="id", IsForeignKey=true)]
 		public Order Order
 		{
 			get
@@ -5925,7 +5925,7 @@ namespace Sale_platform_ele.Models
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_contract_no", DbType="VarChar(50)")]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_contract_no", DbType="VarChar(500)")]
 		public string contract_no
 		{
 			get
@@ -6705,7 +6705,7 @@ namespace Sale_platform_ele.Models
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Sale_order_OrderDetail", Storage="_OrderDetail", ThisKey="id", OtherKey="order_id")]
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Order_OrderDetail", Storage="_OrderDetail", ThisKey="id", OtherKey="order_id")]
 		public EntitySet<OrderDetail> OrderDetail
 		{
 			get
@@ -6718,7 +6718,7 @@ namespace Sale_platform_ele.Models
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="User_Sale_order", Storage="_User", ThisKey="original_id", OtherKey="id", IsForeignKey=true)]
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="User_Order", Storage="_User", ThisKey="original_id", OtherKey="id", IsForeignKey=true)]
 		public User User
 		{
 			get
