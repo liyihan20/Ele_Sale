@@ -182,9 +182,9 @@
       <Column Name="unit_no" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
       <Column Name="unit_name" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
       <Column Name="qty" Type="System.Decimal" DbType="Decimal(18,4)" CanBeNull="true" />
-      <Column Name="unit_price" Type="System.Decimal" DbType="Decimal(18,4)" CanBeNull="true" />
-      <Column Name="tax_price" Type="System.Decimal" DbType="Decimal(18,4)" CanBeNull="true" />
-      <Column Name="deal_price" Type="System.Decimal" DbType="Decimal(18,4)" CanBeNull="true" />
+      <Column Name="unit_price" Type="System.Decimal" DbType="Decimal(20,6)" CanBeNull="true" />
+      <Column Name="tax_price" Type="System.Decimal" DbType="Decimal(20,6)" CanBeNull="true" />
+      <Column Name="deal_price" Type="System.Decimal" DbType="Decimal(20,6)" CanBeNull="true" />
       <Column Name="cost" Type="System.Decimal" DbType="Decimal(18,2)" CanBeNull="true" />
       <Column Name="fee_rate" Type="System.Int32" DbType="Int" CanBeNull="true" />
       <Column Name="tax_rate" Type="System.Int32" DbType="Int" CanBeNull="true" />

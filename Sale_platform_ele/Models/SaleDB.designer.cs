@@ -3808,7 +3808,7 @@ namespace Sale_platform_ele.Models
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_unit_price", DbType="Decimal(18,4)")]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_unit_price", DbType="Decimal(20,6)")]
 		public System.Nullable<decimal> unit_price
 		{
 			get
@@ -3828,7 +3828,7 @@ namespace Sale_platform_ele.Models
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_tax_price", DbType="Decimal(18,4)")]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_tax_price", DbType="Decimal(20,6)")]
 		public System.Nullable<decimal> tax_price
 		{
 			get
@@ -3848,7 +3848,7 @@ namespace Sale_platform_ele.Models
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_deal_price", DbType="Decimal(18,4)")]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_deal_price", DbType="Decimal(20,6)")]
 		public System.Nullable<decimal> deal_price
 		{
 			get

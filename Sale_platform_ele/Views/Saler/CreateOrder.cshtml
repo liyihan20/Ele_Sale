@@ -230,7 +230,7 @@
             onChange: function (newValue, oldValue) {
                 if (newValue != oldValue && newValue != "" && stop == 0) {
                     stop = 1;
-                    $("#tax_price").numberbox("setValue", Math.round(newValue * 10000 * (1 + taxRate / 100)) / 10000);
+                    $("#tax_price").numberbox("setValue", Math.round(newValue * 1000000 * (1 + taxRate / 100)) / 1000000);
                 } else {
                     stop = 0;
                 }
@@ -240,7 +240,7 @@
             onChange: function (newValue, oldValue) {
                 if (newValue != oldValue && newValue != "" && stop == 0) {
                     stop = 1;
-                    $("#unit_price").numberbox("setValue", Math.round(newValue * 10000 / (1 + taxRate / 100)) / 10000);
+                    $("#unit_price").numberbox("setValue", Math.round(newValue * 1000000 / (1 + taxRate / 100)) / 1000000);
                 } else {
                     stop = 0;
                 }
@@ -368,7 +368,7 @@
                 tax_price: $("#tax_price").numberbox("getValue"),
                 deal_price: $("#deal_price").numberbox("getValue"),
                 cost: $("#cost").numberbox("getValue"),
-                total: Math.round($("#qty").numberbox("getValue") * $("#tax_price").numberbox("getValue") * 10000) / 10000,
+                total: Math.round($("#qty").numberbox("getValue") * $("#tax_price").numberbox("getValue") * 1000000) / 1000000,
                 fee_rate: $("#fee_rate").numberbox("getValue"),
                 commission_rate: commissionRate,
                 commission: commission,
@@ -745,7 +745,7 @@
                     @Html.Lang("price"):
                 </td>
                 <td>
-                    <input name="unit_price" id="unit_price" class="easyui-numberbox" required precision="4" style="width:135px" />
+                    <input name="unit_price" id="unit_price" class="easyui-numberbox" required precision="6" style="width:135px" />
                 </td>
             </tr>
             <tr>
@@ -753,13 +753,13 @@
                     @Html.Lang("tax_price"):
                 </td>
                 <td>
-                    <input id="tax_price" class="easyui-numberbox" name="tax_price" required style="width: 135px" precision="4" />
+                    <input id="tax_price" class="easyui-numberbox" name="tax_price" required style="width: 135px" precision="6" />
                 </td>
                 <td>
                     @Html.Lang("deal_price"):
                 </td>
                 <td>
-                    <input name="deal_price" id="deal_price" class="easyui-numberbox" precision="4" required style="width:135px" />
+                    <input name="deal_price" id="deal_price" class="easyui-numberbox" precision="6" required style="width:135px" />
                 </td>
             </tr>
             <tr>
