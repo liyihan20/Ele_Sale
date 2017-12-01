@@ -102,6 +102,7 @@ namespace Sale_platform_ele.Services
                     user.error_times = 0;
                     user.forbit_date = null;
                     user.forbit_reason = "";
+                    user.last_login_date = DateTime.Now;
                 }
                 else {
                     user.is_forbit = true;

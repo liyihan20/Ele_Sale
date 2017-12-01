@@ -3186,7 +3186,7 @@ namespace Sale_platform_ele.Models
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_secondary_data", DbType="VarChar(MAX)")]
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_secondary_data", DbType="NVarChar(MAX)")]
 		public string secondary_data
 		{
 			get

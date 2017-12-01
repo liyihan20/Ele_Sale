@@ -402,6 +402,13 @@
         ]);
     }
 
+    //获取小数的小数点位数(最后的0不算，例如1.234500算4位，1.234560算5位）
+    function GetDecimalPoint(num) {
+        var n = new Number(num);
+        for (var i = 4; i <= 6; i++) {
+            if (n.toFixed(i) == n) return i;
+        }
+    }
 
 </script>
 
