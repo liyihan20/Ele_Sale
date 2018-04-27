@@ -77,5 +77,18 @@ namespace Sale_platform_ele.Controllers
             return Json(new ResultModel() { suc = true, extra = mc });
         }
 
+        public JsonResult GetCustomerCreditInfo(string customerNo, string currencyNo)
+        {
+            //return Json(new { suc = false, msg = "信用额度：<span style='color:green'>8000</span>；已用额度：9000；超出额度：<span style='color:red'>1000</span>" });
+            var ot = new OtherSv();
+            return Json(ot.GetCustomerCreditInfo(ot.GetCustomerId(customerNo), ot.GetCurrencyId(currencyNo)));
+        }
+
+        public JsonResult GetCustomerCreditInfo2(string sysNo)
+        {
+            var order = (Order)new SOSv(sysNo).GetBill(0);
+            return GetCustomerCreditInfo(order.customer_no, order.currency_no);
+        }
+
     }
 }

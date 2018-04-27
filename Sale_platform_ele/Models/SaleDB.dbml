@@ -326,13 +326,6 @@
       <Association Name="User_Order" Member="User" ThisKey="original_id" OtherKey="id" Type="User" IsForeignKey="true" />
     </Type>
   </Table>
-  <Function Name="dbo.getCustomer" Method="getCustomer">
-    <Parameter Name="queryString" Type="System.String" DbType="VarChar(100)" />
-    <ElementType Name="getCustomerResult">
-      <Column Name="customer_name" Type="System.String" DbType="VarChar(80)" CanBeNull="true" />
-      <Column Name="customer_number" Type="System.String" DbType="VarChar(255)" CanBeNull="true" />
-    </ElementType>
-  </Function>
   <Function Name="dbo.getClerk" Method="getClerk">
     <Parameter Name="queryString" Type="System.String" DbType="VarChar(20)" />
     <ElementType Name="getClerkResult">
@@ -361,6 +354,25 @@
     <Parameter Name="sysNo" Type="System.String" DbType="VarChar(20)" />
     <ElementType Name="getK3OrderNoResult">
       <Column Name="FBillNo" Type="System.String" DbType="NVarChar(255) NOT NULL" CanBeNull="false" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.updateAllK3OrderNo" Method="updateAllK3OrderNo">
+    <Return Type="System.Int32" />
+  </Function>
+  <Function Name="dbo.getCustomerCreditInfo" Method="getCustomerCreditInfo">
+    <Parameter Name="FCustomerId" Parameter="fCustomerId" Type="System.Int32" DbType="Int" />
+    <Parameter Name="FCurencyId" Parameter="fCurencyId" Type="System.Int32" DbType="Int" />
+    <ElementType Name="getCustomerCreditInfoResult">
+      <Column Name="suc" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="msg" Type="System.String" DbType="VarChar(1) NOT NULL" CanBeNull="false" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.getCustomer" Method="getCustomer">
+    <Parameter Name="queryString" Type="System.String" DbType="VarChar(100)" />
+    <ElementType Name="getCustomerResult">
+      <Column Name="customer_name" Type="System.String" DbType="VarChar(80)" CanBeNull="true" />
+      <Column Name="customer_number" Type="System.String" DbType="VarChar(255)" CanBeNull="true" />
+      <Column Name="customer_id" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
     </ElementType>
   </Function>
 </Database>

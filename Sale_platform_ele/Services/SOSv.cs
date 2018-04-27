@@ -414,7 +414,7 @@ namespace Sale_platform_ele.Services
                 var otherSv = new OtherSv();
                 foreach (var d in order.OrderDetail) {
                     if (otherSv.GetProducts(d.item_no).Count() < 1) {
-                        throw new Exception("以下产品编码已被禁用或变更为历史资料：["+d.item_no+"],如有问题请联系工程部。");                        
+                        throw new Exception("以下产品编码已被禁用或变更为历史资料：["+d.item_no+"],如有问题请联系工程部。");
                     }
                 }
             }
@@ -541,6 +541,9 @@ namespace Sale_platform_ele.Services
         /// <param name="userId">用户id</param>
         public override void ExportSalerExcle(SalerSearchParamModel pm,int userId)
         {
+            //首先从K3同步一下订单号
+            db.updateAllK3OrderNo();
+
             pm.searchValue = pm.searchValue ?? "";
             pm.customerName = pm.customerName ?? "";     
             DateTime fd, td;
@@ -582,6 +585,9 @@ namespace Sale_platform_ele.Services
         /// <param name="userId">用户ID</param>
         public override void ExportAuditorExcle(AuditSearchParamModel pm, int userId)
         {
+            //首先从K3同步一下订单号
+            db.updateAllK3OrderNo();
+
             DateTime fDate, tDate;
             if (!DateTime.TryParse(pm.fromDate, out fDate)) {
                 fDate = DateTime.Parse("2010-6-1");
@@ -600,7 +606,7 @@ namespace Sale_platform_ele.Services
                           join o in db.Order on a.sys_no equals o.sys_no
                           from d in o.OrderDetail
                           where ad.user_id == userId
-                          && a.order_type==BILL_TYPE
+                          && a.order_type == BILL_TYPE
                           && a.sys_no.Contains(pm.sysNo)
                           && a.user_name.Contains(pm.saler)
                           && a.p_model.Contains(pm.proModel)
@@ -623,15 +629,14 @@ namespace Sale_platform_ele.Services
                           orderby a.start_date descending
                           select new ExcelData()
                           {
-                              h=o,
-                              e=d,
+                              h = o,
+                              e = d,
                               auditStatus = a.success == true ? "PASS" : a.success == false ? "NG" : "----"
                           }).Take(200).ToList();
 
             ExportExcel(result);
         }
-
-
+        
         public override void DoWhenBeforeApply()
         {
             if (string.IsNullOrEmpty(order.contract_no)) {

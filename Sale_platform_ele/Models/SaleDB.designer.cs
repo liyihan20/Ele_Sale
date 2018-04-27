@@ -325,13 +325,6 @@ namespace Sale_platform_ele.Models
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.FunctionAttribute(Name="dbo.getCustomer")]
-		public ISingleResult<getCustomerResult> getCustomer([global::System.Data.Linq.Mapping.ParameterAttribute(DbType="VarChar(100)")] string queryString)
-		{
-			IExecuteResult result = this.ExecuteMethodCall(this, ((MethodInfo)(MethodInfo.GetCurrentMethod())), queryString);
-			return ((ISingleResult<getCustomerResult>)(result.ReturnValue));
-		}
-		
 		[global::System.Data.Linq.Mapping.FunctionAttribute(Name="dbo.getClerk")]
 		public ISingleResult<getClerkResult> getClerk([global::System.Data.Linq.Mapping.ParameterAttribute(DbType="VarChar(20)")] string queryString)
 		{
@@ -359,6 +352,27 @@ namespace Sale_platform_ele.Models
 		{
 			IExecuteResult result = this.ExecuteMethodCall(this, ((MethodInfo)(MethodInfo.GetCurrentMethod())), sysNo);
 			return ((ISingleResult<getK3OrderNoResult>)(result.ReturnValue));
+		}
+		
+		[global::System.Data.Linq.Mapping.FunctionAttribute(Name="dbo.updateAllK3OrderNo")]
+		public int updateAllK3OrderNo()
+		{
+			IExecuteResult result = this.ExecuteMethodCall(this, ((MethodInfo)(MethodInfo.GetCurrentMethod())));
+			return ((int)(result.ReturnValue));
+		}
+		
+		[global::System.Data.Linq.Mapping.FunctionAttribute(Name="dbo.getCustomerCreditInfo")]
+		public ISingleResult<getCustomerCreditInfoResult> getCustomerCreditInfo([global::System.Data.Linq.Mapping.ParameterAttribute(Name="FCustomerId", DbType="Int")] System.Nullable<int> fCustomerId, [global::System.Data.Linq.Mapping.ParameterAttribute(Name="FCurencyId", DbType="Int")] System.Nullable<int> fCurencyId)
+		{
+			IExecuteResult result = this.ExecuteMethodCall(this, ((MethodInfo)(MethodInfo.GetCurrentMethod())), fCustomerId, fCurencyId);
+			return ((ISingleResult<getCustomerCreditInfoResult>)(result.ReturnValue));
+		}
+		
+		[global::System.Data.Linq.Mapping.FunctionAttribute(Name="dbo.getCustomer")]
+		public ISingleResult<getCustomerResult> getCustomer([global::System.Data.Linq.Mapping.ParameterAttribute(DbType="VarChar(100)")] string queryString)
+		{
+			IExecuteResult result = this.ExecuteMethodCall(this, ((MethodInfo)(MethodInfo.GetCurrentMethod())), queryString);
+			return ((ISingleResult<getCustomerResult>)(result.ReturnValue));
 		}
 	}
 	
@@ -6785,50 +6799,6 @@ namespace Sale_platform_ele.Models
 		}
 	}
 	
-	public partial class getCustomerResult
-	{
-		
-		private string _customer_name;
-		
-		private string _customer_number;
-		
-		public getCustomerResult()
-		{
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_customer_name", DbType="VarChar(80)")]
-		public string customer_name
-		{
-			get
-			{
-				return this._customer_name;
-			}
-			set
-			{
-				if ((this._customer_name != value))
-				{
-					this._customer_name = value;
-				}
-			}
-		}
-		
-		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_customer_number", DbType="VarChar(255)")]
-		public string customer_number
-		{
-			get
-			{
-				return this._customer_number;
-			}
-			set
-			{
-				if ((this._customer_number != value))
-				{
-					this._customer_number = value;
-				}
-			}
-		}
-	}
-	
 	public partial class getClerkResult
 	{
 		
@@ -7028,6 +6998,112 @@ namespace Sale_platform_ele.Models
 				if ((this._FBillNo != value))
 				{
 					this._FBillNo = value;
+				}
+			}
+		}
+	}
+	
+	public partial class getCustomerCreditInfoResult
+	{
+		
+		private int _suc;
+		
+		private string _msg;
+		
+		public getCustomerCreditInfoResult()
+		{
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_suc", DbType="Int NOT NULL")]
+		public int suc
+		{
+			get
+			{
+				return this._suc;
+			}
+			set
+			{
+				if ((this._suc != value))
+				{
+					this._suc = value;
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_msg", DbType="VarChar(1) NOT NULL", CanBeNull=false)]
+		public string msg
+		{
+			get
+			{
+				return this._msg;
+			}
+			set
+			{
+				if ((this._msg != value))
+				{
+					this._msg = value;
+				}
+			}
+		}
+	}
+	
+	public partial class getCustomerResult
+	{
+		
+		private string _customer_name;
+		
+		private string _customer_number;
+		
+		private int _customer_id;
+		
+		public getCustomerResult()
+		{
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_customer_name", DbType="VarChar(80)")]
+		public string customer_name
+		{
+			get
+			{
+				return this._customer_name;
+			}
+			set
+			{
+				if ((this._customer_name != value))
+				{
+					this._customer_name = value;
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_customer_number", DbType="VarChar(255)")]
+		public string customer_number
+		{
+			get
+			{
+				return this._customer_number;
+			}
+			set
+			{
+				if ((this._customer_number != value))
+				{
+					this._customer_number = value;
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_customer_id", DbType="Int NOT NULL")]
+		public int customer_id
+		{
+			get
+			{
+				return this._customer_id;
+			}
+			set
+			{
+				if ((this._customer_id != value))
+				{
+					this._customer_id = value;
 				}
 			}
 		}

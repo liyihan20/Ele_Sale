@@ -75,5 +75,31 @@ namespace Sale_platform_ele.Services
                           }).ToList();
             return result;
         }
+
+        public int GetCustomerId(string customerNo)
+        {
+            var customers = db.getCustomer(customerNo).ToList();
+            if (customers.Count() > 0) {
+                return customers.First().customer_id;
+            }
+            return 0;
+        }
+
+        public int GetCurrencyId(string currencyNo)
+        {
+            var currencies=db.vwItems.Where(v=>v.what=="currency" && v.fid==currencyNo).ToList();
+            if (currencies.Count() > 0) {
+                return currencies.First().interid;
+            }
+            return 0;
+
+        }
+
+        //获取客户信用是否超过额度
+        public ResultModel  GetCustomerCreditInfo(int customerId, int currencyId)
+        {
+            var result = db.getCustomerCreditInfo(customerId, currencyId).First();
+            return new ResultModel() { suc = (result.suc == 1 ? true : false), msg = result.msg };
+        }
     }
 }

@@ -302,7 +302,12 @@
 
     function setTaxRat(currencyNo) {
         if ("RMB" == currencyNo) {
-            taxRate = 17;
+            //2018-5-1开始，税率由17改为16
+            if (new Date() > new Date("2018-05-01 00:00:00")) {
+                taxRate = 16;
+            } else {
+                taxRate = 17;
+            }
         } else if ("" == currencyNo || null == currencyNo) {
             taxRate = undefined;
         } else {
@@ -418,21 +423,36 @@
 
             //提交申请按钮
             $("#submitApply").click(function () {
-                $("#submitApply").linkbutton('disable');
-                $('#saveAllBut').linkbutton('disable');
-                $.post("@Url.Content("~/Saler/BeginApply")", { sysNo: $("#sys_no").textbox("getValue") },
-                    function (data) {
-                        if (data.suc) {
-                            showTip(data.msg);
-                            setTimeout('window.location.href="@Url.Content("~/Saler/CheckBillList?billType=SO")"', 1000);
-                        } else {
-                            showTip(data.msg);
-                            $("#submitApply").linkbutton('enable');
-                            $('#saveAllBut').linkbutton('enable');
-                        }
-                    }, "json");
+                var customerNo = $("#customer_no").combogrid("getValue");
+                var currencyNo = $("#currency_no").combobox("getValue");
+                $.post("@Url.Content("~/Items/GetCustomerCreditInfo")", { customerNo: customerNo, currencyNo: currencyNo }, function (data) {
+                    if (data.suc) {
+                        BeginApply();
+                    } else {
+                        $.messager.confirm('@Html.Lang("confirm")', '检测到当前客户的信用额度已超额，是否继续提交?如继续提交，请尽快处理此问题，否则将可能影响最终审批结果。<br/>详情：'+data.msg, function (r) {
+                            if (r) {
+                                BeginApply();
+                            }
+                        });
+                    }
+                });
             });
         });
+        function BeginApply() {
+            $("#submitApply").linkbutton('disable');
+            $('#saveAllBut').linkbutton('disable');
+            $.post("@Url.Content("~/Saler/BeginApply")", { sysNo: $("#sys_no").textbox("getValue") },
+            function (data) {
+                if (data.suc) {
+                    showTip(data.msg);
+                    setTimeout('window.location.href="@Url.Content("~/Saler/CheckBillList?billType=SO")"', 1000);
+                } else {
+                    showTip(data.msg);
+                    $("#submitApply").linkbutton('enable');
+                    $('#saveAllBut').linkbutton('enable');
+                }
+            });
+        }
     </script>
 }
 

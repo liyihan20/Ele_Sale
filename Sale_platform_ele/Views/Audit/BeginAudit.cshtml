@@ -67,8 +67,33 @@
             });
         }
     }
-    
+
     function submitForm() {
+        if ("@sysNo".indexOf("SO") >= 0) {
+            //验证客户信用额度 2018-2-27
+            $.post("@Url.Content("~/Items/GetCustomerCreditInfo2")", { sysNo: "@sysNo" }, function (data) {
+                if (data.suc) {
+                    BeginAudit(false);
+                } else {
+                    $.messager.confirm('@Html.Lang("confirm")', '检测到当前客户的信用额度已超额，是否继续操作?如继续操作，必须填写审核意见。<br/>详情：' + data.msg, function (r) {
+                        if (r) {
+                            BeginAudit(true);
+                        }
+                    });
+                }
+            });
+        } else {
+            BeginAudit(false);
+        }
+    }
+
+    function BeginAudit(needOpintion) {
+        if (needOpintion) {
+            if ($.trim($("#auditor_comment").val()) == "") {
+                showTip("客户信用额度超额的情况下必须填写审核意见");
+                return;
+            }
+        }
         $.messager.progress();
         $("#audit_fm").form("submit", {
             url: '@Url.Content("~/Audit/HandleAudit")',
