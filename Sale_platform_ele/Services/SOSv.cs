@@ -261,6 +261,10 @@ namespace Sale_platform_ele.Services
             if (Math.Abs((order.percent1 ?? 0m) + (order.percent2 ?? 0m) - 100m) > 0.000001m) {
                 return "比例1和比例2之和必须等于100！";
             }
+            var taxRateNum = 17;
+            if (DateTime.Now > DateTime.Parse("2018-05-01")) {
+                taxRateNum = 16;
+            }
 
             foreach (var d in order.OrderDetail) {
                 if (d.fetch_date <= order.order_date) {
@@ -269,8 +273,8 @@ namespace Sale_platform_ele.Services
                 if (isForeignOrder && d.tax_rate != 0) {
                     return "国外单的税率必须是0，请重新编辑订单明细";
                 }
-                if (!isForeignOrder && d.tax_rate != 17) {
-                    return "国内单的税率必须是17，请重新编辑订单明细";
+                if (!isForeignOrder && d.tax_rate != taxRateNum) {
+                    return "国内单的税率必须是" + taxRateNum + "，请重新编辑订单明细";
                 }
                 if (d.tax_price == 0) {
                     return "规格型号为【" + d.item_model + "】的产品，含税单价不能为0。如果是免费单，请在成交价录入0，含税单价录入成本价";
@@ -353,6 +357,12 @@ namespace Sale_platform_ele.Services
             order.order_date = DateTime.Now;
             order.step_version = 0;
             order.order_no = "";
+
+            if (DateTime.Now > DateTime.Parse("2018-05-01")) {
+                foreach (var d in order.OrderDetail) {
+                    d.tax_rate = 16;
+                }
+            }
 
             return order;
         }
