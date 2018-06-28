@@ -1,0 +1,569 @@
+﻿@using Sale_platform_ele.Models;
+@{
+    List<vwChBill> bills = (List<vwChBill>)ViewData["bill"];
+    var bill = bills.First();
+}
+<script type="text/javascript" src="@Url.Content("~/Scripts/json2.js")"></script>
+<script type="text/javascript">
+    var saleStyle="";
+    $(function () {
+        $("#dg_detail").datagrid({
+            width: 1200,
+            loadMsg: "@Html.Lang("loading")",
+            rownumbers: true,
+            singleSelect: true,
+            fitColumns: true,
+            //showFooter: true,
+            columns: [[                
+                { field: 'order_no', title: '订单编号', width: 140 },
+                { field: 'item_name', title: '品名', width: 120 },
+                { field: 'item_model', title: '型号', width: 160 },
+                { field: 'unit_name', title: '单位', width: 60 },
+                { field: 'order_qty', title: '订单数量', width: 80, align: 'right' },
+                { field: 'apply_qty', title: '申请数量', width: 80, align: 'right', editor: { type: 'numberbox' } },
+                { field: 'customer_po', title: '客户P/O', width: 100, editor: { type: 'textbox' } },
+                { field: 'customer_pn', title: '客户P/N', width: 100, editor: { type: 'textbox' } },
+                { field: 'comment', title: '备注', width: 120, editor: { type: 'textbox' } },
+                { field: 'stock_qty', title: '库存数量', width: 80, align: 'right' },
+                { field: 'can_apply_qty', title: '可申请数量', width: 80, align: 'right' },
+                { field: 'order_entry_no', title: '订单行号', width: 80, align: 'center' },
+                { field: 'unit_no', title: 'unit_no', hidden: true },
+                { field: 'order_id', title: 'order_id', hidden: true },
+                { field: 'item_no', title: 'item_no', hidden: true },
+                { field: 'item_id', title: 'item_id', hidden: true }
+            ]],
+            toolbar: [{
+                text: "@Html.Lang("add_item")",
+                iconCls: 'icon-add',
+                handler: function () {
+                    if ($("#customer_no").combogrid("getValue") == "") {
+                        showTip("请先选择客户后再新增出货明细");
+                        return;
+                    }
+                    if ($("#product_type").combobox("getValue") == "") {
+                        showTip("请先选择产品类别后再新增出货明细");
+                        return;
+                    }
+                    $("#dlg_add").dialog("setTitle", "@Html.Lang("add_item")").dialog("open");
+                    $("#orderList").datagrid("resize", {height:345}); //困扰了很久的问题，加上这一句话解决。因为一开始datagrid是隐藏的，而且设置fit=false；所以加载的时候必须再设置一下高度，否则高度都是0
+                }
+            }, '-', {
+                text: "@Html.Lang("del_item")",
+                iconCls: 'icon-remove',
+                handler: function () {
+                    var row = $('#dg_detail').datagrid('getSelected');
+                    if (row) {
+                        $.messager.confirm('@Html.Lang("confirm")', '@Html.Lang("are_you_sure")?', function (r) {
+                            if (r) {
+                                var index = $('#dg_detail').datagrid('getRowIndex', row);
+                                $('#dg_detail').datagrid('deleteRow', index);
+
+                                if ($("#dg_detail").datagrid("getRows").length == 0) {
+                                    //设置可以再选择
+                                    $("#customer_no").combogrid("enable");
+                                    $("#product_type").combobox("enable");
+                                    saleStyle = "";
+                                }
+                            }
+                        });
+                    }
+                }
+            }],
+            onClickRow: onClickRow
+        });
+
+        $("#customer_no").combogrid({
+            idField: "value",
+            textField: "value",
+            panelWidth: 288,
+            required: 'true',
+            editable: false,
+            url:'@Url.Content("~/Items/GetClerkCHCustomer")',
+            columns: [[
+                        { field: 'value', title: '客户编码', width: 80 },
+        				{ field: 'name', title: '客户名称', width: 200 }
+            ]]
+        });
+
+        $("#customer_no").combogrid('grid').datagrid({
+            onClickRow: function (rowIndex, rowData) {
+                $("#customer_no").combogrid("setText", rowData.value);
+                $("#customer_no").combogrid("setValue", rowData.value);
+                $("#customer_name").textbox("setValue", rowData.name);
+                $("#customer_no").combogrid('hidePanel');
+
+                //获取地址等信息
+                $.post("@Url.Content("~/Items/GetDeliveryInfo")", { customerNumber: rowData.value }, function (data) {
+                    $("#delivery_unit").combogrid('grid').datagrid("loadData", data);
+                    $("#delivery_unit").combogrid("setValue", data[0].id);
+                    $("#delivery_unit").combogrid("setText", data[0].deliveryUnit);
+                    $("#delivery_attn").textbox("setValue", data[0].attn);
+                    $("#delivery_addr").textbox("setValue", data[0].addr);
+                    $("#delivery_phone").textbox("setValue", data[0].phone);
+                });
+
+                //将查询订单的datagrid清空，否则会出现客户和订单信息对应不上的情况
+                $("#orderList").datagrid("loadData", []);
+            }
+        });
+
+        $("#product_type").combobox({
+            onChange: function (newValue, oldValue) {
+                //将查询订单的datagrid清空，否则会出现产品类别和订单信息对应不上的情况
+                $("#orderList").datagrid("loadData", []);
+            }
+        });
+
+        $("#delivery_unit").combogrid({
+            idField: "id",            
+            textField: "deliveryUnit",
+            panelWidth: 520,
+            required: 'true',
+            nowrap: false,
+            columns: [[
+                        {field: 'deliveryUnit', title: '收货客户', width: 140 },
+        				{field: 'attn', title: 'attn', width: 60 },
+                        {field: 'phone', title: '电话', width: 100 },
+        				{field: 'addr', title: '收货地址', width: 200 }
+            ]]
+        });
+
+        $("#delivery_unit").combogrid('grid').datagrid({
+            onClickRow: function (rowIndex, rowData) {
+                $("#delivery_unit").combogrid("setText", rowData.deliveryUnit);
+                $("#delivery_unit").combogrid("setValue", rowData.id);
+                $("#delivery_attn").textbox("setValue", rowData.attn);
+                $("#delivery_addr").textbox("setValue", rowData.addr);
+                $("#delivery_phone").textbox("setValue", rowData.phone);
+                $("#delivery_unit").combogrid('hidePanel');
+            }
+        });
+
+        $("#orderList").datagrid({
+            width: 1280,            
+            rownumbers: true,            
+            checkOnSelect: true,
+            selectOnCheck: true,
+            fitColumns: true,
+            columns: [[
+                { field: 'ck', checkbox: true },
+                { field: 'orderNumber', title: '订单编号', width: 140 },
+                {
+                    field: 'orderDate', title: '订单日期', width: 80,
+                    formatter: function (value, row, index) {
+                        var date = eval('new ' + eval(value).source);
+                        return date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
+                    }
+                },
+                { field: 'orderEntry', title: '订单行号', width: 60 },
+                { field: 'itemName', title: '品名', width: 120 },
+                { field: 'itemModel', title: '型号', width: 180 },
+                { field: 'qty', title: '订单数量', width: 80, align: 'right' },
+                { field: 'relateQty', title: '关联数量', width: 80, align: 'right' },
+                {
+                    field: 'canApplyQty', title: '可申请数量', width: 80, align: 'right',
+                    formatter: function (value, row, index) {
+                        return row.qty - row.relateQty;
+                    }
+                },
+                { field: 'stockQty', title: '库存数量', width: 80, align: 'right' },
+                { field: 'unitName', title: '单位', width: 60 },
+                { field: 'empName', title: '营业员', width: 100 },
+                { field: 'saleStyle', title: '销售方式', width: 100 },
+                { field: 'productType', title: '产品类别', width: 100, align: 'center' },
+                { field: 'unitNumber', hidden: true },
+                { field: 'orderId', hidden: true },
+                { field: 'itemNumber', hidden: true }
+            ]]
+        });
+
+        $("#checkBt").on("click", function () {
+            $("#orderList").datagrid("loading");
+            $.post("@Url.Content("~/CHSP/CheckOrderStockInfo")", {
+                customerNumber: $("#customer_no").combogrid("getValue"),
+                saleStyle: saleStyle,
+                productType: $("#product_type").combobox("getValue"),
+                fromDate: $("#fromDate").datebox("getValue"),
+                toDate: $("#toDate").datebox("getValue"),
+                orderNumber: $("#order_no").textbox("getValue"),
+                productModel: $("#pro_model").textbox("getValue")
+            }, function (data) {
+                $("#orderList").datagrid("loaded");
+                if (data.length == 0) {
+                    showTip("查询不到符合条件的单据信息");
+                } else {
+                    $("#orderList").datagrid("loadData", data);
+                }
+                
+            });
+        });
+
+        $("#order_div").click(function () {
+            endEditing();
+        });
+
+    });
+
+    function addCHItem() {
+        var nowRows = $("#dg_detail").datagrid("getRows");
+        var toAddeds=$("#orderList").datagrid("getChecked");
+        
+        var isEmpty = nowRows.length == 0;//当前出货信息为空
+        for (var i = 0; i < toAddeds.length; i++) {
+            //判断是否在列表中已存在
+            for (var j = 0; j < nowRows.length; j++) {
+                if (toAddeds[i].orderId == nowRows[j].order_id && toAddeds[i].orderEntry == nowRows[j].order_entry_no) {
+                    showTip("#" + toAddeds[i].orderNumber + ":" + toAddeds[i].orderEntry + "#已存在，不能重复添加");
+                    return;
+                }
+            }
+
+            if (isEmpty) {
+                saleStyle = toAddeds[i].saleStyle;
+                //设置不能再选择
+                $("#customer_no").combogrid("disable");
+                $("#product_type").combobox("disable");
+            } else {
+                if (toAddeds[i].saleStyle != saleStyle) {
+                    showTip("同一张出货申请的销售方式必须保持一致，列表中的销售方式是:" + saleStyle + ";#" + toAddeds[i].orderNumber + "#的销售方式是:" + toAddeds[i].saleStyle);
+                    return;
+                }
+            }
+            $("#dg_detail").datagrid("appendRow", {
+                order_no: toAddeds[i].orderNumber,
+                item_name: toAddeds[i].itemName,
+                item_model: toAddeds[i].itemModel,
+                unit_name: toAddeds[i].unitName,
+                order_qty: toAddeds[i].qty,
+                stock_qty: toAddeds[i].stockQty,
+                can_apply_qty: toAddeds[i].qty - toAddeds[i].relateQty,
+                order_entry_no: toAddeds[i].orderEntry,
+                unit_no: toAddeds[i].unitNumber,
+                order_id: toAddeds[i].orderId,
+                item_no: toAddeds[i].itemNumber,
+                item_id:toAddeds[i].itemID
+            });
+        }
+        $("#dlg_add").dialog("close");
+    }
+
+    var editIndex = undefined;
+    function endEditing() {
+        if (editIndex == undefined) { return true; }
+        if ($('#dg_detail').datagrid('validateRow', editIndex)) {
+            $('#dg_detail').datagrid('endEdit', editIndex);
+            editIndex = undefined;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    function onClickRow(index) {        
+        if (editIndex != index) {
+            if (endEditing()) {
+                $('#dg_detail').datagrid('selectRow', index)
+                        .datagrid('beginEdit', index);
+                editIndex = index;
+            } else {
+                $('#dg_detail').datagrid('selectRow', editIndex);
+            }
+        }
+        preventBubble();
+    }
+
+    //阻止冒泡事件
+    function preventBubble() {
+        if (navigator.userAgent.indexOf("Firefox") > 0) {
+            var $E = function () { var c = $E.caller; while (c.caller) c = c.caller; return c.arguments[0] };
+            __defineGetter__("event", $E);
+        }
+        if (window.event) {
+            event.cancelBubble = true;
+        } else if (evt) {
+            event.stopPropagation();
+        }
+    }
+</script>
+
+<script>
+
+    $(function () {
+        //保存表单
+        $("#saveAllBut").on("click", function () {
+            if (validateBeforeSave()) {
+                $.messager.progress();
+                $('#order_form').form('submit', {
+                    url: '@Url.Content("~/Saler/SaveBill")',
+                    onSubmit: function (param) {
+                        console.log($("#dg_detail").datagrid("getRows"));
+                        param.ch_bill_details = JSON.stringify($("#dg_detail").datagrid("getRows"));
+                        param.product_type = $("#product_type").combobox("getValue");
+                        param.delivery_unit = $("#delivery_unit").combobox("getText");
+                        param.customer_no = $("#customer_no").combogrid("getValue");
+                        param.sale_style = saleStyle;
+                        return true;
+                    },
+                    success: function (data) {
+                        var result = eval('(' + data + ')');
+                        if (result.suc) {
+                            showTip("@Html.Lang("suc_save")");
+                        } else {
+                            showTip("@Html.Lang("failure_save"):" + result.msg);
+                        }
+                    }
+                });
+                $.messager.progress("close");
+            }
+        });
+
+        $("#submitApply").click(function () {
+            $("#submitApply").linkbutton('disable');
+            $('#saveAllBut').linkbutton('disable');
+            $.post("@Url.Content("~/Saler/BeginApply")", { sysNo: $("#sys_no").textbox("getValue") },
+            function (data) {
+                if (data.suc) {
+                    showTip(data.msg);
+                    setTimeout('window.location.href="@Url.Content("~/Saler/CheckBillList?billType=CH")"', 1000);
+                } else {
+                    showTip(data.msg);
+                    $("#submitApply").linkbutton('enable');
+                    $('#saveAllBut').linkbutton('enable');
+                }
+            });
+        });
+
+    });   
+
+    //保存之前先验证
+    function validateBeforeSave() {
+        if (!$('#order_form').form('validate')) {
+            return false;
+        }
+        var rows = $("#dg_detail").datagrid("getRows");
+        if (rows.length == 0) {
+            showTip("保存失败：出货信息明细必须至少有一条数据");
+            return false;
+        }
+        var modelStockQty = [];
+        for (var i = 0;i<rows.length;i++){
+            if (rows[i].apply_qty=="" || isNaN(rows[i].apply_qty)) {
+                showTip("保存失败：申请数量不能为空，行号：" + (i + 1));
+                return false;
+            }
+            if (parseInt(rows[i].apply_qty) > parseInt(rows[i].can_apply_qty)) {
+                showTip("保存失败：申请数量不能大于可出数量，行号：" + (i + 1));
+                return false;
+            }
+            var idx = modelStockQty.findIndex(function (m) { return m.model == rows[i].item_model; });
+            if (idx>=0) {
+                modelStockQty[idx].qty = parseInt(modelStockQty[idx].qty) + parseInt(rows[i].apply_qty);
+            } else {
+                modelStockQty.push({ model: rows[i].item_model, qty: parseInt(rows[i].apply_qty),stockQty: parseInt(rows[i].stock_qty) });
+            }
+        }        
+        var exceedQty = modelStockQty.filter(function (v) { return v.qty > v.stockQty; });
+        if (exceedQty.length > 0) {
+            showTip("保存失败，型号#" + exceedQty[0].model + "#申请数量(" + exceedQty[0].qty + ")不能大于库存数量(" + exceedQty[0].stockQty + ")");
+            return false;
+        }
+        return true;
+    }
+
+</script>
+
+@if (!string.IsNullOrEmpty(bill.sale_style)) {
+    <script type="text/javascript">
+        $(function(){
+            saleStyle = "@bill.sale_style";
+            $("#customer_no").combogrid("disable");
+            $("#product_type").combobox("disable");
+            $("#delivery_unit").combogrid("setText", "@bill.delivery_unit");
+            $("#delivery_unit").combogrid("setValue", "@bill.delivery_unit");
+            $.post("@Url.Content("~/Items/GetDeliveryInfo")", { customerNumber: "@bill.customer_no" }, function (data) {
+                $("#delivery_unit").combogrid('grid').datagrid("loadData", data);
+            });
+        });
+        
+    </script>
+}
+
+<form id="order_form" method="post">
+    <div id="order_div" class="easyui-panel" title="新增出货申请" style="width: 840px; padding: 10px; background: #fafafa;">
+        <div>
+            <table border="0" cellpadding="1" cellspacing="3" width="800">
+                <tr>
+                    <td>
+                        系统流水号:
+                    </td>
+                    <td>
+                        <input class="easyui-textbox" name="sys_no" id="sys_no" style="width: 140px" required="true" editable="false" value="@bill.sys_no" />
+                    </td>
+                    <td>
+                        产品类别:
+                    </td>
+                    <td>
+                        <input class="easyui-combobox" name="product_type" id="product_type" style="width:140px"
+                               data-options="textField:'value',valueField:'value',panelHeight:'auto',panelWidth:'220', required:true,editable:false,
+                                           data:[
+                                           {value:'FPC/软硬结合板'},{value:'FPC样品/FPC开模'},{value:'PCB/HDI'},{value:'PCB样品/HDI样品/PCB开模/HDI开模'}
+                                           ]" value="@bill.product_type" />
+                    </td>
+                    <td>
+                        制单人:
+                    </td>
+                    <td>
+                        <input class="easyui-textbox" style="width:140px" editable="false" value="@bill.real_name" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        客户编码:
+                    </td>
+                    <td>
+                        <input class="easyui-combogrid" name="customer_no" id="customer_no" style="width:140px" value="@bill.customer_no" />
+                    </td>
+                    <td>
+                        营业员:
+                    </td>
+                    <td>
+                        <input class="easyui-textbox" name="clerk_name" id="clerk_name" style="width: 140px" value="@bill.clerk_name"/>
+                    </td>
+                    <td>
+                        营业员电话:
+                    </td>
+                    <td>
+                        <input class="easyui-textbox" name="clerk_phone" id="clerk_phone" style="width: 140px" value="@bill.clerk_phone" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        客户名称:
+                    </td>
+                    <td>
+                        <input class="easyui-textbox" id="customer_name" name="customer_name" style="width: 140px" editable="false" value="@bill.customer_name" />
+                    </td>
+                    <td>
+                        备注:
+                    </td>
+                    <td colspan="3">
+                        <input class="easyui-textbox" id="comment" name="comment" style="width: 432px" value="@bill.comment" />
+                    </td>
+                </tr>
+            </table>
+            <br />
+            <div id="detail_div" class="easyui-panel" title="出货信息明细" style="width: 815px; height: 300px">
+                <table id="dg_detail">
+                    @foreach (var l in bills.Where(b => b.item_no != null)) {
+                        <tr>                            
+                            <td>@l.order_no</td>
+                            <td>@l.item_name</td>
+                            <td>@l.item_model</td>
+                            <td>@l.unit_name</td>
+                            <td>@l.order_qty</td>
+                            <td>@l.apply_qty</td>
+                            <td>@l.customer_po</td>
+                            <td>@l.customer_pn</td>
+                            <td>@l.entry_comment</td>
+                            <td>@l.stock_qty</td>
+                            <td>@l.can_apply_qty</td>
+                            <td>@l.order_entry_no</td>
+                            <td>@l.unit_no</td>
+                            <td>@l.order_id</td>
+                            <td>@l.item_no</td>
+                            <td>@l.item_id</td>
+                        </tr>
+                    }
+                </table>
+            </div>
+            <br/>
+            <table border="0" cellpadding="1" cellspacing="3" width="800">
+                <tr>
+                    <td>
+                        收货单位:
+                    </td>
+                    <td>
+                        <input class="easyui-combogrid" id="delivery_unit" style="width: 160px" required />
+                    </td>
+                    <td>
+                        ATTN:
+                    </td>
+                    <td>
+                        <input class="easyui-textbox" name="delivery_attn" id="delivery_attn" style="width:140px" value="@bill.delivery_attn" />
+                    </td>
+                    <td>
+                        收货电话:
+                    </td>
+                    <td>
+                        <input class="easyui-textbox" name="delivery_phone" id="delivery_phone" style="width:140px" value="@bill.delivery_phone" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        收货地址:
+                    </td>
+                    <td colspan="5">
+                        <input class="easyui-textbox" name="delivery_addr" id="delivery_addr" required style="width:680px" value="@bill.delivery_addr" />
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <div align="center">
+            <a id="saveAllBut" href="#" class="easyui-linkbutton" iconcls='icon-save' style="margin: 10px 20px;">@Html.Lang("save_form")</a>                    
+            <a id="submitApply" href="#" class="easyui-linkbutton" iconcls='icon-document' style="margin: 10px 20px;">@Html.Lang("submit_apply")</a>                    
+        </div>
+
+    </div>
+</form>
+
+@*弹出的新增对话框*@
+<div id="dlg_add" class="easyui-dialog" style="width: 800px; height:500px;" closed="true" buttons="#dlg_add_buttons" modal="true" title="新增出货条目">
+    <div class="easyui-layout" data-options="fit:true">
+        <div data-options="region:'north',collapsed:false,split:true" style="height: 60px; background: #fafafa; padding: 1px;">            
+            <table cellpadding="0" cellspacing="2">
+                <tr>
+                    <td>
+                        订单日期:
+                    </td>
+                    <td>
+                        到:
+                    </td>
+                    <td>
+                        订单号:
+                    </td>
+                    <td>
+                        规格型号:
+                    </td>
+                    <td>
+                        &nbsp;
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <input id="fromDate" class="easyui-datebox" name="from_date" style="width: 90px" value="@(DateTime.Now.Year+"-01-01")"/>
+                    </td>
+                    <td>
+                        <input id="toDate" class="easyui-datebox" name="to_date" style="width: 90px" value="@(DateTime.Now.ToString("yyyy-MM-dd"))" />
+                    </td>
+                    <td>
+                        <input class="easyui-textbox" id="order_no" name="order_no" style="width: 120px" />
+                    </td>
+                    <td>
+                        <input class="easyui-textbox" id="pro_model" name="pro_model" style="width: 120px" />
+                    </td>
+                    <td>
+                        <a id="checkBt" href="#" class="easyui-linkbutton" data-options="iconCls:'icon-search'">@Html.Lang("search")</a>
+                    </td>
+                </tr>
+            </table>            
+        </div>
+        <div data-options="region:'center'">
+            <table id="orderList"></table>
+        </div>
+    </div>
+</div>
+<div id="dlg_add_buttons">
+    <a href="#" class="easyui-linkbutton" iconcls="icon-ok" onclick="addCHItem()">确定</a>
+    <a href="#" class="easyui-linkbutton" iconcls="icon-cancel" onclick="javascript: $('#dlg_add').dialog('close')">@Html.Lang("cancel")</a>
+</div>

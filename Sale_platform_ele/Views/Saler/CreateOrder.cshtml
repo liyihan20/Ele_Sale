@@ -130,7 +130,7 @@
                 }
             }, '-', {
                 text: "@Html.Lang("del_item")",
-                iconCls: 'icon-remove',
+                iconCls: 'icon-remove', 
                 handler: function () {
                     var row = $('#dg_detail').datagrid('getSelected');
                     if (row) {
@@ -303,7 +303,8 @@
     function setTaxRat(currencyNo) {
         if ("RMB" == currencyNo) {
             //2018-5-1开始，税率由17改为16
-            if (new Date() > new Date("2018-05-01 00:00:00")) {
+            //if (new Date() > new Date("2018-05-01 00:00:00")) { //这种方式只能兼容google chrome，IE不兼容
+            if (new Date() > new Date(2018,4,1)) {
                 taxRate = 16;
             } else {
                 taxRate = 17;
@@ -330,7 +331,7 @@
                 }
             }
 
-            if (taxedPrice > dealPrice) {
+            if (parseFloat(taxedPrice) > parseFloat(dealPrice)) {
                 $.messager.confirm("保存确认", "含税单价大于成交价，要继续保存吗？", function (r) {
                     if (r) {
                         beginSaveDetail();
@@ -369,7 +370,8 @@
                 unit_no: $("#unit_no").combobox("getValue"),
                 unit_name: $("#unit_no").combobox("getText"),
                 qty: $("#qty").numberbox("getValue"),
-                unit_price: $("#unit_price").numberbox("getValue"),
+                //unit_price: $("#unit_price").numberbox("getValue"),
+                unit_price: Math.round($("#tax_price").numberbox("getValue") * 1000000 / (1 + taxRate / 100)) / 1000000, //重新以含税单价为准，计算一遍不含税单价
                 tax_price: $("#tax_price").numberbox("getValue"),
                 deal_price: $("#deal_price").numberbox("getValue"),
                 cost: $("#cost").numberbox("getValue"),

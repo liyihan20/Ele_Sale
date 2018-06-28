@@ -1450,4 +1450,21 @@
     <value>Settlement Method</value>
     <comment>结算方式</comment>
   </data>
+  <data name="ch_apply" xml:space="preserve">
+    <value>Shipment apply</value>
+    <comment>出货申请</comment>
+  </data>
+  <data name="clerk_customer" xml:space="preserve">
+    <value>Clerk&amp;Customer</value>
+    <comment>营业与客户</comment>
+  </data>
+  <data name="new_ch_bill" xml:space="preserve">
+    <value>New Delivery Apply</value>
+  </data>
+  <data name="k3_order_info" xml:space="preserve">
+    <value>Order Shipment Status</value>
+  </data>
+  <data name="stock_team_report" xml:space="preserve">
+    <value>Report &amp; Print Bill</value>
+  </data>
 </root>

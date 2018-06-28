@@ -146,6 +146,7 @@
     <Compile Include="Controllers\AuditController.cs" />
     <Compile Include="Controllers\AuthorityController.cs" />
     <Compile Include="Controllers\BaseController.cs" />
+    <Compile Include="Controllers\CHSPController.cs" />
     <Compile Include="Controllers\FileController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ItemsController.cs" />
@@ -157,6 +158,7 @@
     </Compile>
     <Compile Include="Models\ApplyModels.cs" />
     <Compile Include="Models\BillModels.cs" />
+    <Compile Include="Models\CHModel.cs" />
     <Compile Include="Models\CommissionModels.cs" />
     <Compile Include="Models\CommonModels.cs" />
     <Compile Include="Models\ProcessModel.cs" />
@@ -171,6 +173,7 @@
     <Compile Include="Services\ApplySv.cs" />
     <Compile Include="Services\BaseSv.cs" />
     <Compile Include="Services\BillSv.cs" />
+    <Compile Include="Services\CHSv.cs" />
     <Compile Include="Services\CommissionSv.cs" />
     <Compile Include="Services\DepSv.cs" />
     <Compile Include="Services\GroupSv.cs" />
@@ -185,6 +188,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="bin\org.in2bits.MyXls.dll" />
+    <Content Include="Content\images\Truly.gif" />
     <Content Include="Content\MyCSS.css" />
     <Content Include="Content\Site.css" />
     <Content Include="Content\themes\black\accordion.css" />
@@ -562,6 +566,7 @@
     <Content Include="Content\themes\metro\tree.css" />
     <Content Include="Content\themes\metro\validatebox.css" />
     <Content Include="Content\themes\metro\window.css" />
+    <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
     <Content Include="Models\SaleDB.dbml">
       <Generator>MSLinqToSQLGenerator</Generator>
@@ -585,7 +590,9 @@
     <Content Include="Scripts\uploadify\uploadify.css" />
     <Content Include="Scripts\uploadify\uploadify.swf" />
     <Content Include="Scripts\_references.js" />
-    <Content Include="Web.config" />
+    <Content Include="Web.config">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </Content>
@@ -613,12 +620,19 @@
     <Content Include="Views\Shared\_UploadFilePartial.cshtml" />
     <Content Include="Views\File\UploadFileView.cshtml" />
     <Content Include="Views\File\DownloadFileView.cshtml" />
-    <Content Include="Views\Saler\CheckBillList.cshtml" />
+    <Content Include="Views\Saler\CheckSOList.cshtml" />
     <Content Include="Views\Saler\CheckOrder.cshtml" />
     <Content Include="Views\Shared\_CheckAuditStatus.cshtml" />
     <Content Include="Views\Audit\CheckAuditList.cshtml" />
     <Content Include="Views\Audit\BeginAudit.cshtml" />
     <Content Include="Views\Shared\_BlockInfoPartial.cshtml" />
+    <Content Include="Views\CHSP\ClerkAndCustomer.cshtml" />
+    <Content Include="Views\Saler\CreateCH.cshtml" />
+    <Content Include="Views\Saler\CheckCHList.cshtml" />
+    <Content Include="Views\Saler\CheckCH.cshtml" />
+    <Content Include="Views\CHSP\K3OrderInfo.cshtml" />
+    <Content Include="Views\CHSP\StockTeamReport.cshtml" />
+    <Content Include="Views\File\PrintChReport.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

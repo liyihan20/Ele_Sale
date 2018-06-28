@@ -7,6 +7,7 @@ using System.IO;
 using System.Web;
 using System.Web.Mvc;
 using Newtonsoft.Json;
+using Sale_platform_ele.Filters;
 
 namespace Sale_platform_ele.Controllers
 {
@@ -172,6 +173,42 @@ namespace Sale_platform_ele.Controllers
             Wlog("审核人导出Excel：" + JsonConvert.SerializeObject(pm), billType);
 
             bill.ExportAuditorExcle(pm, currentUser.userId);
+        }
+
+        //导出出货组报表
+        public void ExportStockTeamExcel(FormCollection fc)
+        {
+            string sysNo = fc.Get("sysNo") ?? "";
+            string customer = fc.Get("customer") ?? "";
+            string stockNo = fc.Get("stockNo") ?? "";
+            string orderNo = fc.Get("orderNo") ?? "";
+            string fromDateStr = fc.Get("fromDate");
+            string toDateStr = fc.Get("toDate");
+            string model = fc.Get("productModel") ?? "";
+
+            DateTime fromDate, toDate;
+            if (!DateTime.TryParse(fromDateStr, out fromDate)) {
+                return;
+            }
+            if (!DateTime.TryParse(toDateStr, out toDate)) {
+                return;
+            }
+            toDate = toDate.AddDays(1);
+
+            if (fromDate > toDate) {
+                return;
+            }
+
+            new CHSv().ExportStockTeamExcel(sysNo, stockNo, orderNo, customer, model, fromDate, toDate, currentUser.userId);
+        }
+
+        //打印出货送货单
+        [SessionTimeOutFilter]
+        public ActionResult PrintChReport(string sysNo)
+        {
+            ViewData["list"] = new CHSv().GetChReportData(sysNo);
+            ViewData["printer"] = currentUser.realName;
+            return View();
         }
 
     }

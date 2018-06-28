@@ -17,4 +17,32 @@ namespace Sale_platform_ele.Models
         public string dealPrice { get; set; }
         public string auditStatus { get; set; }
     }
+
+    public class CHListModel
+    {
+        public int billId { get; set; }
+        public string billDate { get; set; }
+        public string sysNo { get; set; }
+        public string customerName { get; set; }
+        public string productType { get; set; }
+        public string productName { get; set; }
+        public string productModel { get; set; }
+        public string qty { get; set; }
+        public string orderNo { get; set; }
+        public int? orderEntryNo { get; set; }
+        public string auditStatus { get; set; }
+        public string k3AuditDate { get; set; }
+    }
+
+    public class ClerkAndCustomerModel
+    {
+        public int id { get; set; }
+        public string agency { get; set; }
+        public int? clerkId { get; set; }
+        public string clerkName { get; set; }
+        public string clerkNumber { get; set; }
+        public string customerNumber { get; set; }
+        public string customerName { get; set; }
+    }
+
 }

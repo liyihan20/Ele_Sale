@@ -1449,4 +1449,21 @@
     <value>结算方式</value>
     <comment>结算方式</comment>
   </data>
+  <data name="ch_apply" xml:space="preserve">
+    <value>出货申请</value>
+    <comment>出货申请</comment>
+  </data>
+  <data name="clerk_customer" xml:space="preserve">
+    <value>营业与客户</value>
+    <comment>营业与客户</comment>
+  </data>
+  <data name="new_ch_bill" xml:space="preserve">
+    <value>新增出货申请</value>
+  </data>
+  <data name="k3_order_info" xml:space="preserve">
+    <value>订单出货状态</value>
+  </data>
+  <data name="stock_team_report" xml:space="preserve">
+    <value>报表&amp;送货单</value>
+  </data>
 </root>

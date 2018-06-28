@@ -9,8 +9,7 @@ using System.Web.Mvc;
 namespace Sale_platform_ele.Services
 {
     public abstract class BillSv:BaseSv
-    {
-        const string CHECK_VIEW_LIST_NAME = "CheckBillList";
+    {       
 
         // --------------------------   抽象属性   -------------------------- //
 
@@ -27,20 +26,24 @@ namespace Sale_platform_ele.Services
         /// <summary>
         /// 新建单据视图名
         /// </summary>
-        public abstract string CreateViewName { get; }               
+        public abstract string CreateViewName { get; }
 
         /// <summary>
         /// 查看单据视图名
         /// </summary>
         public abstract string CheckViewName { get; }
 
+        /// <summary>
+        /// 单据列表视图
+        /// </summary>
+        public abstract string CheckListViewName { get; }
 
         // --------------------------   抽象方法   -------------------------- //
 
         /// <summary>
         /// 单据列表视图
         /// </summary>
-        public virtual string CheckListViewName { get { return CHECK_VIEW_LIST_NAME; } }
+        //public virtual string CheckListViewName { get { return CHECK_VIEW_LIST_NAME; } }
 
         /// <summary>
         /// 新建单据需要返回的object

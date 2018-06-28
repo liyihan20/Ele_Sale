@@ -96,10 +96,41 @@ namespace Sale_platform_ele.Services
         }
 
         //获取客户信用是否超过额度
-        public ResultModel  GetCustomerCreditInfo(int customerId, int currencyId)
+        public ResultModel GetCustomerCreditInfo(int customerId, int currencyId)
         {
             var result = db.getCustomerCreditInfo(customerId, currencyId).First();
             return new ResultModel() { suc = (result.suc == 1 ? true : false), msg = result.msg };
         }
+
+        //获取有权限的出货客户
+        public List<ComboResult> GetClerkCHCustomers(int userId)
+        {
+            var result = (from v in db.ClerkAndCustomer
+                          where v.clerk_id == userId 
+                          orderby v.customer_number
+                          select new ComboResult()
+                          {
+                              value = v.customer_number,
+                              name = v.customer_name
+                          }).ToList();
+            return result;
+        } 
+
+        //获取出货客户的地址等信息
+        public List<DeliveryInfoModel> GetDeliveryInfo(string customerNumber)
+        {
+            var result = (from d in db.getDeliveryUnitInfo(customerNumber)
+                          orderby d.id descending
+                          select new DeliveryInfoModel()
+                          {
+                              id = d.id,
+                              deliveryUnit = d.delivery_unit,
+                              addr = d.delivery_addr,
+                              attn = d.attn,
+                              phone = d.phone
+                          }).ToList();
+            return result;
+        }
+
     }
 }

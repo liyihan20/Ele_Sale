@@ -90,5 +90,15 @@ namespace Sale_platform_ele.Controllers
             return GetCustomerCreditInfo(order.customer_no, order.currency_no);
         }
 
+        public JsonResult GetClerkCHCustomer()
+        {
+            return Json(new OtherSv().GetClerkCHCustomers(currentUser.userId));
+        }
+
+        public JsonResult GetDeliveryInfo(string customerNumber)
+        {
+            return Json(new OtherSv().GetDeliveryInfo(customerNumber));
+        }
+
     }
 }

@@ -109,7 +109,7 @@ namespace Sale_platform_ele.Services
                     default:
                         //其它除了从表单直接传过来的审核人，全部通过关联关系进行查询审核人。统一使用关联类型+“NO"这个变量名，值从上一级传进来
                         string realteTypeID = relateType + "NO";
-                        if (auditorsDic.TryGetValue(realteTypeID, out dicValue)) {
+                        if (auditorsDic != null && auditorsDic.TryGetValue(realteTypeID, out dicValue)) {
                             if (relateType.StartsWith("表单")) {
                                 //如果以表单开头，表示是从表单直接选择审核人员，那么不用关联直接加入审核人
                                 auditors.Add(dicValue);

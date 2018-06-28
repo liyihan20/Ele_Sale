@@ -3,14 +3,14 @@ using System.Linq;
 
 namespace Sale_platform_ele.Services
 {
-    public class UA:BaseSv
+    public class UA : BaseSv
     {
         int userId;
 
         public UA(int userId)
-        {            
+        {
             this.userId = userId;
-        }        
+        }
 
         public User GetUser()
         {
@@ -42,5 +42,6 @@ namespace Sale_platform_ele.Services
         {
             return HasGotPower("check_all");
         }
+
     }
 }

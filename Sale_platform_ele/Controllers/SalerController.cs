@@ -129,9 +129,11 @@ namespace Sale_platform_ele.Controllers
 
             SetBillBySysNo(sysNo);
             ViewData["bill"] = bill.GetBill(0);
-            if (new ApplySv().ApplyHasBegan(sysNo)) {
+            var hasSubmited=new ApplySv().ApplyHasBegan(sysNo);
+            if (hasSubmited) {
                 ViewData["blockInfo"] = new ApplySv(sysNo).GetBlockInfo();
             }
+            ViewData["hasSubmited"] = hasSubmited;
             return View(bill.CheckViewName);
         }
 

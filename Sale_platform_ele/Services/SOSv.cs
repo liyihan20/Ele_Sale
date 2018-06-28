@@ -14,6 +14,7 @@ namespace Sale_platform_ele.Services
         const string BILL_TYPE_NAME = "销售订单";
         const string CREATE_VIEW_NAME = "CreateOrder";
         const string CHECK_VIEW_NAME = "CheckOrder";
+        const string CHECK_VIEW_LIST_NAME = "CheckSOList";
         private Order order;
 
         /// <summary>
@@ -76,7 +77,11 @@ namespace Sale_platform_ele.Services
             }
         }
 
-        
+        public override string CheckListViewName
+        {
+            get { return CHECK_VIEW_LIST_NAME; }
+        }
+
         /// <summary>
         /// (无参构造)获取新建单据的对象实例
         /// </summary>
@@ -186,6 +191,7 @@ namespace Sale_platform_ele.Services
                     d.MU = csv.GetMU((decimal)d.deal_price, (decimal)d.cost,(int)d.tax_rate, (int)d.fee_rate, (decimal)order.exchange_rate);
                     d.commission_rate = csv.GetCommissionRate((decimal)d.MU, order.product_type_no);
                     d.commission = csv.GetCommissionMoney((decimal)d.deal_price , (decimal)d.qty, (decimal)d.commission_rate);
+                    d.unit_price = Math.Round((decimal)(d.tax_price / (1 + d.tax_rate / 100.0m)), 6);
                 }
 
                 db.Order.InsertOnSubmit(order);
@@ -294,7 +300,7 @@ namespace Sale_platform_ele.Services
         {
             bool canCheckAll = new UA(userId).CanCheckAllBill();
             pm.searchValue = pm.searchValue ?? "";
-            pm.customerName = pm.customerName ?? "";            
+            pm.customerName = pm.customerName ?? "";
 
             DateTime fd, td;
             if (!DateTime.TryParse(pm.fromDate, out fd)) {
@@ -329,12 +335,9 @@ namespace Sale_platform_ele.Services
                               productModel = d.item_model,
                               productName = d.item_name,
                               auditStatus = (Y == null ? "未开始申请" : Y.success == true ? "申请成功" : Y.success == false ? "申请失败" : "审批之中")
-                          }).Take(200).ToList();
-
-            var list = new List<object>();
-            list.AddRange(result);
-
-            return list;
+                          }).Take(200).ToList<object>();
+                        
+            return result;
         }
 
         /// <summary>
@@ -424,7 +427,7 @@ namespace Sale_platform_ele.Services
                 var otherSv = new OtherSv();
                 foreach (var d in order.OrderDetail) {
                     if (otherSv.GetProducts(d.item_no).Count() < 1) {
-                        throw new Exception("以下产品编码已被禁用或变更为历史资料：["+d.item_no+"],如有问题请联系工程部。");
+                        throw new Exception("以下产品编码已被禁用或变更为历史资料：[" + d.item_no + "],如有问题请联系工程部。");
                     }
                 }
             }
@@ -657,5 +660,7 @@ namespace Sale_platform_ele.Services
                 }
             }
         }
+
+
     }
 }

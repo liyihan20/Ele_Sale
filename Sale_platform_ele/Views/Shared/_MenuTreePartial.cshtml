@@ -16,6 +16,24 @@
                     </ul>
                 </li>
             }
+            @if (Array.IndexOf(powers, "clerk_customer") != -1 || Array.IndexOf(powers, "new_ch") != -1 || Array.IndexOf(powers, "CH_FPC_Team") != -1 || Array.IndexOf(powers, "CH_PCB_Team") != -1) {
+                <li>
+                    <span>@Html.Lang("ch_apply")</span>
+                    <ul>
+                        @if (Array.IndexOf(powers, "new_ch") != -1) { 
+                            <li id="~/Saler/CreateBill?billType=CH"><span>@Html.Lang("new_ch_bill")</span> </li>
+                            <li id="~/Saler/CheckBillList?billType=CH"><span>@Html.Lang("check_add_apply")</span> </li>
+                            <li id="~/CHSP/K3OrderInfo"><span>@Html.Lang("k3_order_info")</span> </li>
+                        }
+                        @if (Array.IndexOf(powers, "clerk_customer") != -1) { 
+                            <li id="~/CHSP/ClerkAndCustomer"><span>@Html.Lang("clerk_customer")</span> </li>          
+                        }
+                        @if (Array.IndexOf(powers, "CH_FPC_Team") != -1 || Array.IndexOf(powers, "CH_PCB_Team") != -1) { 
+                            <li id="~/CHSP/StockTeamReport"><span>@Html.Lang("stock_team_report")</span> </li>          
+                        }
+                    </ul>
+                </li>
+            }
             <li id="~/Audit/CheckAuditList"><span>@Html.Lang("audit_apply")</span></li>
          </ul>
     </li>

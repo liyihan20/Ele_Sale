@@ -1,0 +1,135 @@
+﻿<script type="text/javascript">
+
+    $(function () {
+        $(".customerbox").combogrid({
+            loadMsg: "Please wait...",
+            idField: "value",
+            textField: "name",
+            panelWidth: 400,
+            columns: [[
+                    { field: 'value', title: '@Html.Lang("customer_num")', width: 150 },
+                    { field: 'name', title: '@Html.Lang("customer_name")', width: 220 }
+            ]],
+            keyHandler: {
+                query: function () { },
+                enter: function () {
+                    var box_id = $(this).attr("id");
+                    var _this = "#" + box_id;
+                    var q = $(_this).combogrid('getText');
+                    if (q != "") {
+                        $.post("@Url.Content("~/Items/GetCustomers")", { q: q },
+                            function (data) {
+                                $(_this).combogrid('grid').datagrid('loadData', data);
+                                $(_this).combogrid('setText', q);
+                            },
+                            "json"
+                            );
+                    }
+                }
+            }
+        });
+    });
+
+    var url;
+    function newRel() {
+        $('#rel_dlg').dialog('open').dialog('setTitle', '新增对应关系');
+        $('#fm').form('clear');
+        url = 'SaveClerkAndCustomer';
+    }
+    function editRel() {
+        var row = $('#rel_dg').datagrid('getSelected');
+        if (row) {
+            $('#rel_dlg').dialog('open').dialog('setTitle', '编辑对应关系');
+            $('#clerk_id').combobox("setValue", row.clerkId);
+            $('#customer_number').combogrid('setValue', row.customerNumber);
+            $('#customer_number').combogrid('setText', row.customerName);
+            url = 'UpdateClerkAndCustomer/' + row.id;
+        }
+    }
+    function saveRel() {
+        $('#fm').form('submit', {
+            url: url,
+            onSubmit: function (param) {
+                param.customer_name = $("#customer_number").combogrid("getText");
+                return $(this).form('validate');
+            },
+            success: function (data) {
+                var result = eval('(' + data + ')');
+                if (result.suc) {
+                    $('#rel_dlg').dialog('close');
+                    $('#rel_dg').datagrid('reload');
+                } else {
+                    showTip(result.msg);
+                }
+            }
+        });
+    }
+    function removeRel(){
+        var row = $('#rel_dg').datagrid('getSelected');
+        if (row) {
+            $.messager.confirm('@Html.Lang("confirm")', '@Html.Lang("confirm_delete")?', function(r){
+                if (r){
+                    $.post("RemoveClerkAndCustomer", { id: row.id }, function (data) {
+                        showTip(data.msg);
+                        if(data.suc){
+                            $('#rel_dg').datagrid('reload');
+                        }
+                    });
+                }
+            });
+        }
+    }
+    function qq(value,name){
+        $('#rel_dg').datagrid('load',{
+            value: value,
+            name: name
+        });
+    }
+
+</script>
+
+<table id="rel_dg" title="营业员与客户对应表" class="easyui-datagrid" fit="true"
+       url="GetCleckAndCustomerList"
+       toolbar="#toolbar"
+       rownumbers="true" fitcolumns="true" singleselect="true" pagination="true" pagesize="40">
+    <thead>
+        <tr>
+            <th field="agency" width="50" align="center">办事处</th>
+            <th field="clerkNumber" width="50" align="center">营业厂牌</th>
+            <th field="clerkName" width="50" align="center">营业名称</th>
+            <th field="customerNumber" width="50" align="center">客户编码</th>
+            <th field="customerName" width="100" align="center">客户名称</th>
+        </tr>
+    </thead>
+</table>
+<div id="toolbar">
+    <a href="#" class="easyui-linkbutton" iconcls="icon-add" plain="true" onclick="newRel()">新建关系</a>
+    <a href="#" class="easyui-linkbutton" iconcls="icon-edit" plain="true" onclick="editRel()">编辑关系</a>
+    <a href="#" class="easyui-linkbutton" iconcls="icon-remove" plain="true" onclick="removeRel()">删除关系</a>
+    <input id="ss" class="easyui-searchbox" style="width:220px" searcher="qq" menu="#mm" prompt="@Html.Lang("please_input")" />
+    <div id="mm" style="width:100px">
+        <div name="name">筛选项</div>
+    </div>
+</div>
+
+<div id="rel_dlg" class="easyui-dialog" style="width:400px;padding:10px 20px"
+     closed="true" buttons="#dlg-buttons">
+    <div class="ftitle">营业与客户对应信息</div>
+    <form id="fm" method="post">
+        <div class="fitem">
+            <label>营业姓名:</label>
+            <input name="clerk_id" id="clerk_id" class="easyui-combobox" url="@Url.Content("~/Items/GetUsersforCombo")" valuefield="value" textfield="name" style="width: 160px;" />
+        </div>
+        <div class="fitem">
+            <label>客户名称:</label>
+            <input name="customer_number" id="customer_number" class="customerbox" style="width: 160px;" />
+        </div>
+    </form>
+</div>
+
+<div id="dlg-buttons">
+    <a href="#" class="easyui-linkbutton" iconcls="icon-ok" onclick="saveRel()">@Html.Lang("save")</a>
+    <a href="#" class="easyui-linkbutton" iconcls="icon-cancel" onclick="javascript: $('#rel_dlg').dialog('close')">@Html.Lang("cancel")</a>
+</div>
+
+

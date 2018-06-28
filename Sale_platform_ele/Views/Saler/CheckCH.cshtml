@@ -1,0 +1,169 @@
+﻿@using Sale_platform_ele.Models;
+@{
+    bool hasSubmited = (bool)ViewData["hasSubmited"];
+    List<vwChBill> bills = (List<vwChBill>)ViewData["bill"];
+    var bill = bills.First();
+}
+<script type="text/javascript">
+    $(function () {
+        $("#dg_detail").datagrid({
+            width: 1200,
+            loadMsg: "@Html.Lang("loading")",
+            rownumbers: true,
+            singleSelect: true,
+            fitColumns: true,
+            //showFooter: true,
+            columns: [[
+                { field: 'order_no', title: '订单编号', width: 140 },
+                { field: 'item_name', title: '品名', width: 120 },
+                { field: 'item_model', title: '型号', width: 160 },
+                { field: 'unit_name', title: '单位', width: 60 },
+                { field: 'order_qty', title: '订单数量', width: 80, align: 'right' },
+                { field: 'apply_qty', title: '申请数量', width: 80, align: 'right' },
+                { field: 'customer_po', title: '客户P/O', width: 100 },
+                { field: 'customer_pn', title: '客户P/N', width: 100 },
+                { field: 'comment', title: '备注', width: 120 },
+                { field: 'stock_qty', title: '库存数量', width: 80, align: 'right' },
+                { field: 'can_apply_qty', title: '可申请数量', width: 80, align: 'right' },
+                { field: 'order_entry_no', title: '订单行号', width: 80, align: 'center' }
+            ]]
+        });
+        $("#order_div input[type='text']").attr("readonly", "readonly");
+    });
+
+</script>
+
+<div class="easyui-layout" data-options="fit:true">
+    <div data-options="region:'center'">
+        <div id="order_div" class="easyui-panel" title="出货申请信息" style="width: 840px; padding: 10px; background: #fafafa;">
+            <div>
+                <table border="0" cellpadding="1" cellspacing="3" width="800">
+                    <tr>
+                        <td>
+                            系统流水号:
+                        </td>
+                        <td>
+                            <input class="easyui-textbox" style="width: 140px" value="@bill.sys_no" />
+                        </td>
+                        <td>
+                            产品类别:
+                        </td>
+                        <td>
+                            <input class="easyui-textbox" style="width: 140px" value="@bill.product_type" />
+                        </td>
+                        <td>
+                            制单人:
+                        </td>
+                        <td>
+                            <input class="easyui-textbox" style="width:140px" value="@bill.real_name" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            客户编码:
+                        </td>
+                        <td>
+                            <input class="easyui-textbox" style="width:140px" value="@bill.customer_no" />
+                        </td>
+                        <td>
+                            营业员:
+                        </td>
+                        <td>
+                            <input class="easyui-textbox" style="width: 140px" value="@bill.clerk_name" />
+                        </td>
+                        <td>
+                            营业员电话:
+                        </td>
+                        <td>
+                            <input class="easyui-textbox" style="width: 140px" value="@bill.clerk_phone" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            客户名称:
+                        </td>
+                        <td>
+                            <input class="easyui-textbox" style="width: 140px" value="@bill.customer_name" />
+                        </td>
+                        <td>
+                            备注:
+                        </td>
+                        <td colspan="3">
+                            <input class="easyui-textbox" style="width: 432px" value="@bill.comment" />
+                        </td>
+                    </tr>
+                    @if (!string.IsNullOrEmpty(bill.k3_stock_no)) { 
+                        <tr>
+                            <td>
+                                出库单号:
+                            </td>
+                            <td>
+                                <input class="easyui-textbox" style="width:140px" value="@bill.k3_stock_no" />
+                            </td>
+                            <td>
+                                出库日期:
+                            </td>
+                            <td>
+                                <input class="easyui-textbox" style="width:140px" value="@(bill.k3_audit_date == null?"":((DateTime)bill.k3_audit_date).ToString("yyyy-MM-dd"))" />
+                            </td>
+                            <td></td><td></td>
+                        </tr>
+                    }
+                </table>
+                <br />
+                <div id="detail_div" class="easyui-panel" title="出货信息明细" style="width: 815px; height: 300px">
+                    <table id="dg_detail">
+                        @foreach (var l in bills.Where(b => b.item_no != null)) {
+                            <tr>
+                                <td>@l.order_no</td>
+                                <td>@l.item_name</td>
+                                <td>@l.item_model</td>
+                                <td>@l.unit_name</td>
+                                <td>@l.order_qty</td>
+                                <td>@l.apply_qty</td>
+                                <td>@l.customer_po</td>
+                                <td>@l.customer_pn</td>
+                                <td>@l.entry_comment</td>
+                                <td>@(l.stock_qty + (hasSubmited? bills.Where(b=>b.item_id==l.item_id).Sum(b=>b.apply_qty):0))</td> @*库存数量需要加上本单的申请数量*@
+                                <td>@l.can_apply_qty</td>
+                                <td>@l.order_entry_no</td>
+                            </tr>
+                        }
+                    </table>
+                </div>
+                <br />
+                <table border="0" cellpadding="1" cellspacing="3" width="800">
+                    <tr>
+                        <td>
+                            收货单位:
+                        </td>
+                        <td>
+                            <input class="easyui-textbox" style="width: 160px" value="@bill.delivery_unit" />
+                        </td>
+                        <td>
+                            ATTN:
+                        </td>
+                        <td>
+                            <input class="easyui-textbox" style="width:140px" value="@bill.delivery_attn" />
+                        </td>
+                        <td>
+                            收货电话:
+                        </td>
+                        <td>
+                            <input class="easyui-textbox" style="width:140px" value="@bill.delivery_phone" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            收货地址:
+                        </td>
+                        <td colspan="5">
+                            <input class="easyui-textbox" style="width:680px" value="@bill.delivery_addr" />
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    @Html.Partial("_BlockInfoPartial")
+</div>

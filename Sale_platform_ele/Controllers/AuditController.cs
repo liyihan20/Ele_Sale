@@ -5,6 +5,7 @@ using Sale_platform_ele.Utils;
 using System;
 using System.Web;
 using System.Web.Mvc;
+using Sale_platform_ele.Filters;
 
 namespace Sale_platform_ele.Controllers
 {
@@ -25,9 +26,10 @@ namespace Sale_platform_ele.Controllers
                 return Json(new { suc = false });
             }
             ApplySv sv = new ApplySv(sysNo);
-            return Json(new { suc = true, nextStepName = sv.GetNextStepName(), nextAuditors = sv.GetNextStepAudiors(),result=sv.GetAuditStatus() });
+            return Json(new { suc = true, nextStepName = sv.GetNextStepName(), nextAuditors = sv.GetNextStepAudiors(), result = sv.GetAuditStatus() });
         }
 
+        [SessionTimeOutFilter]
         public ActionResult CheckAuditList()
         {
             Wlog("打开审核列表视图");
@@ -81,6 +83,7 @@ namespace Sale_platform_ele.Controllers
             return Json(new ApplySv().GetAuditList(currentUser.userId, pm), "text/html");
         }
 
+        [SessionTimeOutFilter]
         public ActionResult BeginAudit(int step, int applyId)
         {
             string info;
@@ -120,6 +123,7 @@ namespace Sale_platform_ele.Controllers
 
         }
 
+        [SessionTimeOutFilter]
         public ActionResult GetStatusResult(int step, int applyId)
         {
             return Json(new ApplySv(applyId).GetAuditResult(step, currentUser.userId));

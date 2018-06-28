@@ -1,0 +1,222 @@
+﻿@using Sale_platform_ele.Models;
+@{
+    List<VwChPrintReport> list=(List<VwChPrintReport>)ViewData["list"];
+    var h = list.First();
+    int numPerPage = 12;
+    int pageNum = (int)Math.Ceiling((decimal)list.Count() / numPerPage);
+}
+
+@section CSS{
+    <style type="text/css" media="print">
+        .noPrint{
+            display:none;
+        }
+        .pageNext {
+            page-break-after: always;
+        }
+    </style>
+}
+
+<div class="noPrint" style="text-align:center;margin-bottom:6px;"><a href="#" class="easyui-linkbutton" iconcls="icon-print" onclick="javascript: window.print();">打印</a></div>
+
+@for (var p = 1; p <= pageNum; p++) { 
+<div style="padding:4px;font-size:9pt;">    
+    <div><img src="@Url.Content("~/Content/Images/Truly.gif")" /></div>
+
+    <div style="text-align:center;">
+        <div style="font-size:14pt;font-weight:bold;">信利电子有限公司</div>
+        <div style="font-size:10pt">地址：广东省汕尾市城区信利工业城10栋</div>
+        @if (!string.IsNullOrEmpty(h.clerk_name)) {
+            <div style="font-size:10pt">
+                <span>联系人：@h.clerk_name</span>
+                @if (!string.IsNullOrEmpty(h.clerk_phone)) {
+                    <span>电话：@h.clerk_phone</span>
+                }
+            </div>
+        }
+        <div style="font-size:12pt;font-weight:bold;margin-top:6px;">
+            <span>送货单</span> <br/>
+            <span style="border-top:1px solid;">Delivery Note</span>
+        </div>
+    </div>
+
+    <p></p>
+
+    <p style="clear:both;"></p>
+
+    <div style="float:left;width:40%;">
+        发货日期：@DateTime.Now.ToString("yyyy-MM-dd") <br/>
+        <br/>
+        客户名称：@h.customer_name <br/>
+        客户地址：@h.customerAddr <br/>
+        联系人：@h.customer_attn <br/>
+        电话：@h.customer_phone
+    </div>
+    <div style="float:right;width:40%;">
+        发货编号：@h.k3_stock_no <br/>
+        <br/>
+        收货客户：@h.delivery_unit <br/>
+        收货地址：@h.delivery_addr <br/>
+        联系人：@h.delivery_attn <br/>
+        电话：@h.delivery_phone
+    </div>
+
+    <p style="clear:both;"></p>
+
+    <table style="width:100%;" cellpadding="4" cellspacing="4">
+        <tr>
+            <td colspan="7">
+                <hr style="margin-bottom:-4px;" />
+            </td>
+        </tr>
+        <tr>
+            <th style="width:15%;">
+                生产单号 <br/>
+                P/O NO.
+            </th>
+            <th style="width:20%;">
+                产品名称 <br/>
+                Name
+            </th>
+            <th style="width:27%;">
+                规格型号 <br/>
+                Moduel
+            </th>
+            <th style="width:10%;">
+                数量 <br/>
+                Qty
+            </th>
+            <th style="width:8%;">
+                件数 <br/>
+                Cartons
+            </th>
+            <th style="width:10%;">
+                客户P/O <br/>
+                Customer P/O
+            </th>
+            <th style="width:10%;">
+                客户P/N <br/>
+                Customer P/N
+            </th>
+        </tr>
+        <tr>
+            <td colspan="7">
+                <hr style="margin-top:-4px;" />
+            </td>
+        </tr>  
+        @{
+    int totalQtyInPage = 0;
+    int totalPacksInPage = 0;
+        }
+        @for (int i = (p - 1) * numPerPage; i < p * numPerPage; i++) {
+            if (i < list.Count()) {
+                
+                totalQtyInPage += (int)list[i].apply_qty;
+                totalPacksInPage += list[i].packs ?? 0;
+                
+                <tr>
+                    <td>
+                        @list[i].order_no
+                    </td>
+                    <td>
+                        @list[i].item_name
+                    </td>
+                    <td>
+                        @list[i].item_model
+                    </td>
+                    <td style="text-align:center;">
+                        @(((int)list[i].apply_qty).ToString("N0"))
+                    </td>
+                    <td style="text-align:center;">
+                        @(list[i].packs == null ? "" : ((int)list[i].packs).ToString("N0"))
+                    </td>
+                    <td>
+                        @list[i].customer_po
+                    </td>
+                    <td>
+                        @list[i].customer_pn
+                    </td>
+                </tr>
+            }
+            else {
+                <tr>
+                    <td colspan="7">
+                        &nbsp;
+                    </td>
+                </tr>
+            }
+        }                
+        <tr>
+            <td colspan="7">
+                <hr style="margin-bottom:-4px;" />
+            </td>
+        </tr>  
+        <tr>
+            <td colspan="3" style="text-align:right;">
+                TOTAL:
+            </td>
+            <td style="text-align:center;">
+                @totalQtyInPage.ToString("N0")
+            </td>
+            <td style="text-align:center;">
+                @(totalPacksInPage==0?"":totalPacksInPage.ToString("N0"))
+            </td>
+            <td></td><td></td>
+        </tr>
+
+    </table>
+
+    <p>注:本送货单所列产品验收无误，请即盖章及签收后交货运公司/快递公司带回，或邮寄回本司出货员收。谢谢合作！</p>
+
+    <table style="width:100%;margin-top:16px;" cellpadding="1" cellspacing="1">
+        <tr>
+            <td style="width:35%;">
+                收货人
+            </td>
+            <td style="width:30%;"></td>
+            <td style="width:35%;text-align:center;">
+                信利电子有限公司
+            </td>
+        </tr>
+        <tr>
+            <td>
+                盖章及签收
+            </td>
+            <td></td>
+            <td style="text-align:center;">
+                Truly Electronics Manufacturing Limited
+            </td>
+        </tr>
+        <tr>
+            <td colspan="3">&nbsp;</td>
+        </tr>
+        <tr>
+            <td></td><td></td>
+            <td style="text-align:center;font-size:10pt;font-weight:bold;">@ViewData["printer"]</td>
+        </tr>
+        <tr>
+            <td>
+                <hr/>
+            </td>
+            <td></td>
+            <td>
+                <hr/>
+            </td>
+        </tr>
+        <tr>
+            <td style="font-size:10pt;font-weight:bold;">
+                Signed With Company Chop
+            </td>
+            <td></td>
+            <td style="font-size:10pt;font-weight:bold;">
+                Authorized Signature
+            </td>
+        </tr>
+    </table>
+
+</div>
+    if (p < pageNum) {
+        <div class="pageNext"></div>
+    }
+}
+
