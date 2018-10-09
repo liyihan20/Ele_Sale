@@ -206,6 +206,14 @@ namespace Sale_platform_ele.Controllers
         [SessionTimeOutFilter]
         public ActionResult PrintChReport(string sysNo)
         {
+            try {
+                new CHSv().InsertCHReportPringLog(sysNo, currentUser.userId);
+            }
+            catch (Exception ex) {
+                ViewBag.tip = ex.Message;
+                return View("Error");
+            }
+
             ViewData["list"] = new CHSv().GetChReportData(sysNo);
             ViewData["printer"] = currentUser.realName;
             return View();

@@ -32,6 +32,7 @@ namespace Sale_platform_ele.Models
         public string finalStatus { get; set; }
         public string orderType { get; set; }
         public string model { get; set; }
+        public string customer { get; set; }
     }
 
     public class AuditResultModel

@@ -133,7 +133,8 @@ namespace Sale_platform_ele.Controllers
             if (hasSubmited) {
                 ViewData["blockInfo"] = new ApplySv(sysNo).GetBlockInfo();
             }
-            ViewData["hasSubmited"] = hasSubmited;
+            //ViewData["hasSubmited"] = hasSubmited;
+            //ViewData["hasFinished"] = new ApplySv().ApplyHasFinished(sysNo);
             return View(bill.CheckViewName);
         }
 
@@ -165,6 +166,7 @@ namespace Sale_platform_ele.Controllers
                         GetIPAddr(),
                         sysNo,
                         bill.GetProductModel(),
+                        bill.GetCustomerName(),
                         new ProcessSv().GetProcessByNo(bill.GetProcessNo()),
                         bill.GetProcessDic()
                         );

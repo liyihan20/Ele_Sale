@@ -51,6 +51,7 @@ namespace Sale_platform_ele.Controllers
             if (!string.IsNullOrEmpty(result)) {
                 return Json(new { suc = false, msg = result }, "text/html");
             }
+            Wlog("保存客户与营业的关系：" + clerkId + ";" + customerName);
             return Json(new { suc = true }, "text/html");
         }
 
@@ -70,6 +71,7 @@ namespace Sale_platform_ele.Controllers
             if (!string.IsNullOrEmpty(result)) {
                 return Json(new { suc = false, msg = result }, "text/html");
             }
+            Wlog("更新客户与营业的关系:" + clerkId + ";" + customerName);
             return Json(new { suc = true }, "text/html");
         }
 
@@ -79,6 +81,7 @@ namespace Sale_platform_ele.Controllers
             if (!string.IsNullOrEmpty(result)) {
                 return Json(new { suc = false, msg = result });
             }
+            Wlog("删除客户与营业关系：" + id);
             return Json(new { suc = true, msg = "删除成功" });
         }
 
@@ -91,7 +94,7 @@ namespace Sale_platform_ele.Controllers
             string toDate = fc.Get("toDate");
             string orderNumber = fc.Get("orderNumber") ?? "";
             string productModel = fc.Get("productModel") ?? "";
-            string hasStockQty = fc.Get("hasStockQty") ?? "1"; //是否有库存，1表示有库存，0表示无库存，其它表示不筛选
+            string hasStockQty = fc.Get("hasStockQty") ?? "10"; //是否有库存，1表示有库存，0表示无库存，其它表示不筛选
             string isClosed = fc.Get("isClosed") ?? "0"; //是否关闭，1表示已关闭，0表示没关闭，其他表示不筛选
 
             DateTime fromDateDT, toDateDT;
@@ -101,7 +104,7 @@ namespace Sale_platform_ele.Controllers
             if (!DateTime.TryParse(toDate, out toDateDT)) {
                 toDateDT = DateTime.Parse("2099-9-9");
             }
-
+            Wlog("查询订单库存信息");
             return Json(new CHSv().GetOrderStockInfo(customerNumber, saleStyle, productType, fromDateDT, toDateDT, orderNumber, productModel, hasStockQty, isClosed));
         }
 
@@ -150,15 +153,17 @@ namespace Sale_platform_ele.Controllers
                 return Json(new { suc = false, msg = "查不到符合条件的记录" }, "text/html");
             }
 
+            Wlog("查看出货组报表");
             return Json(new { suc = true, result = result }, "text/html");
 
         }
 
         //更新件数/叉板数/快递单号等信息
-        public JsonResult UpdateStockPackInfo(int detailId, string deliveryNumber, int cardboardNum, int packs, string cycle)
+        public JsonResult UpdateStockPackInfo(int detailId, string deliveryNumber, int cardboardNum, int packs, string cycle, string itemComment)
         {
-            var result = new CHSv().UpdateCHPackInfo(detailId, deliveryNumber, cardboardNum, packs, cycle);
+            var result = new CHSv().UpdateCHPackInfo(detailId, deliveryNumber, cardboardNum, packs, cycle, itemComment);
             if (string.IsNullOrEmpty(result)) {
+                Wlog("更新快递单号等额外信息:" + detailId);
                 return Json(new { suc = true });
             }
             else {

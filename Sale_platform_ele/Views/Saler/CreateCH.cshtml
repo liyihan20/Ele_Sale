@@ -45,7 +45,7 @@
                         return;
                     }
                     $("#dlg_add").dialog("setTitle", "@Html.Lang("add_item")").dialog("open");
-                    $("#orderList").datagrid("resize", {height:345}); //困扰了很久的问题，加上这一句话解决。因为一开始datagrid是隐藏的，而且设置fit=false；所以加载的时候必须再设置一下高度，否则高度都是0
+                    $("#orderList").datagrid("resize", { height: 345 }); //困扰了很久的问题，加上这一句话解决。因为一开始datagrid是隐藏的，而且设置fit=false；所以加载的时候必须再设置一下高度，否则高度都是0
                 }
             }, '-', {
                 text: "@Html.Lang("del_item")",
@@ -211,12 +211,12 @@
         var isEmpty = nowRows.length == 0;//当前出货信息为空
         for (var i = 0; i < toAddeds.length; i++) {
             //判断是否在列表中已存在
-            for (var j = 0; j < nowRows.length; j++) {
-                if (toAddeds[i].orderId == nowRows[j].order_id && toAddeds[i].orderEntry == nowRows[j].order_entry_no) {
-                    showTip("#" + toAddeds[i].orderNumber + ":" + toAddeds[i].orderEntry + "#已存在，不能重复添加");
-                    return;
-                }
-            }
+            //for (var j = 0; j < nowRows.length; j++) {
+            //    if (toAddeds[i].orderId == nowRows[j].order_id && toAddeds[i].orderEntry == nowRows[j].order_entry_no) {
+            //        showTip("#" + toAddeds[i].orderNumber + ":" + toAddeds[i].orderEntry + "#已存在，不能重复添加");
+            //        return;
+            //    }
+            //}
 
             if (isEmpty) {
                 saleStyle = toAddeds[i].saleStyle;
@@ -345,7 +345,10 @@
             showTip("保存失败：出货信息明细必须至少有一条数据");
             return false;
         }
-        var modelStockQty = [];
+        //var modelStockQty = [];
+        var orderCanApplyQty = [];
+        var exceedQty = [];
+        var idx = -1;
         for (var i = 0;i<rows.length;i++){
             if (rows[i].apply_qty=="" || isNaN(rows[i].apply_qty)) {
                 showTip("保存失败：申请数量不能为空，行号：" + (i + 1));
@@ -355,18 +358,32 @@
                 showTip("保存失败：申请数量不能大于可出数量，行号：" + (i + 1));
                 return false;
             }
-            var idx = modelStockQty.findIndex(function (m) { return m.model == rows[i].item_model; });
-            if (idx>=0) {
-                modelStockQty[idx].qty = parseInt(modelStockQty[idx].qty) + parseInt(rows[i].apply_qty);
+            //验证库存数量的
+            //idx = modelStockQty.findIndex(function (m) { return m.itemNo == rows[i].item_no; });
+            //if (idx >= 0) {
+            //    modelStockQty[idx].qty = parseInt(modelStockQty[idx].qty) + parseInt(rows[i].apply_qty);
+            //} else {
+            //    modelStockQty.push({ itemNo: rows[i].item_no, qty: parseInt(rows[i].apply_qty), stockQty: parseInt(rows[i].stock_qty) });
+            //}
+            //验证可申请数量的
+            idx = orderCanApplyQty.findIndex(function (m) { return m.orderNo == rows[i].order_no && m.orderEntryNo == rows[i].order_entry_no; });
+            if (idx >= 0) {
+                orderCanApplyQty[idx].qty = parseInt(orderCanApplyQty[idx].qty) + parseInt(rows[i].apply_qty);
             } else {
-                modelStockQty.push({ model: rows[i].item_model, qty: parseInt(rows[i].apply_qty),stockQty: parseInt(rows[i].stock_qty) });
+                orderCanApplyQty.push({ orderNo: rows[i].order_no, orderEntryNo: rows[i].order_entry_no, qty: parseInt(rows[i].apply_qty), canApplyQty: parseInt(rows[i].can_apply_qty) });
             }
-        }        
-        var exceedQty = modelStockQty.filter(function (v) { return v.qty > v.stockQty; });
+        }
+        //exceedQty = modelStockQty.filter(function (v) { return v.qty > v.stockQty; });
+        //if (exceedQty.length > 0) {
+        //    showTip("保存失败，产品代码#" + exceedQty[0].itemNo + "#申请数量(" + exceedQty[0].qty + ")不能大于库存数量(" + exceedQty[0].stockQty + ")");
+        //    return false;
+        //}
+        exceedQty = orderCanApplyQty.filter(function (v) { return v.qty > v.canApplyQty; });
         if (exceedQty.length > 0) {
-            showTip("保存失败，型号#" + exceedQty[0].model + "#申请数量(" + exceedQty[0].qty + ")不能大于库存数量(" + exceedQty[0].stockQty + ")");
+            showTip("保存失败，订单号#" + exceedQty[0].orderNo + "，行号#" + exceedQty[0].orderEntryNo + "#申请数量(" + exceedQty[0].qty + ")不能大于可申请数量(" + exceedQty[0].canApplyQty + ")");
             return false;
         }
+
         return true;
     }
 

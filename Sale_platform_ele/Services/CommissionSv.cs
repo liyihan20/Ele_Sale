@@ -114,15 +114,16 @@ namespace Sale_platform_ele.Services
         }
 
         /// <summary>
-        /// 含税单价*数量*佣金率
+        /// 成交价*数量*佣金率
+        /// 2018-10-1开始，改为不含税单价*数量*佣金率
         /// </summary>
         /// <param name="price"></param>
         /// <param name="qty"></param>
         /// <param name="commissionRate"></param>
         /// <returns></returns>
-        public decimal GetCommissionMoney(decimal dealPrice, decimal qty, decimal commissionRate)
+        public decimal GetCommissionMoney(decimal unitPrice, decimal qty, decimal commissionRate)
         {
-            return Math.Round(dealPrice * qty * commissionRate, 4);
+            return Math.Round(unitPrice * qty * commissionRate, 4);
         }
 
         

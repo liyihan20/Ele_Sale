@@ -188,10 +188,10 @@ namespace Sale_platform_ele.Services
                 //在后台再计算一次佣金、MU等
                 CommissionSv csv = new CommissionSv();
                 foreach (var d in order.OrderDetail) {
+                    d.unit_price = Math.Round((decimal)(d.tax_price / (1 + d.tax_rate / 100.0m)), 6);
                     d.MU = csv.GetMU((decimal)d.deal_price, (decimal)d.cost,(int)d.tax_rate, (int)d.fee_rate, (decimal)order.exchange_rate);
                     d.commission_rate = csv.GetCommissionRate((decimal)d.MU, order.product_type_no);
-                    d.commission = csv.GetCommissionMoney((decimal)d.deal_price , (decimal)d.qty, (decimal)d.commission_rate);
-                    d.unit_price = Math.Round((decimal)(d.tax_price / (1 + d.tax_rate / 100.0m)), 6);
+                    d.commission = csv.GetCommissionMoney((decimal)d.unit_price , (decimal)d.qty, (decimal)d.commission_rate);                    
                 }
 
                 db.Order.InsertOnSubmit(order);
@@ -662,5 +662,10 @@ namespace Sale_platform_ele.Services
         }
 
 
+
+        public override string GetCustomerName()
+        {
+            return order.customer_name;
+        }
     }
 }

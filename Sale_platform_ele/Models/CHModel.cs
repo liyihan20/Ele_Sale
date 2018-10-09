@@ -17,7 +17,7 @@ namespace Sale_platform_ele.Models
     public class StockTeamReport
     {
         public int chDetailId { get; set; }
-        public string stockAudit1Date { get; set; }
+        public string billDate { get; set; }
         public string sysNo { get; set; }
         public string k3StockNo { get; set; }
         public string customerName { get; set; }
@@ -37,6 +37,10 @@ namespace Sale_platform_ele.Models
         public string customerPN { get; set; }
         public string deliveryUnit { get; set; }
         public string deliveryAddr { get; set; }
+        public string hasPrint { get; set; }
+        public string itemComment { get; set; }
+        public string contact { get; set; }
+        public string contactPhone { get; set; }
     }
 
 }

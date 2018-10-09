@@ -8,28 +8,28 @@
     $(function () {
         $("#orderList").datagrid({
             fit: true,
-            fitColumns: true,
+            //fitColumns: true,
             rownumbers: true,
             singleSelect: true,
             columns: [[                        
                         {
-                            field: 'orderDate', title: '订单日期', width: 60,
+                            field: 'orderDate', title: '订单日期', width: 80,
                             formatter: function (value, row, index) {
                                 var date = eval('new ' + eval(value).source)
                                 return date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();                                
                             }
                         },
-                        { field: 'orderNumber', title: '订单编号', width: 110 },
-    					{ field: 'customerName', title: '客户名称', width: 130 },
-    					{ field: 'itemName', title: '产品名称', width: 100 },
-                        { field: 'itemModel', title: '规格型号', width: 160 },
-                        { field: 'productType', title: '产品类别', width: 60 },
-    					{ field: 'qty', title: '订单数量', width: 60, align: 'right' },
-                        { field: 'relateQty', title: '关联数量', width: 60, align: 'right' },
-                        { field: 'unitName', title: '单位', width: 50, align: 'center' },
-                        { field: 'stockQty', title: '库存数量', width: 60, align: 'right' },
+                        { field: 'orderNumber', title: '订单编号', width: 140 },
+    					{ field: 'customerName', title: '客户名称', width: 170 },
+    					{ field: 'itemName', title: '产品名称', width: 160 },
+                        { field: 'itemModel', title: '规格型号', width: 200 },
+                        { field: 'productType', title: '产品类别', width: 70 },
+    					{ field: 'qty', title: '订单数量', width: 70, align: 'right' },
+                        { field: 'relateQty', title: '关联数量', width: 70, align: 'right' },
+                        { field: 'unitName', title: '单位', width: 60, align: 'center' },
+                        { field: 'stockQty', title: '库存数量', width: 70, align: 'right' },
                         {
-                            field: 'isclosed', title: '已关闭', width: 50, align: 'center',
+                            field: 'isclosed', title: '已关闭', width: 60, align: 'center',
                             formatter: function (value, row, index) {
                                 if (value == "0") {
                                     return "N";

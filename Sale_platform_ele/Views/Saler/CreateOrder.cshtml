@@ -353,7 +353,8 @@
             feeRate: $("#fee_rate").numberbox("getValue"),
             exchangeRate: $("#exchange_rate").textbox("getValue"),
             productType: $("#product_type_no").combobox("getText"),
-            qty: $("#qty").numberbox("getValue")
+            qty: $("#qty").numberbox("getValue"),
+            unitPrice: Math.round($("#tax_price").numberbox("getValue") * 1000000 / (1 + taxRate / 100)) / 1000000
         }, function (data) {
             if (!data.suc) {
                 showTip(data.msg);

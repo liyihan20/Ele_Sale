@@ -156,6 +156,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Interfaces\IFinishEmail.cs" />
     <Compile Include="Models\ApplyModels.cs" />
     <Compile Include="Models\BillModels.cs" />
     <Compile Include="Models\CHModel.cs" />
@@ -586,6 +587,7 @@
     <Content Include="Scripts\locale\easyui-lang-en.js" />
     <Content Include="Scripts\locale\easyui-lang-zh_CN.js" />
     <Content Include="Scripts\plugins\jquery.parser.js" />
+    <Content Include="Scripts\polyfill.min.js" />
     <Content Include="Scripts\uploadify\jquery.uploadify.min.js" />
     <Content Include="Scripts\uploadify\uploadify.css" />
     <Content Include="Scripts\uploadify\uploadify.swf" />

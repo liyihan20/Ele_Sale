@@ -15,6 +15,12 @@
             page-break-after: always;
         }
     </style>
+    <style type="text/css">        
+        #printTb tr td{
+            overflow:hidden;
+            word-break:break-all;
+        }
+    </style>
 }
 
 <div class="noPrint" style="text-align:center;margin-bottom:6px;"><a href="#" class="easyui-linkbutton" iconcls="icon-print" onclick="javascript: window.print();">打印</a></div>
@@ -63,61 +69,59 @@
 
     <p style="clear:both;"></p>
 
-    <table style="width:100%;" cellpadding="4" cellspacing="4">
+    <table style="width:100%;" cellpadding="4" cellspacing="4" id="printTb">
         <tr>
-            <td colspan="7">
+            <td colspan="9">
                 <hr style="margin-bottom:-4px;" />
             </td>
         </tr>
-        <tr>
+        <tr>            
             <th style="width:15%;">
-                生产单号 <br/>
-                P/O NO.
+                产品名称 
             </th>
             <th style="width:20%;">
-                产品名称 <br/>
-                Name
-            </th>
-            <th style="width:27%;">
-                规格型号 <br/>
-                Moduel
+                规格型号 
             </th>
             <th style="width:10%;">
-                数量 <br/>
-                Qty
+                数量 
             </th>
             <th style="width:8%;">
-                件数 <br/>
-                Cartons
+                单位 
+            </th>
+            <th style="width:9%;">
+                叉板数 
+            </th>
+            <th style="width:8%;">
+                件数 
             </th>
             <th style="width:10%;">
-                客户P/O <br/>
-                Customer P/O
+                客户P/O 
             </th>
             <th style="width:10%;">
-                客户P/N <br/>
-                Customer P/N
+                客户P/N 
+            </th>
+            <th style="width:10%;">
+                备注 
             </th>
         </tr>
         <tr>
-            <td colspan="7">
+            <td colspan="9">
                 <hr style="margin-top:-4px;" />
             </td>
         </tr>  
         @{
-    int totalQtyInPage = 0;
-    int totalPacksInPage = 0;
+            int totalQtyInPage = 0;
+            int totalPacksInPage = 0;
+            int totalCarBoradInPage = 0;
         }
         @for (int i = (p - 1) * numPerPage; i < p * numPerPage; i++) {
             if (i < list.Count()) {
                 
                 totalQtyInPage += (int)list[i].apply_qty;
                 totalPacksInPage += list[i].packs ?? 0;
+                totalCarBoradInPage += list[i].cardboard_num ?? 0;
                 
                 <tr>
-                    <td>
-                        @list[i].order_no
-                    </td>
                     <td>
                         @list[i].item_name
                     </td>
@@ -128,6 +132,12 @@
                         @(((int)list[i].apply_qty).ToString("N0"))
                     </td>
                     <td style="text-align:center;">
+                        @list[i].unit_name
+                    </td>
+                    <td  style="text-align:center;">
+                        @list[i].cardboard_num
+                    </td>
+                    <td style="text-align:center;">
                         @(list[i].packs == null ? "" : ((int)list[i].packs).ToString("N0"))
                     </td>
                     <td>
@@ -136,27 +146,34 @@
                     <td>
                         @list[i].customer_pn
                     </td>
+                    <td>
+                        @list[i].entry_comment
+                    </td>
                 </tr>
             }
             else {
                 <tr>
-                    <td colspan="7">
+                    <td colspan="9">
                         &nbsp;
                     </td>
                 </tr>
             }
         }                
         <tr>
-            <td colspan="7">
+            <td colspan="9">
                 <hr style="margin-bottom:-4px;" />
             </td>
         </tr>  
         <tr>
-            <td colspan="3" style="text-align:right;">
+            <td colspan="2" style="text-align:right;">
                 TOTAL:
             </td>
             <td style="text-align:center;">
                 @totalQtyInPage.ToString("N0")
+            </td>
+            <td></td>
+            <td style="text-align:center;">
+                @(totalCarBoradInPage==0?"":totalCarBoradInPage.ToString("N0"))
             </td>
             <td style="text-align:center;">
                 @(totalPacksInPage==0?"":totalPacksInPage.ToString("N0"))
@@ -165,7 +182,7 @@
         </tr>
 
     </table>
-
+    <p>备注:@h.comment</p>
     <p>注:本送货单所列产品验收无误，请即盖章及签收后交货运公司/快递公司带回，或邮寄回本司出货员收。谢谢合作！</p>
 
     <table style="width:100%;margin-top:16px;" cellpadding="1" cellspacing="1">
@@ -213,6 +230,8 @@
             </td>
         </tr>
     </table>
+
+    <div style="margin-top:8px;text-align:center;">第 @p 页/共 @pageNum 页</div>
 
 </div>
     if (p < pageNum) {

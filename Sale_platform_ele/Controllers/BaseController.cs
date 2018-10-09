@@ -20,11 +20,11 @@ namespace Sale_platform_ele.Controllers
                     var user = ua.GetUser();
                     _currentUser = new UserInfo()
                     {
-                        userId=user.id,
+                        userId = user.id,
                         departmentName = ua.GetUserDepartmentName(),
-                        email=user.email,
-                        userName=user.username,
-                        realName=user.real_name
+                        email = user.email,
+                        userName = user.username,
+                        realName = user.real_name
                     };
                     Session["currentUser"] = _currentUser;
                 }

@@ -143,9 +143,9 @@ namespace Sale_platform_ele.Controllers
                 return Json(new ResultModel() { suc = false, msg = result }, "text/html");
             }
 
-            return Json(new ResultModel() { suc = true, msg = "审批成功" });
+            return Json(new ResultModel() { suc = true, msg = "审批成功" }, "text/html");
 
         }
-
+        
     }
 }

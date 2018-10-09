@@ -1,13 +1,14 @@
 ﻿@using Sale_platform_ele.Models;
 @{
-    bool hasSubmited = (bool)ViewData["hasSubmited"];
+    //bool hasSubmited = (bool)ViewData["hasSubmited"];
+    //bool hasFinished = (bool)ViewData["hasFinished"];
     List<vwChBill> bills = (List<vwChBill>)ViewData["bill"];
     var bill = bills.First();
 }
 <script type="text/javascript">
     $(function () {
         $("#dg_detail").datagrid({
-            width: 1200,
+            width: 1460,
             loadMsg: "@Html.Lang("loading")",
             rownumbers: true,
             singleSelect: true,
@@ -20,6 +21,9 @@
                 { field: 'unit_name', title: '单位', width: 60 },
                 { field: 'order_qty', title: '订单数量', width: 80, align: 'right' },
                 { field: 'apply_qty', title: '申请数量', width: 80, align: 'right' },
+                { field: 'unit_price', title: '含税单价', width: 80, align: 'right' },
+                { field: 'total_price', title: '金额', width: 80, align: 'right' },
+                { field: 'tax_rate', title: '折扣率%', width: 60, align: 'right' },
                 { field: 'customer_po', title: '客户P/O', width: 100 },
                 { field: 'customer_pn', title: '客户P/N', width: 100 },
                 { field: 'comment', title: '备注', width: 120 },
@@ -121,14 +125,34 @@
                                 <td>@l.unit_name</td>
                                 <td>@l.order_qty</td>
                                 <td>@l.apply_qty</td>
+                                <td>@l.unit_price.ToString("###,##0.####")</td>
+                                <td>@(l.total_price == null ? "0" : ((decimal)l.total_price).ToString("###,##0.####"))</td>
+                                <td>@l.tax_rate</td>
                                 <td>@l.customer_po</td>
                                 <td>@l.customer_pn</td>
                                 <td>@l.entry_comment</td>
-                                <td>@(l.stock_qty + (hasSubmited? bills.Where(b=>b.item_id==l.item_id).Sum(b=>b.apply_qty):0))</td> @*库存数量需要加上本单的申请数量*@
+                                @*<td>@(l.stock_qty + ((hasSubmited && !hasFinished)? bills.Where(b=>b.item_id==l.item_id).Sum(b=>b.apply_qty):0))</td>*@ @*库存数量需要加上本单的申请数量*@
+                                <td>@l.stock_qty</td>
                                 <td>@l.can_apply_qty</td>
                                 <td>@l.order_entry_no</td>
                             </tr>
                         }
+                        <tr>
+                            <td>合计:</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td>@bills.Sum(b=>b.order_qty)</td>
+                            <td>@bills.Sum(b=>b.apply_qty)</td>
+                            <td></td>
+                            <td>@bills.Sum(b => b.total_price ?? 0).ToString("###,##0.####")</td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
                     </table>
                 </div>
                 <br />

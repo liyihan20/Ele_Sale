@@ -32,6 +32,7 @@ namespace Sale_platform_ele.Models
         public int? orderEntryNo { get; set; }
         public string auditStatus { get; set; }
         public string k3AuditDate { get; set; }
+        public string k3StockNo { get; set; }
     }
 
     public class ClerkAndCustomerModel

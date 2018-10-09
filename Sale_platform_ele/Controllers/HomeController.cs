@@ -37,5 +37,12 @@ namespace Sale_platform_ele.Controllers
             // return RedirectToAction("Index");
         }
 
+        //public string Test(string sn)
+        //{            
+        //    new CHSv(sn).DoWhenBeforeAudit(1, "cc", true, 0);
+
+        //    return "ok";
+        //}
+
     }
 }

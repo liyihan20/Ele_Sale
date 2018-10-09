@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
+using Sale_platform_ele.Interfaces;
 
 namespace Sale_platform_ele.Services
 {
@@ -55,6 +56,17 @@ namespace Sale_platform_ele.Services
         }
 
         /// <summary>
+        /// (无参构造）申请是否已完结
+        /// </summary>
+        /// <param name="sysNo"></param>
+        /// <returns></returns>
+        public bool ApplyHasFinished(string sysNo)
+        {
+            return db.Apply.Where(a => a.sys_no == sysNo && a.success != null).Count() > 0;
+        }
+
+
+        /// <summary>
         /// (无参构造)提交申请
         /// </summary>
         /// <param name="orderType">单据类型</param>
@@ -66,7 +78,7 @@ namespace Sale_platform_ele.Services
         /// <param name="pro">流程对象</param>
         /// <param name="auditorsDic">审核关系字典</param>
         /// <returns></returns>
-        public void BeginApply(string orderType, int userId, string userName, string ipAddr, string sysNo, string pModel, Process pro, Dictionary<string, int?> auditorsDic)
+        public void BeginApply(string orderType, int userId, string userName, string ipAddr, string sysNo, string pModel,string pCustomer, Process pro, Dictionary<string, int?> auditorsDic)
         {
             if (db.Apply.Where(a => a.sys_no == sysNo).Count() > 0) {
                 throw new Exception("单据已提交，不能重复操作");
@@ -86,6 +98,7 @@ namespace Sale_platform_ele.Services
             ap.user_name = userName;
             ap.sys_no = sysNo;
             ap.p_model = pModel;
+            ap.p_customer = pCustomer;
             ap.order_type = orderType;
             ap.start_date = DateTime.Now;
             ap.ip = ipAddr;
@@ -214,6 +227,11 @@ namespace Sale_platform_ele.Services
             ";
             BillSv bs = (BillSv)new BillUtils().GetBillSvInstanceBySysNo(ap.sys_no);
             string billType = bs.GetSpecificBillTypeName();
+            string ccEmails = null;
+            var ife = bs as IFinishEmail;
+            if (ife != null) {
+                ccEmails = ife.ccToOthers(ap.sys_no, ap.success ?? false);
+            }
             string emailContent = string.Format(
                 emailTemplate,
                 ap.sys_no,
@@ -224,7 +242,7 @@ namespace Sale_platform_ele.Services
                 ap.success == true ? "" : ap.ApplyDetails.Where(ad => ad.pass == false).First().comment
                 );
 
-            return new EmailUtil().SendEmail(emailContent, ap.User.email, null, billType + "申请完成");
+            return new EmailUtil().SendEmail(emailContent, ap.User.email, ccEmails, billType + "申请完成");
         }
 
         /// <summary>
@@ -469,6 +487,7 @@ namespace Sale_platform_ele.Services
                               applyDetailId = ad.id,
                               applyTime = DateTime.Parse(a.start_date.ToString()).ToString("yyyy-MM-dd HH:mm"),
                               salerName = a.user_name,
+                              customer = a.p_customer,
                               model = a.p_model,
                               depName = new UA((int)a.user_id).GetUserDepartmentName(),
                               sysNo = a.sys_no,

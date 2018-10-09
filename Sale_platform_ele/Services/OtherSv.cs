@@ -105,14 +105,14 @@ namespace Sale_platform_ele.Services
         //获取有权限的出货客户
         public List<ComboResult> GetClerkCHCustomers(int userId)
         {
-            var result = (from v in db.ClerkAndCustomer
-                          where v.clerk_id == userId 
-                          orderby v.customer_number
+            var result = (from v in db.vwClerkAndCustomer
+                          where v.clerkId == userId 
+                          orderby v.customerNumber
                           select new ComboResult()
                           {
-                              value = v.customer_number,
-                              name = v.customer_name
-                          }).ToList();
+                              value = v.customerNumber,
+                              name = v.customerName
+                          }).Distinct().ToList();
             return result;
         } 
 

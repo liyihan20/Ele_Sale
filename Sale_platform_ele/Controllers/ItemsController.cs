@@ -61,7 +61,7 @@ namespace Sale_platform_ele.Controllers
             return Json(new OtherSv().GetUnitGroup(groupId));
         }
 
-        public JsonResult GetMUAndCommisson(decimal dealPrice, decimal cost,int taxRate, int feeRate, decimal exchangeRate, string productType, decimal qty)
+        public JsonResult GetMUAndCommisson(decimal dealPrice, decimal cost, int taxRate, int feeRate, decimal exchangeRate, string productType, decimal qty, decimal unitPrice)
         {
             MUAndCommissionModel mc = new MUAndCommissionModel();
             CommissionSv csv = new CommissionSv();
@@ -72,7 +72,7 @@ namespace Sale_platform_ele.Controllers
                 return Json(new ResultModel() { suc = false, msg = "佣金率没有维护，请联系电子市场部" });
             }
 
-            mc.commission = csv.GetCommissionMoney(dealPrice, qty, mc.commissionRate);
+            mc.commission = csv.GetCommissionMoney(unitPrice, qty, mc.commissionRate);
 
             return Json(new ResultModel() { suc = true, extra = mc });
         }

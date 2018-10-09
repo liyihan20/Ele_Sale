@@ -103,6 +103,12 @@ namespace Sale_platform_ele.Services
         public abstract string GetProductModel();
 
         /// <summary>
+        /// 获取客户名称
+        /// </summary>
+        /// <returns></returns>
+        public abstract string GetCustomerName();
+
+        /// <summary>
         /// 单据是否已保存
         /// </summary>
         /// <param name="sysNo"></param>

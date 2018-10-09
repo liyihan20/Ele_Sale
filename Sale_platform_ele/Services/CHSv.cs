@@ -1,15 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using Newtonsoft.Json;
+using org.in2bits.MyXls;
 using Sale_platform_ele.Models;
 using Sale_platform_ele.Utils;
-using Newtonsoft.Json;
-using org.in2bits.MyXls;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Sale_platform_ele.Interfaces;
 
 namespace Sale_platform_ele.Services
 {
-    public class CHSv:BillSv
+    public class CHSv:BillSv,IFinishEmail
     {
         const string BILL_TYPE = "CH";
         const string BILL_TYPE_NAME = "出货申请单";
@@ -64,6 +64,12 @@ namespace Sale_platform_ele.Services
             vw.sys_no = GetNextSysNo("CH");
             vw.bill_date = DateTime.Now;
             vw.real_name = new UA(userId).GetUser().real_name;
+
+            var existedBill = db.ChBill.Where(c => c.user_id == userId).OrderByDescending(c => c.id).FirstOrDefault();
+            if (existedBill!=null) {
+                vw.clerk_name = existedBill.clerk_name;
+                vw.clerk_phone = existedBill.clerk_phone;
+            }
 
             List<vwChBill> list = new List<vwChBill>();
             list.Add(vw);
@@ -161,16 +167,17 @@ namespace Sale_platform_ele.Services
                           {
                               billId = o.id,
                               billDate = DateTime.Parse(o.bill_date.ToString()).ToString("yyyy-MM-dd"),
-                              qty = d.apply_qty.ToString(),                              
+                              qty = d.apply_qty.ToString(),
                               sysNo = o.sys_no,
                               customerName = o.customer_name,
                               productModel = d.item_model,
                               productName = d.item_name,
                               auditStatus = (Y == null ? "未开始申请" : Y.success == true ? "申请成功" : Y.success == false ? "申请失败" : "审批之中"),
                               k3AuditDate = o.k3_audit2_date == null ? "未出库" : DateTime.Parse(o.k3_audit2_date.ToString()).ToString("yyyy-MM-dd"),
-                              orderNo=d.order_no,
-                              orderEntryNo=d.order_entry_no,
-                              productType=o.product_type
+                              orderNo = d.order_no,
+                              orderEntryNo = d.order_entry_no,
+                              productType = o.product_type,
+                              k3StockNo = o.k3_stock_no
                           }).Take(200).ToList<object>();
 
             return result;
@@ -224,11 +231,13 @@ namespace Sale_platform_ele.Services
                                        from cd in c.ChBillDetail
                                        from a in db.Apply
                                        where c.sys_no == a.sys_no
+                                       && cd.order_no == d.order_no
+                                       && cd.order_entry_no == d.order_entry_no
                                        && (a.success == null || a.success == true)
                                        && c.k3_stock_no == null
                                        select c.sys_no).ToList();
                 if (existsedApplies.Count() > 0) {
-                    throw new Exception("此订单存在未出库的出货申请，在出库前不能再次申请：#订单号：" + d.order_no + "#出货流水号：" + existsedApplies.First() + "#");
+                    throw new Exception("此订单存在未导入k3的出货申请，在导入k3前不能再次申请：#订单号：" + d.order_no + ":" + d.order_entry_no + "#出货流水号：" + existsedApplies.First() + "#");
                 }
             }
 
@@ -237,32 +246,82 @@ namespace Sale_platform_ele.Services
 
         private void ValidateK3StockAndRelateQty(bool hasSubmited = false)
         {
-            foreach (var d in bill.ChBillDetail) {
-                var k3Info = db.vwK3OrderInfo.Where(k => k.orderId == d.order_id && k.orderEntry == d.order_entry_no).ToList();
-                if (k3Info.Count() > 0) {
-                    var ki = k3Info.First();
-                    var stockQty = ki.stockQty;
-                    if (hasSubmited) {
-                        //已提交的需要加上本单的数量
-                        stockQty += bill.ChBillDetail.Where(c => c.item_id == d.item_id).Sum(c => c.apply_qty);                        
-                    }                    
-                    if (d.apply_qty > stockQty) {
-                        throw new Exception("申请数量不能大于库存数量：#单号：" + d.order_no + "#行号：" + d.order_entry_no + "#库存数：" + stockQty + "#");
+            //用于验证申请数量与关联数量的分组
+            var qtyEnough = (from v in db.vwK3OrderInfo
+                             from g in
+                                 (from d in db.ChBillDetail
+                                  where d.ch_bill_id == bill.id
+                                  group d by new
+                                  {
+                                      d.order_id,
+                                      d.order_no,
+                                      d.order_entry_no
+                                  }
+                                      into g
+                                      select new
+                                      {
+                                          g.Key,
+                                          applyQtySum = g.Sum(s => s.apply_qty)
+                                      })
+                             where v.orderId == g.Key.order_id
+                             && v.orderEntry == g.Key.order_entry_no
+                             && (v.qty - v.relateQty) < g.applyQtySum
+                             select new { 
+                                g,
+                                canApplyQty = (v.qty - v.relateQty)
+                             }).FirstOrDefault();
+            if (qtyEnough != null) {
+                throw new Exception("申请数量不能大于k3可出数量：#单号：" + qtyEnough.g.Key.order_no + "#行号：" + qtyEnough.g.Key.order_entry_no + "#可出数：" + qtyEnough.canApplyQty + "#");
+            }
+            
+
+            if (hasSubmited) {
+                //成品仓审核是才验证库存
+                var group = (from d in bill.ChBillDetail
+                                group d by new{ d.item_id, d.item_no }into g
+                                select new
+                                {
+                                    g.Key,
+                                    applyQtySum = g.Sum(s => s.apply_qty)
+                                }).ToList();
+                foreach (var g in group) {
+                    var stockQty = db.GetItemStockQty(g.Key.item_id);
+                    if (stockQty < g.applyQtySum) {
+                        throw new Exception("申请数量不能大于库存数量：#产品编码：" + g.Key.item_no + "#申请数:" + g.applyQtySum + "#库存数：" + stockQty + "#");
                     }
-                    
-                    if (d.apply_qty > ki.qty - ki.relateQty) {
-                        throw new Exception("申请数量不能大于k3可出数量：#单号：" + d.order_no + "#行号：" + d.order_entry_no + "#可出数：" + (ki.qty - ki.relateQty) + "#");
-                    }
-                }
-                else {
-                    throw new Exception("当前订单不存在#" + d.order_no + "#" + d.order_entry_no + "#");
                 }
             }
+
+            //foreach (var d in bill.ChBillDetail) {
+            //    var k3Info = db.vwK3OrderInfo.Where(k => k.orderId == d.order_id && k.orderEntry == d.order_entry_no).ToList();
+            //    if (k3Info.Count() > 0) {
+            //        var ki = k3Info.First();
+            //        var stockQty = ki.stockQty;
+            //        if (hasSubmited) {
+            //            //已提交的需要加上本单的数量
+            //            //stockQty += bill.ChBillDetail.Where(c => c.item_id == d.item_id).Sum(c => c.apply_qty);
+
+            //        }
+            //        if (d.apply_qty > stockQty) {
+            //            throw new Exception("申请数量不能大于库存数量：#单号：" + d.order_no + "#行号：" + d.order_entry_no + "#库存数：" + stockQty + "#");
+            //        }
+                    
+            //        if (d.apply_qty > ki.qty - ki.relateQty) {
+            //            throw new Exception("申请数量不能大于k3可出数量：#单号：" + d.order_no + "#行号：" + d.order_entry_no + "#可出数：" + (ki.qty - ki.relateQty) + "#");
+            //        }
+            //    }
+            //    else {
+            //        throw new Exception("当前订单不存在#" + d.order_no + "#" + d.order_entry_no + "#");
+            //    }
+            //}
         }
 
         public override void DoWhenBeforeAudit(int step, string stepName, bool isPass, int userId)
         {
-            ValidateK3StockAndRelateQty(true);
+            if (isPass && step == 1) {
+                ValidateK3StockAndRelateQty(true);
+            }
+            
         }
 
         public override void DoWhenFinishAudit(bool isPass)
@@ -281,7 +340,7 @@ namespace Sale_platform_ele.Services
         }
 
         /// <summary>
-        /// 导出SO的excel通用方法
+        /// 导出CH的excel通用方法
         /// </summary>
         /// <param name="myData">导出的数据</param>
         private void ExportExcel(List<ExcelData> myData)
@@ -289,12 +348,14 @@ namespace Sale_platform_ele.Services
             //列宽：
             ushort[] colWidth = new ushort[] {16,16,16,14,14,16,28,14,16,
                                             28,28,16,16,32,14,18,24,12,18,
-                                            18,16,16,24,24,12,24,18};
+                                            18,16,16,24,24,12,24,18,
+                                            18,18,18,18};
 
             //列名：
             string[] colName = new string[] { "审核结果","流水号","下单日期","制单人","产品类别","客户编码","客户名称","营业员","营业员电话",
                                             "备注","收货单位","ATTN","收货电话","收货地址","产品代码","产品名称","规格型号","单位","订单数量",
-                                            "申请数量","客户P/O","客户P/N","行备注","订单号","订单行号","出库单号","出库日期" };
+                                            "申请数量","客户P/O","客户P/N","行备注","订单号","订单行号","出库单号","出库日期",
+                                            "快递单号","叉板数","件数","周期"};
 
             //設置excel文件名和sheet名
             XlsDocument xls = new XlsDocument();
@@ -346,7 +407,7 @@ namespace Sale_platform_ele.Services
                 cells.Add(rowIndex, ++colIndex, d.h.comment);
                 cells.Add(rowIndex, ++colIndex, d.h.delivery_unit);
                 cells.Add(rowIndex, ++colIndex, d.h.delivery_attn);
-                cells.Add(rowIndex, ++colIndex, d.h.clerk_phone);
+                cells.Add(rowIndex, ++colIndex, d.h.delivery_phone);
                 cells.Add(rowIndex, ++colIndex, d.h.delivery_addr);
                 cells.Add(rowIndex, ++colIndex, d.e.item_no);
                 cells.Add(rowIndex, ++colIndex, d.e.item_name);
@@ -362,6 +423,11 @@ namespace Sale_platform_ele.Services
                 cells.Add(rowIndex, ++colIndex, d.e.order_entry_no);
                 cells.Add(rowIndex, ++colIndex, d.h.k3_stock_no);
                 cells.Add(rowIndex, ++colIndex, d.h.k3_audit2_date == null ? "" : ((DateTime)d.h.k3_audit2_date).ToString("yyyy-MM-dd"));
+
+                cells.Add(rowIndex, ++colIndex, d.e.delivery_num);
+                cells.Add(rowIndex, ++colIndex, d.e.cardboard_num);
+                cells.Add(rowIndex, ++colIndex, d.e.packs);
+                cells.Add(rowIndex, ++colIndex, d.e.cycle);
             }
 
             xls.Send();
@@ -463,27 +529,44 @@ namespace Sale_platform_ele.Services
             ExportExcel(result);
         }
 
-        public List<ClerkAndCustomerModel> GetCleckAndCustomerList(string searchValue)
+        public override string GetCustomerName()
         {
-            return (from c in db.ClerkAndCustomer
-                    from d in db.Department
-                    where c.User.department_no == d.dep_no
-                    && (
-                    c.customer_name.Contains(searchValue)
-                    || c.customer_number.Contains(searchValue)
-                    || c.User.real_name.Contains(searchValue)
-                    || c.User.username.Contains(searchValue)
-                    || d.name.Contains(searchValue))
-                    select new ClerkAndCustomerModel()
-                    {
-                        id = c.id,
-                        agency = d.name,
-                        clerkId = c.clerk_id,
-                        clerkName = c.User.real_name,
-                        clerkNumber = c.User.username,
-                        customerName = c.customer_name,
-                        customerNumber = c.customer_number
-                    }).ToList();
+            return bill.customer_name;
+        }
+
+        public List<vwClerkAndCustomer> GetCleckAndCustomerList(string searchValue)
+        {
+            var result = (from v in db.vwClerkAndCustomer
+                          where v.customerName.Contains(searchValue)
+                          || v.customerNumber.Contains(searchValue)
+                          || v.clerkName.Contains(searchValue)
+                          || v.clerkNumber.Contains(searchValue)
+                          || v.agency.Contains(searchValue)
+                          || v.fromSystem == searchValue
+                          orderby v.agency, v.clerkId
+                          select v).ToList();
+
+            return result;
+
+            //return (from c in db.ClerkAndCustomer
+            //        from d in db.Department
+            //        where c.User.department_no == d.dep_no
+            //        && (
+            //        c.customer_name.Contains(searchValue)
+            //        || c.customer_number.Contains(searchValue)
+            //        || c.User.real_name.Contains(searchValue)
+            //        || c.User.username.Contains(searchValue)
+            //        || d.name.Contains(searchValue))
+            //        select new ClerkAndCustomerModel()
+            //        {
+            //            id = c.id,
+            //            agency = d.name,
+            //            clerkId = c.clerk_id,
+            //            clerkName = c.User.real_name,
+            //            clerkNumber = c.User.username,
+            //            customerName = c.customer_name,
+            //            customerNumber = c.customer_number
+            //        }).ToList();
         }
 
         public string SaveClerkAndCustomer(int clerkId, string customerName, string customerNumber)
@@ -525,6 +608,10 @@ namespace Sale_platform_ele.Services
 
             if (db.ClerkAndCustomer.Where(c => c.id == id).Count() == 0) {
                 return "数据已过期，请刷新页面";
+            }
+
+            if (id == 0) {
+                return "来源于K3的关系不能修改";
             }
 
             try {
@@ -592,7 +679,7 @@ namespace Sale_platform_ele.Services
         public List<vwK3StockInfo> GetK3StockInfo(int orderId, int orderEntryId)
         {
             return db.vwK3StockInfo.Where(v => v.orderID == orderId && v.orderEntryId == orderEntryId).OrderBy(v => v.stockDate).ToList();
-        }
+        }          
 
         public List<StockTeamReport> GetStockTeamReport(string sysNo, string stockNo, string orderNo,string customer,string model, DateTime fromDate, DateTime toDate,int userId)
         {
@@ -610,7 +697,8 @@ namespace Sale_platform_ele.Services
 
             var result = (from c in db.ChBill
                           from d in c.ChBillDetail
-                          where c.k3_stock_no != null
+                          where
+                          c.k3_stock_no != null
                           && c.sys_no.Contains(sysNo)
                           && c.k3_stock_no.Contains(stockNo)
                           && d.order_no.Contains(orderNo)
@@ -619,13 +707,13 @@ namespace Sale_platform_ele.Services
                           && (c.customer_name.Contains(customer) || c.customer_no.Contains(customer))
                           && ptypeArr.Contains(c.product_type)
                           && d.item_model.Contains(model)
-                          orderby c.k3_audit1_date
+                          orderby c.id
                           select new StockTeamReport()
                           {
                               chDetailId = d.id,
                               sysNo = c.sys_no,
-                              stockAudit1Date = DateTime.Parse(c.k3_audit1_date.ToString()).ToString("yyyy-MM-dd HH:mm"),
-                              k3StockNo = c.k3_stock_no,
+                              billDate = c.k3_audit1_date == null ? "" : DateTime.Parse(c.k3_audit1_date.ToString()).ToString("yyyy-MM-dd HH:mm"),
+                              k3StockNo = c.k3_stock_no ?? "",
                               customerName = c.customer_name,
                               billName = c.User.real_name,
                               productType = c.product_type,
@@ -642,12 +730,16 @@ namespace Sale_platform_ele.Services
                               customerPN = d.customer_pn,
                               customerPO = d.customer_po,
                               deliveryAddr = c.delivery_addr,
-                              deliveryUnit = c.delivery_unit
-                          }).Take(200).ToList();
+                              deliveryUnit = c.delivery_unit,
+                              hasPrint = db.ChPrintLog.Where(p => p.sysNo == c.sys_no).Count() > 0 ? "Y" : "N",
+                              itemComment = d.comment,
+                              contact = c.delivery_attn,
+                              contactPhone = c.delivery_phone
+                          }).Take(300).ToList();
             return result;
         }
 
-        public string UpdateCHPackInfo(int detailId, string deliveryNumber, int cardboardNum, int packs, string cycle)
+        public string UpdateCHPackInfo(int detailId, string deliveryNumber, int cardboardNum, int packs, string cycle, string itemComment)
         {
             try {
                 var detail = db.ChBillDetail.Single(c => c.id == detailId);
@@ -655,6 +747,7 @@ namespace Sale_platform_ele.Services
                 detail.cardboard_num = cardboardNum;
                 detail.packs = packs;
                 detail.cycle = cycle;
+                detail.comment = itemComment;
                 db.SubmitChanges();
                 return "";
             }
@@ -669,12 +762,12 @@ namespace Sale_platform_ele.Services
             var datas = GetStockTeamReport(sysNo, stockNo, orderNo, customer, model, fromDate, toDate, userId);
 
             //列宽：
-            ushort[] colWidth = new ushort[] {26,24,16,16,20,32,12,10,12,10,
-                                            18,18,24,48 };
+            ushort[] colWidth = new ushort[] { 26, 24, 16, 16, 20, 32, 12, 10, 12, 10,
+                                            18, 18,18, 24, 48,18,18 };
 
             //列名：
             string[] colName = new string[] { "销售订单号","客户名称","客户P/O","客户P/N","产品名称","规格型号","出货数量","单位","叉板数","件数",
-                                            "快递单号","周期","收货单位","送货地址" };
+                                            "快递单号","周期","备注","收货单位","送货地址","收件人","收件人电话" };
 
             //設置excel文件名和sheet名
             XlsDocument xls = new XlsDocument();
@@ -725,8 +818,11 @@ namespace Sale_platform_ele.Services
 
                 cells.Add(rowIndex, ++colIndex, d.deliveryNumber);
                 cells.Add(rowIndex, ++colIndex, d.cycle);
+                cells.Add(rowIndex, ++colIndex, d.itemComment);
                 cells.Add(rowIndex, ++colIndex, d.deliveryUnit);
                 cells.Add(rowIndex, ++colIndex, d.deliveryAddr);
+                cells.Add(rowIndex, ++colIndex, d.contact);
+                cells.Add(rowIndex, ++colIndex, d.contactPhone);
             }
 
             xls.Send();
@@ -737,5 +833,31 @@ namespace Sale_platform_ele.Services
         {
             return db.VwChPrintReport.Where(v => v.sys_no == sysNo).ToList();
         }
+
+        //插入打印日志
+        public void InsertCHReportPringLog(string sysNo, int userId)
+        {
+            try {
+                ChPrintLog log = new ChPrintLog();
+                log.op_date = DateTime.Now;
+                log.op_user_id = userId;
+                log.sysNo = sysNo;
+                db.ChPrintLog.InsertOnSubmit(log);
+                db.SubmitChanges();
+            }
+            catch (Exception ex) {
+                throw ex;
+            }
+        }
+
+        //成功申请后的邮件需要抄送给文员
+        public string ccToOthers(string sysNo, bool isPass)
+        {
+            if (!isPass) return null;
+
+            return "laitt.sale@truly.com.cn,linhh.sale@truly.com.cn";
+        }
+
+        
     }
 }

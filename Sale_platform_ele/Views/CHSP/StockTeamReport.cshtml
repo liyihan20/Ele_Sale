@@ -8,28 +8,40 @@
     };
     $(function () {
         $("#orderList").datagrid({
-            width: 1800,
-            fitColumns: true,
+            fit:true,
+            //width: 1850,
+            //fitColumns: true,
             rownumbers: true,
             singleSelect: true,
             idField: "chDetailId",
-            columns: [[                        
-                        { field: 'stockAudit1Date', title: '出库日期', width: 100 },
-                        { field: 'k3StockNo', title: '出库编号', width: 100 },
-    					{ field: 'customerName', title: '客户名称', width: 140 },
-    					{ field: 'itemName', title: '产品名称', width: 100 },
+            columns: [[
+                        {
+                            field: 'hasPrint', title: '已打印', width: 60, align: 'center',
+                            styler: function (value, row, index) {
+                                if (value == "Y") {
+                                    return 'color:green;';
+                                } else {
+                                    return 'color:red;';
+                                }
+                            },
+                        },
+                        { field: 'billDate', title: '制单日期', width: 120 },
+                        { field: 'k3StockNo', title: '出库编号', width: 120 },
+    					{ field: 'customerName', title: '客户名称', width: 160 },
+    					{ field: 'itemName', title: '产品名称', width: 140 },
                         { field: 'itemModel', title: '规格型号', width: 160 },
                         //{ field: 'productType', title: '产品类别', width: 60 },
     					{ field: 'applyQty', title: '出货数量', width: 70 },
-                        { field: 'unitName', title: '单位', width: 50 },
-                        { field: 'orderNo', title: '订单编号', width: 120 },
+                        { field: 'unitName', title: '单位', width: 60 },
+                        { field: 'orderNo', title: '订单编号', width: 140 },
                         { field: 'orderEntryNo', title: '订单行号', width: 60 },
-                        { field: 'sysNo', title: '申请流水号', width: 100 },
-                        { field: 'deliveryNumber', title: '快递单号', width: 80 },
-                        { field: 'cardboardNum', title: '叉板数', width: 60 },
+                        { field: 'sysNo', title: '申请流水号', width: 120 },
                         { field: 'packs', title: '件数', width: 60 },
+                        { field: 'cardboardNum', title: '叉板数', width: 70 },
                         { field: 'cycle', title: '周期', width: 80 },
-                        { field: 'billName', title: '制单人', width: 60 }
+                        { field: 'deliveryNumber', title: '快递单号', width: 90 },
+                        { field: 'itemComment', title: '备注', width: 120 },
+                        { field: 'billName', title: '制单人', width: 70 }
             ]],
             toolbar: [{
                 text: "出货申请详情",
@@ -74,12 +86,17 @@
 
     function PrintReport() {
         var row = $("#orderList").datagrid("getSelected");
-        if (row) {
+        if (row) {            
+            if (row.k3StockNo == "") {
+                showTip("未生成销售出库单号，不能打印送货单");
+                return;
+            }
             window.open("@Url.Content("~/File/PrintChReport?sysNo=")" + row.sysNo);
         }
     }
 
-    function ExportExcel() {        
+    function ExportExcel() {
+        showTip("数据正在准备中，请等待...");
         $("#fm").form("submit", {
             url: "../File/ExportStockTeamExcel",
             success: function (data) {}
@@ -89,12 +106,17 @@
     function OpenUpdateInfoWin() {
         var row = $("#orderList").datagrid("getSelected");
         if (row) {
+            if (row.k3StockNo == "") {
+                showTip("未生成销售出库单号，不能录入其它信息");
+                return;
+            }
             currentRow = row;
             $("#pack_dlg").dialog("open");
             $("#packs").numberbox("setValue", row.packs);
             $("#cardboardNum").numberbox("setValue", row.cardboardNum);
             $("#cycle").textbox("setValue", row.cycle);
             $("#deliveryNumber").textbox("setValue", row.deliveryNumber);
+            $("#itemComment").textbox("setValue", row.itemComment);
         }
     }
 
@@ -103,6 +125,7 @@
         var cardboardNum = $("#cardboardNum").numberbox("getValue");
         var cycle = $("#cycle").textbox("getValue");
         var deliveryNumber = $("#deliveryNumber").textbox("getValue");
+        var itemComment = $("#itemComment").textbox("getValue");
 
         if (packs == "") {
             showTip("必须录入件数");
@@ -119,13 +142,15 @@
             deliveryNumber: deliveryNumber,
             cardboardNum: cardboardNum,
             packs: packs,
-            cycle:cycle
+            cycle: cycle,
+            itemComment:itemComment
         }, function (data) {
             if (data.suc) {
                 currentRow.deliveryNumber = deliveryNumber;
                 currentRow.cardboardNum = cardboardNum;
                 currentRow.packs = packs;
                 currentRow.cycle = cycle;
+                currentRow.itemComment = itemComment;
 
                 var currentIndex = $("#orderList").datagrid("getRowIndex", currentRow);                
 
@@ -146,8 +171,7 @@
 
     function CheckDetail() {
         var row = $("#orderList").datagrid("getSelected");
-        if (row) {
-            showTip("数据正在准备中，请等待...");
+        if (row) {            
             window.open("@Url.Content("~/Saler/CheckBill?sysNo=")" + row.sysNo);
         }
     }
@@ -230,6 +254,10 @@
             <label>快递单号:</label>
             <input id="deliveryNumber" class="easyui-textbox"  />
         </div>   
+        <div class="fitem">
+            <label>备注:</label>
+            <input id="itemComment" class="easyui-textbox"  />
+        </div>  
 </div>
 
 <div id="dlg-buttons">
