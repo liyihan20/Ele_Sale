@@ -123,7 +123,7 @@ namespace Sale_platform_ele.Services
         /// <returns></returns>
         public decimal GetCommissionMoney(decimal unitPrice, decimal qty, decimal commissionRate)
         {
-            return Math.Round(unitPrice * qty * commissionRate, 4);
+            return Math.Round(unitPrice * qty * commissionRate, 2);
         }
 
         
