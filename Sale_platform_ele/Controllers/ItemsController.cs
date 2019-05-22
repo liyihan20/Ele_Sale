@@ -100,5 +100,14 @@ namespace Sale_platform_ele.Controllers
             return Json(new OtherSv().GetDeliveryInfo(customerNumber));
         }
 
+        public JsonResult GetProductPriceInfo(string itemNo)
+        {
+            var result = new OtherSv().GetProductPriceInfo(currentUser.userId, itemNo);
+            if (result == null) {
+                return Json(new ResultModel() { suc = false });
+            }
+            return Json(new ResultModel() { suc = true, extra = result });
+        }
+
     }
 }

@@ -2,7 +2,7 @@
 @{
     List<VwChPrintReport> list=(List<VwChPrintReport>)ViewData["list"];
     var h = list.First();
-    int numPerPage = 12;
+    int numPerPage = 8;
     int pageNum = (int)Math.Ceiling((decimal)list.Count() / numPerPage);
 }
 
@@ -71,28 +71,34 @@
 
     <table style="width:100%;" cellpadding="4" cellspacing="4" id="printTb">
         <tr>
-            <td colspan="9">
+            <td colspan="10">
                 <hr style="margin-bottom:-4px;" />
             </td>
         </tr>
         <tr>            
-            <th style="width:15%;">
+            @*<th style="width:15%;">
                 产品名称 
-            </th>
+            </th>*@
             <th style="width:20%;">
                 规格型号 
             </th>
-            <th style="width:10%;">
+            <th style="width:8%;">
                 数量 
             </th>
-            <th style="width:8%;">
+            <th style="width:7%;">
                 单位 
             </th>
-            <th style="width:9%;">
+            <th style="width:8%;">
                 叉板数 
             </th>
-            <th style="width:8%;">
+            <th style="width:7%;">
                 件数 
+            </th>
+            <th style="width:13%;">
+                装箱规格尺寸/MM 
+            </th>
+            <th style="width:7%;">
+                总毛重/KG 
             </th>
             <th style="width:10%;">
                 客户P/O 
@@ -105,7 +111,7 @@
             </th>
         </tr>
         <tr>
-            <td colspan="9">
+            <td colspan="10">
                 <hr style="margin-top:-4px;" />
             </td>
         </tr>  
@@ -113,6 +119,7 @@
             int totalQtyInPage = 0;
             int totalPacksInPage = 0;
             int totalCarBoradInPage = 0;
+            decimal totalGrossWeightInPage = 0;
         }
         @for (int i = (p - 1) * numPerPage; i < p * numPerPage; i++) {
             if (i < list.Count()) {
@@ -120,11 +127,11 @@
                 totalQtyInPage += (int)list[i].apply_qty;
                 totalPacksInPage += list[i].packs ?? 0;
                 totalCarBoradInPage += list[i].cardboard_num ?? 0;
-                
+                totalGrossWeightInPage+=list[i].total_gross_weight??0;
                 <tr>
-                    <td>
+                    @*<td>
                         @list[i].item_name
-                    </td>
+                    </td>*@
                     <td>
                         @list[i].item_model
                     </td>
@@ -141,6 +148,12 @@
                         @(list[i].packs == null ? "" : ((int)list[i].packs).ToString("N0"))
                     </td>
                     <td>
+                        @list[i].box_size
+                    </td>
+                    <td style="text-align:center;">
+                        @(list[i].total_gross_weight==null?"":list[i].total_gross_weight.ToString())
+                    </td>
+                    <td>
                         @list[i].customer_po
                     </td>
                     <td>
@@ -150,22 +163,22 @@
                         @list[i].entry_comment
                     </td>
                 </tr>
-            }
+        }
             else {
                 <tr>
-                    <td colspan="9">
+                    <td colspan="10">
                         &nbsp;
                     </td>
                 </tr>
             }
         }                
         <tr>
-            <td colspan="9">
+            <td colspan="10">
                 <hr style="margin-bottom:-4px;" />
             </td>
         </tr>  
         <tr>
-            <td colspan="2" style="text-align:right;">
+            <td style="text-align:right;">
                 TOTAL:
             </td>
             <td style="text-align:center;">
@@ -173,10 +186,14 @@
             </td>
             <td></td>
             <td style="text-align:center;">
-                @(totalCarBoradInPage==0?"":totalCarBoradInPage.ToString("N0"))
+                @(totalCarBoradInPage == 0 ? "" : totalCarBoradInPage.ToString("N0"))
             </td>
             <td style="text-align:center;">
-                @(totalPacksInPage==0?"":totalPacksInPage.ToString("N0"))
+                @(totalPacksInPage == 0 ? "" : totalPacksInPage.ToString("N0"))
+            </td>
+            <td></td>
+            <td style="text-align:center;">
+                @(totalGrossWeightInPage == 0 ? "" : totalGrossWeightInPage.ToString())
             </td>
             <td></td><td></td>
         </tr>

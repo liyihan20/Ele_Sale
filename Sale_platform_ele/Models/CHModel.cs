@@ -41,6 +41,8 @@ namespace Sale_platform_ele.Models
         public string itemComment { get; set; }
         public string contact { get; set; }
         public string contactPhone { get; set; }
+        public string boxSize { get; set; }
+        public decimal? totalGrossWeight { get; set; }
     }
 
 }

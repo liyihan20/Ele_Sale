@@ -228,14 +228,14 @@ namespace Sale_platform_ele.Services
             foreach (var d in bill.ChBillDetail) {
                 //先检查是否有未结束的同一张订单分录出货申请
                 var existsedApplies = (from c in db.ChBill
-                                       from cd in c.ChBillDetail
-                                       from a in db.Apply
-                                       where c.sys_no == a.sys_no
-                                       && cd.order_no == d.order_no
+                                       join cd in db.ChBillDetail on c.id equals cd.ch_bill_id
+                                       join a in db.Apply on c.sys_no equals a.sys_no
+                                       where 
+                                       cd.order_no == d.order_no
                                        && cd.order_entry_no == d.order_entry_no
                                        && (a.success == null || a.success == true)
                                        && c.k3_stock_no == null
-                                       select c.sys_no).ToList();
+                                       select c.sys_no);
                 if (existsedApplies.Count() > 0) {
                     throw new Exception("此订单存在未导入k3的出货申请，在导入k3前不能再次申请：#订单号：" + d.order_no + ":" + d.order_entry_no + "#出货流水号：" + existsedApplies.First() + "#");
                 }
@@ -247,9 +247,7 @@ namespace Sale_platform_ele.Services
         private void ValidateK3StockAndRelateQty(bool hasSubmited = false)
         {
             //用于验证申请数量与关联数量的分组
-            var qtyEnough = (from v in db.vwK3OrderInfo
-                             from g in
-                                 (from d in db.ChBillDetail
+            var hasApplyQtySum = (from d in db.ChBillDetail
                                   where d.ch_bill_id == bill.id
                                   group d by new
                                   {
@@ -262,17 +260,47 @@ namespace Sale_platform_ele.Services
                                       {
                                           g.Key,
                                           applyQtySum = g.Sum(s => s.apply_qty)
-                                      })
-                             where v.orderId == g.Key.order_id
-                             && v.orderEntry == g.Key.order_entry_no
-                             && (v.qty - v.relateQty) < g.applyQtySum
-                             select new { 
-                                g,
-                                canApplyQty = (v.qty - v.relateQty)
-                             }).FirstOrDefault();
-            if (qtyEnough != null) {
-                throw new Exception("申请数量不能大于k3可出数量：#单号：" + qtyEnough.g.Key.order_no + "#行号：" + qtyEnough.g.Key.order_entry_no + "#可出数：" + qtyEnough.canApplyQty + "#");
+                                      }).ToList();
+            foreach (var h in hasApplyQtySum) {
+                var qtyEnough = (from v in db.vwK3OrderInfo                                 
+                                 where v.orderId == h.Key.order_id
+                                 && v.orderEntry == h.Key.order_entry_no
+                                 && (v.qty - v.relateQty) < h.applyQtySum
+                                 select new
+                                 {
+                                     h,
+                                     canApplyQty = (v.qty - v.relateQty)
+                                 }).FirstOrDefault();
+                if (qtyEnough != null) {
+                    throw new Exception("申请数量不能大于k3可出数量：#单号：" + qtyEnough.h.Key.order_no + "#行号：" + qtyEnough.h.Key.order_entry_no + "#可出数：" + qtyEnough.canApplyQty + "#");
+                }
             }
+            //var qtyEnough = (from v in db.vwK3OrderInfo
+            //                 from g in
+            //                     (from d in db.ChBillDetail
+            //                      where d.ch_bill_id == bill.id
+            //                      group d by new
+            //                      {
+            //                          d.order_id,
+            //                          d.order_no,
+            //                          d.order_entry_no
+            //                      }
+            //                          into g
+            //                          select new
+            //                          {
+            //                              g.Key,
+            //                              applyQtySum = g.Sum(s => s.apply_qty)
+            //                          })
+            //                 where v.orderId == g.Key.order_id
+            //                 && v.orderEntry == g.Key.order_entry_no
+            //                 && (v.qty - v.relateQty) < g.applyQtySum
+            //                 select new { 
+            //                    g,
+            //                    canApplyQty = (v.qty - v.relateQty)
+            //                 }).FirstOrDefault();
+            //if (qtyEnough != null) {
+            //    throw new Exception("申请数量不能大于k3可出数量：#单号：" + qtyEnough.g.Key.order_no + "#行号：" + qtyEnough.g.Key.order_entry_no + "#可出数：" + qtyEnough.canApplyQty + "#");
+            //}
             
 
             if (hasSubmited) {
@@ -524,7 +552,7 @@ namespace Sale_platform_ele.Services
                               h = o,
                               e = d,
                               auditStatus = a.success == true ? "PASS" : a.success == false ? "NG" : "----"
-                          }).Take(200).ToList();
+                          }).Take(400).ToList();
 
             ExportExcel(result);
         }
@@ -734,12 +762,14 @@ namespace Sale_platform_ele.Services
                               hasPrint = db.ChPrintLog.Where(p => p.sysNo == c.sys_no).Count() > 0 ? "Y" : "N",
                               itemComment = d.comment,
                               contact = c.delivery_attn,
-                              contactPhone = c.delivery_phone
+                              contactPhone = c.delivery_phone,
+                              boxSize = d.box_size,
+                              totalGrossWeight = d.total_gross_weight
                           }).Take(300).ToList();
             return result;
         }
 
-        public string UpdateCHPackInfo(int detailId, string deliveryNumber, int cardboardNum, int packs, string cycle, string itemComment)
+        public string UpdateCHPackInfo(int detailId, string deliveryNumber, int cardboardNum, int packs, string cycle, string itemComment,string boxSize,decimal totalGrossWeight)
         {
             try {
                 var detail = db.ChBillDetail.Single(c => c.id == detailId);
@@ -748,6 +778,8 @@ namespace Sale_platform_ele.Services
                 detail.packs = packs;
                 detail.cycle = cycle;
                 detail.comment = itemComment;
+                detail.box_size = boxSize;
+                detail.total_gross_weight = totalGrossWeight;
                 db.SubmitChanges();
                 return "";
             }
@@ -762,11 +794,11 @@ namespace Sale_platform_ele.Services
             var datas = GetStockTeamReport(sysNo, stockNo, orderNo, customer, model, fromDate, toDate, userId);
 
             //列宽：
-            ushort[] colWidth = new ushort[] { 26, 24, 16, 16, 20, 32, 12, 10, 12, 10,
+            ushort[] colWidth = new ushort[] { 26, 24, 24, 16, 16, 20, 32, 12, 10, 12, 10,
                                             18, 18,18, 24, 48,18,18 };
 
             //列名：
-            string[] colName = new string[] { "销售订单号","客户名称","客户P/O","客户P/N","产品名称","规格型号","出货数量","单位","叉板数","件数",
+            string[] colName = new string[] { "销售订单号","K3出库单号","客户名称","客户P/O","客户P/N","产品名称","规格型号","出货数量","单位","叉板数","件数",
                                             "快递单号","周期","备注","收货单位","送货地址","收件人","收件人电话" };
 
             //設置excel文件名和sheet名
@@ -803,9 +835,10 @@ namespace Sale_platform_ele.Services
             }
             foreach (var d in datas) {
                 colIndex = 1;
-                //"销售订单号","客户名称","客户P/O","客户P/N","产品名称","规格型号","出货数量","单位","叉板数","件数",
+                //"销售订单号","出库单号","客户名称","客户P/O","客户P/N","产品名称","规格型号","出货数量","单位","叉板数","件数",
                 //"快递单号","周期","收货单位","送货地址"
                 cells.Add(++rowIndex, colIndex, d.orderNo);
+                cells.Add(rowIndex, ++colIndex, d.k3StockNo);
                 cells.Add(rowIndex, ++colIndex, d.customerName);
                 cells.Add(rowIndex, ++colIndex, d.customerPO);
                 cells.Add(rowIndex, ++colIndex, d.customerPN);
@@ -858,6 +891,11 @@ namespace Sale_platform_ele.Services
             return "laitt.sale@truly.com.cn,linhh.sale@truly.com.cn";
         }
 
-        
+        public override void BeforeRollBack(int step)
+        {
+            if (!string.IsNullOrEmpty(bill.k3_stock_no)) {
+                throw new Exception("此出货申请单已导入K3，不能反审核");
+            }
+        }
     }
 }

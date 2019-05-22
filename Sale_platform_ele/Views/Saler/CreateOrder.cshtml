@@ -41,9 +41,20 @@
 
                 $.post("@Url.Content("~/Items/GetUnitGroup")", { groupId: rowData.unitGroupId }, function (data) {
                     $("#unit_no").combobox("loadData", data);
+                    $("#unit_no").combobox("setValue", rowData.unitNo);
+                    $("#unit_no").combobox("setText", rowData.unitName);
                 });
-                $("#unit_no").combobox("setValue", rowData.unitNo);
-                $("#unit_no").combobox("setText", rowData.unitName);
+
+                $.post("@Url.Content("~/Items/GetProductPriceInfo")", { itemNo: rowData.number }, function (data) {
+                    if (data.suc) {
+                        var e = data.extra;
+                        $("#fm_detail #unit_price").textbox("setValue",e.unitPrice);
+                        $("#fm_detail #deal_price").textbox("setValue", e.dealPrice);
+                        $("#fm_detail #cost").textbox("setValue", e.cost);
+                        $("#fm_detail #fee_rate").textbox("setValue", e.feeRate);
+                    }
+                });
+                
                 $("#item_no").combogrid('hidePanel');
             }
         });
@@ -304,7 +315,9 @@
         if ("RMB" == currencyNo) {
             //2018-5-1开始，税率由17改为16
             //if (new Date() > new Date("2018-05-01 00:00:00")) { //这种方式只能兼容google chrome，IE不兼容
-            if (new Date() > new Date(2018,4,1)) {
+            if (new Date() > new Date(2019, 3, 1)) {
+                taxRate = 13;
+            }else if (new Date() > new Date(2018,4,1)) {
                 taxRate = 16;
             } else {
                 taxRate = 17;
@@ -319,28 +332,31 @@
 
     function saveDetail() {
         if ($("#fm_detail").form("validate")) {
-            //含税单价大于成交价时，需用户确认
-            var taxedPrice = $("#tax_price").numberbox("getValue");
-            var dealPrice = $("#deal_price").numberbox("getValue");
-            var unitName = $("#unit_no").combobox("getText");
-            var itemModel = $("#item_model").textbox("getValue");
-            if (itemModel.indexOf("(模具)") >= 0) {
-                if (unitName.indexOf("套") < 0) {
-                    showTip("模具型号的单位请选择【套】,保存失败");
-                    return;
-                }
-            }
-
-            if (parseFloat(taxedPrice) > parseFloat(dealPrice)) {
-                $.messager.confirm("保存确认", "含税单价大于成交价，要继续保存吗？", function (r) {
-                    if (r) {
+            //确认一次成交价
+            $.messager.confirm("保存确认", "请再一次确认成交价是否正确，要继续保存吗？", function (r) {
+                if (r) {
+                    var taxedPrice = $("#tax_price").numberbox("getValue");
+                    var dealPrice = $("#deal_price").numberbox("getValue");
+                    var unitName = $("#unit_no").combobox("getText");
+                    var itemModel = $("#item_model").textbox("getValue");
+                    if (itemModel.indexOf("(模具)") >= 0) {
+                        if (unitName.indexOf("套") < 0) {
+                            showTip("模具型号的单位请选择【套】,保存失败");
+                            return;
+                        }
+                    }
+                    //含税单价大于成交价时，需用户确认
+                    if (parseFloat(taxedPrice) > parseFloat(dealPrice)) {
+                        $.messager.confirm("保存确认", "含税单价大于成交价，要继续保存吗？", function (r) {
+                            if (r) {
+                                beginSaveDetail();
+                            }
+                        });
+                    } else {
                         beginSaveDetail();
                     }
-                });
-            } else {
-                beginSaveDetail();
-            }
-            
+                }
+            });
         }
     }
 

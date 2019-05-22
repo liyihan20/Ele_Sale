@@ -745,8 +745,7 @@ namespace Sale_platform_ele.Services
                 ap.finish_date = DateTime.Now;
           
                 //审批完成之后需要做的事情
-                bill.DoWhenFinishAudit(isPass);
-                
+                bill.DoWhenFinishAudit(isPass);                
             }
             try {
                 db.SubmitChanges();
@@ -758,6 +757,41 @@ namespace Sale_platform_ele.Services
             SendNotificationEmail();
 
             return "";
+        }
+
+        /// <summary>
+        /// (有参构造)反审核/收回
+        /// </summary>
+        /// <param name="sysNo"></param>
+        /// <param name="step"></param>
+        /// <param name="userId"></param>
+        public void AuditStepRollBack(int step, int userId)
+        {
+            BillSv bill = (BillSv)new BillUtils().GetBillSvInstanceBySysNo(ap.sys_no);
+            bill.BeforeRollBack(step);
+
+            var ad = ap.ApplyDetails.Where(a => a.user_id == userId && a.pass != null).OrderByDescending(a => a.id).FirstOrDefault();
+            if (ad == null) {
+                throw new Exception("还未审核或不是审核人，不能反审核");
+            }
+
+            if (ap.ApplyDetails.Where(a => a.step > ad.step && a.pass != null).Count() > 0) {
+                throw new Exception("后续步骤已被审核，不能反审核");
+            }
+
+            ad.pass = null;
+            ad.finish_date = null;
+            ad.comment = null;
+            ad.ip = null;
+
+            if (ap.success != null) {
+                ap.success = null;
+                ap.finish_date = null;                
+            }
+            
+
+            db.SubmitChanges();
+
         }
 
     }

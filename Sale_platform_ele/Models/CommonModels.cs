@@ -61,4 +61,14 @@ namespace Sale_platform_ele.Models
         
     }
 
+    public class ProductPriceModel
+    {
+        public decimal? unitPrice { get; set; }
+        public decimal? dealPrice { get; set; }
+        public decimal? cost { get; set; }
+        public int? feeRate { get; set; }
+
+    }
+
+
 }

@@ -268,7 +268,10 @@ namespace Sale_platform_ele.Services
                 return "比例1和比例2之和必须等于100！";
             }
             var taxRateNum = 17;
-            if (DateTime.Now > DateTime.Parse("2018-05-01")) {
+            if (DateTime.Now > DateTime.Parse("2019-04-01")) {
+                taxRateNum = 13;
+            }
+            else if (DateTime.Now > DateTime.Parse("2018-05-01")) {
                 taxRateNum = 16;
             }
 
@@ -361,7 +364,11 @@ namespace Sale_platform_ele.Services
             order.step_version = 0;
             order.order_no = "";
 
-            if (DateTime.Now > DateTime.Parse("2018-05-01")) {
+            if (DateTime.Now > DateTime.Parse("2019-04-01")) {
+                foreach (var d in order.OrderDetail) {
+                    d.tax_rate = 13;
+                }
+            }else if (DateTime.Now > DateTime.Parse("2018-05-01")) {
                 foreach (var d in order.OrderDetail) {
                     d.tax_rate = 16;
                 }
@@ -411,8 +418,7 @@ namespace Sale_platform_ele.Services
                 return order.OrderDetail.First().item_model + "...等" + detailsCount + "个";
             }
         }
-
-
+        
         /// <summary>
         /// (有参构造)审批之前需要做的事
         /// </summary>
@@ -662,10 +668,22 @@ namespace Sale_platform_ele.Services
         }
 
 
-
         public override string GetCustomerName()
         {
             return order.customer_name;
+        }
+
+        public override void BeforeRollBack(int step)
+        {
+            if (!string.IsNullOrEmpty(order.order_no)) {
+                if (db.getK3OrderNo(order.sys_no).Count() == 0) {
+                    order.order_no = null;
+                    db.SubmitChanges();
+                }
+                else {
+                    throw new Exception("此订单已导入K3，不能反审核");
+                }
+            }
         }
     }
 }

@@ -159,9 +159,9 @@ namespace Sale_platform_ele.Controllers
         }
 
         //更新件数/叉板数/快递单号等信息
-        public JsonResult UpdateStockPackInfo(int detailId, string deliveryNumber, int cardboardNum, int packs, string cycle, string itemComment)
+        public JsonResult UpdateStockPackInfo(int detailId, string deliveryNumber, int cardboardNum, int packs, string cycle, string itemComment,string boxSize,decimal totalGrossWeight)
         {
-            var result = new CHSv().UpdateCHPackInfo(detailId, deliveryNumber, cardboardNum, packs, cycle, itemComment);
+            var result = new CHSv().UpdateCHPackInfo(detailId, deliveryNumber, cardboardNum, packs, cycle, itemComment, boxSize, totalGrossWeight);
             if (string.IsNullOrEmpty(result)) {
                 Wlog("更新快递单号等额外信息:" + detailId);
                 return Json(new { suc = true });

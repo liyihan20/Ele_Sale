@@ -153,6 +153,12 @@ namespace Sale_platform_ele.Services
         /// <param name="pm">搜索参数模型</param>
         public abstract void ExportAuditorExcle(AuditSearchParamModel pm, int userId);
 
+        /// <summary>
+        /// 收回之前需要做的判断和操作
+        /// </summary>
+        /// <param name="sysNo"></param>
+        public abstract void BeforeRollBack(int step);
+
         // --------------------------  虚方法  -------------------------- //
 
         /// <summary>

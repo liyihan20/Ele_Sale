@@ -146,6 +146,26 @@ namespace Sale_platform_ele.Controllers
             return Json(new ResultModel() { suc = true, msg = "审批成功" }, "text/html");
 
         }
-        
+
+        /// <summary>
+        /// 反审核
+        /// </summary>
+        /// <param name="applyId"></param>
+        /// <param name="step"></param>
+        /// <returns></returns>
+        public JsonResult StepRollBack(int applyId, int step)
+        {
+            var sv = new ApplySv(applyId);
+            try {
+                sv.AuditStepRollBack(step, currentUser.userId);
+            }
+            catch (Exception ex) {
+                Wlog(string.Format("反审核失败:applyID：{0},step:{1}，ex:{2}", applyId, step, ex.Message));
+                return Json(new ResultModel() { suc = false, msg = ex.Message });
+            }
+            Wlog(string.Format("反审核成功:applyID：{0},step:{1}", applyId, step));
+            return Json(new ResultModel() { suc = true, msg = "反审批成功" });
+        }
+
     }
 }

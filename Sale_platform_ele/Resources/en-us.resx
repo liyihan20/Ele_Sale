@@ -1467,4 +1467,8 @@
   <data name="stock_team_report" xml:space="preserve">
     <value>Report &amp; Print Bill</value>
   </data>
+  <data name="un_audit" xml:space="preserve">
+    <value>Reverse Audit</value>
+    <comment>反审核</comment>
+  </data>
 </root>

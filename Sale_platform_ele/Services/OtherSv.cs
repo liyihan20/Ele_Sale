@@ -132,5 +132,23 @@ namespace Sale_platform_ele.Services
             return result;
         }
 
+        //营业选择了产品之后，带出上一次下单的信息
+        public ProductPriceModel GetProductPriceInfo(int userId, string itemNo)
+        {
+            var result = (from o in db.Order
+                          join e in db.OrderDetail on o.id equals e.order_id
+                          where o.original_id == userId
+                          && e.item_no == itemNo
+                          orderby e.id descending
+                          select new ProductPriceModel()
+                          {
+                              unitPrice = e.unit_price,
+                              dealPrice = e.deal_price,
+                              cost = e.cost,
+                              feeRate = e.fee_rate
+                          }).FirstOrDefault();
+            return result;
+        }
+
     }
 }

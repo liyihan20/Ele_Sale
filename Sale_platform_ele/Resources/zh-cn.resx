@@ -1466,4 +1466,8 @@
   <data name="stock_team_report" xml:space="preserve">
     <value>报表&amp;送货单</value>
   </data>
+  <data name="un_audit" xml:space="preserve">
+    <value>反审核</value>
+    <comment>反审核</comment>
+  </data>
 </root>

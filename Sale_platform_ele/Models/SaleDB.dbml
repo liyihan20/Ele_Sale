@@ -370,32 +370,6 @@
       <Column Name="unitName" Type="System.String" DbType="VarChar(80) NOT NULL" CanBeNull="false" />
     </Type>
   </Table>
-  <Table Name="dbo.Sale_ch_bill_detail" Member="ChBillDetail">
-    <Type Name="ChBillDetail">
-      <Column Name="id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
-      <Column Name="ch_bill_id" Type="System.Int32" DbType="Int" CanBeNull="true" />
-      <Column Name="entry_no" Type="System.Int32" DbType="Int" CanBeNull="true" />
-      <Column Name="item_no" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
-      <Column Name="item_model" Type="System.String" DbType="VarChar(500)" CanBeNull="true" />
-      <Column Name="item_name" Type="System.String" DbType="VarChar(500)" CanBeNull="true" />
-      <Column Name="unit_name" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
-      <Column Name="order_qty" Type="System.Int32" DbType="Int" CanBeNull="true" />
-      <Column Name="apply_qty" Type="System.Int32" DbType="Int" CanBeNull="true" />
-      <Column Name="customer_po" Type="System.String" DbType="VarChar(200)" CanBeNull="true" />
-      <Column Name="customer_pn" Type="System.String" DbType="VarChar(200)" CanBeNull="true" />
-      <Column Name="comment" Type="System.String" DbType="VarChar(500)" CanBeNull="true" />
-      <Column Name="order_no" Type="System.String" DbType="VarChar(500)" CanBeNull="true" />
-      <Column Name="order_id" Type="System.Int32" DbType="Int" CanBeNull="true" />
-      <Column Name="order_entry_no" Type="System.Int32" DbType="Int" CanBeNull="true" />
-      <Column Name="unit_no" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
-      <Column Name="item_id" Type="System.Int32" DbType="Int" CanBeNull="true" />
-      <Column Name="packs" Type="System.Int32" DbType="Int" CanBeNull="true" />
-      <Column Name="cardboard_num" Type="System.Int32" DbType="Int" CanBeNull="true" />
-      <Column Name="delivery_num" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
-      <Column Name="cycle" Type="System.String" DbType="VarChar(100)" CanBeNull="true" />
-      <Association Name="ChBill_ChBillDetail" Member="ChBill" ThisKey="ch_bill_id" OtherKey="id" Type="ChBill" IsForeignKey="true" />
-    </Type>
-  </Table>
   <Table Name="dbo.Sale_ch_bill" Member="ChBill">
     <Type Name="ChBill">
       <Column Name="id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
@@ -416,7 +390,7 @@
       <Column Name="k3_audit2_date" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
       <Column Name="sale_style" Type="System.String" DbType="VarChar(500)" CanBeNull="true" />
       <Column Name="k3_audit1_date" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
-      <Association Name="ChBill_ChBillDetail" Member="ChBillDetail" ThisKey="id" OtherKey="ch_bill_id" Type="ChBillDetail" />
+      <Association Name="ChBill_Sale_ch_bill_detail" Member="ChBillDetail" ThisKey="id" OtherKey="ch_bill_id" Type="ChBillDetail" />
       <Association Name="User_ChBill" Member="User" ThisKey="user_id" OtherKey="id" Type="User" IsForeignKey="true" />
     </Type>
   </Table>
@@ -438,33 +412,6 @@
       <Column Name="customerNumber" Type="System.String" DbType="VarChar(255)" CanBeNull="true" />
       <Column Name="customerName" Type="System.String" DbType="VarChar(500)" CanBeNull="true" />
       <Column Name="fromSystem" Type="System.String" DbType="VarChar(3) NOT NULL" CanBeNull="false" />
-    </Type>
-  </Table>
-  <Table Name="dbo.vw_ch_print_report" Member="VwChPrintReport">
-    <Type Name="VwChPrintReport">
-      <Column Name="sys_no" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
-      <Column Name="clerk_name" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
-      <Column Name="clerk_phone" Type="System.String" DbType="VarChar(100)" CanBeNull="true" />
-      <Column Name="customer_name" Type="System.String" DbType="VarChar(200)" CanBeNull="true" />
-      <Column Name="customerAddr" Type="System.String" DbType="VarChar(255)" CanBeNull="true" />
-      <Column Name="customer_phone" Type="System.String" DbType="VarChar(40)" CanBeNull="true" />
-      <Column Name="customer_attn" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
-      <Column Name="delivery_unit" Type="System.String" DbType="NVarChar(500)" CanBeNull="true" />
-      <Column Name="delivery_addr" Type="System.String" DbType="NVarChar(800)" CanBeNull="true" />
-      <Column Name="delivery_attn" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
-      <Column Name="delivery_phone" Type="System.String" DbType="VarChar(200)" CanBeNull="true" />
-      <Column Name="order_no" Type="System.String" DbType="VarChar(500)" CanBeNull="true" />
-      <Column Name="item_name" Type="System.String" DbType="VarChar(500)" CanBeNull="true" />
-      <Column Name="item_model" Type="System.String" DbType="VarChar(500)" CanBeNull="true" />
-      <Column Name="apply_qty" Type="System.Int32" DbType="Int" CanBeNull="true" />
-      <Column Name="customer_pn" Type="System.String" DbType="VarChar(200)" CanBeNull="true" />
-      <Column Name="customer_po" Type="System.String" DbType="VarChar(200)" CanBeNull="true" />
-      <Column Name="k3_stock_no" Type="System.String" DbType="VarChar(100)" CanBeNull="true" />
-      <Column Name="packs" Type="System.Int32" DbType="Int" CanBeNull="true" />
-      <Column Name="unit_name" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
-      <Column Name="comment" Type="System.String" DbType="NVarChar(800)" CanBeNull="true" />
-      <Column Name="entry_comment" Type="System.String" DbType="VarChar(500)" CanBeNull="true" />
-      <Column Name="cardboard_num" Type="System.Int32" DbType="Int" CanBeNull="true" />
     </Type>
   </Table>
   <Table Name="dbo.Sale_apply" Member="Apply">
@@ -524,6 +471,63 @@
       <Column Name="unit_price" Type="System.Decimal" DbType="Decimal(28,10) NOT NULL" CanBeNull="false" />
       <Column Name="total_price" Type="System.Decimal" DbType="Decimal(38,9)" CanBeNull="true" />
       <Column Name="tax_rate" Type="System.Decimal" DbType="Decimal(28,10)" CanBeNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Sale_ch_bill_detail" Member="ChBillDetail">
+    <Type Name="ChBillDetail">
+      <Column Name="id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="ch_bill_id" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="entry_no" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="item_no" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="item_model" Type="System.String" DbType="VarChar(500)" CanBeNull="true" />
+      <Column Name="item_name" Type="System.String" DbType="VarChar(500)" CanBeNull="true" />
+      <Column Name="unit_name" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="order_qty" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="apply_qty" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="customer_po" Type="System.String" DbType="VarChar(200)" CanBeNull="true" />
+      <Column Name="customer_pn" Type="System.String" DbType="VarChar(200)" CanBeNull="true" />
+      <Column Name="comment" Type="System.String" DbType="VarChar(500)" CanBeNull="true" />
+      <Column Name="order_no" Type="System.String" DbType="VarChar(500)" CanBeNull="true" />
+      <Column Name="order_id" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="order_entry_no" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="unit_no" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="item_id" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="packs" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="cardboard_num" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="delivery_num" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="cycle" Type="System.String" DbType="VarChar(100)" CanBeNull="true" />
+      <Column Name="box_size" Type="System.String" DbType="NVarChar(200)" CanBeNull="true" />
+      <Column Name="total_gross_weight" Type="System.Decimal" DbType="Decimal(10,2)" CanBeNull="true" />
+      <Association Name="ChBill_Sale_ch_bill_detail" Member="ChBill" ThisKey="ch_bill_id" OtherKey="id" Type="ChBill" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.vw_ch_print_report" Member="VwChPrintReport">
+    <Type Name="VwChPrintReport">
+      <Column Name="sys_no" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="clerk_name" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="clerk_phone" Type="System.String" DbType="VarChar(100)" CanBeNull="true" />
+      <Column Name="customer_name" Type="System.String" DbType="VarChar(200)" CanBeNull="true" />
+      <Column Name="customerAddr" Type="System.String" DbType="VarChar(255)" CanBeNull="true" />
+      <Column Name="customer_phone" Type="System.String" DbType="VarChar(40)" CanBeNull="true" />
+      <Column Name="customer_attn" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="delivery_unit" Type="System.String" DbType="NVarChar(500)" CanBeNull="true" />
+      <Column Name="delivery_addr" Type="System.String" DbType="NVarChar(800)" CanBeNull="true" />
+      <Column Name="delivery_attn" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="delivery_phone" Type="System.String" DbType="VarChar(200)" CanBeNull="true" />
+      <Column Name="order_no" Type="System.String" DbType="VarChar(500)" CanBeNull="true" />
+      <Column Name="item_name" Type="System.String" DbType="VarChar(500)" CanBeNull="true" />
+      <Column Name="item_model" Type="System.String" DbType="VarChar(500)" CanBeNull="true" />
+      <Column Name="apply_qty" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="customer_pn" Type="System.String" DbType="VarChar(200)" CanBeNull="true" />
+      <Column Name="customer_po" Type="System.String" DbType="VarChar(200)" CanBeNull="true" />
+      <Column Name="k3_stock_no" Type="System.String" DbType="VarChar(100)" CanBeNull="true" />
+      <Column Name="packs" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="unit_name" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="comment" Type="System.String" DbType="NVarChar(800)" CanBeNull="true" />
+      <Column Name="entry_comment" Type="System.String" DbType="VarChar(500)" CanBeNull="true" />
+      <Column Name="cardboard_num" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="box_size" Type="System.String" DbType="NVarChar(200)" CanBeNull="true" />
+      <Column Name="total_gross_weight" Type="System.Decimal" DbType="Decimal(10,2)" CanBeNull="true" />
     </Type>
   </Table>
   <Function Name="dbo.getClerk" Method="getClerk">

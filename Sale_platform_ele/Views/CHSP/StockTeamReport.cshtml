@@ -9,7 +9,7 @@
     $(function () {
         $("#orderList").datagrid({
             fit:true,
-            //width: 1850,
+            width: 2000,
             //fitColumns: true,
             rownumbers: true,
             singleSelect: true,
@@ -40,6 +40,8 @@
                         { field: 'cardboardNum', title: '叉板数', width: 70 },
                         { field: 'cycle', title: '周期', width: 80 },
                         { field: 'deliveryNumber', title: '快递单号', width: 90 },
+                        { field: 'boxSize', title: '装箱规格尺寸/MM', width: 120 },
+                        { field: 'totalGrossWeight', title: '总毛重/KG', width: 70 },
                         { field: 'itemComment', title: '备注', width: 120 },
                         { field: 'billName', title: '制单人', width: 70 }
             ]],
@@ -117,6 +119,8 @@
             $("#cycle").textbox("setValue", row.cycle);
             $("#deliveryNumber").textbox("setValue", row.deliveryNumber);
             $("#itemComment").textbox("setValue", row.itemComment);
+            $("#boxSize").textbox("setValue", row.boxSize);
+            $("#totalGrossWeight").numberbox("setValue", row.totalGrossWeight);
         }
     }
 
@@ -126,6 +130,8 @@
         var cycle = $("#cycle").textbox("getValue");
         var deliveryNumber = $("#deliveryNumber").textbox("getValue");
         var itemComment = $("#itemComment").textbox("getValue");
+        var boxSize = $("#boxSize").textbox("getValue");
+        var totalGrossWeight = $("#totalGrossWeight").numberbox("getValue");
 
         if (packs == "") {
             showTip("必须录入件数");
@@ -137,13 +143,19 @@
             return;
         }
 
+        if (totalGrossWeight == "") {
+            totalGrossWeight = 0;
+        }
+
         $.post("@Url.Content("~/CHSP/UpdateStockPackInfo")", {
             detailId: currentRow.chDetailId,
             deliveryNumber: deliveryNumber,
             cardboardNum: cardboardNum,
             packs: packs,
             cycle: cycle,
-            itemComment:itemComment
+            itemComment: itemComment,
+            boxSize: boxSize,
+            totalGrossWeight:totalGrossWeight
         }, function (data) {
             if (data.suc) {
                 currentRow.deliveryNumber = deliveryNumber;
@@ -151,6 +163,8 @@
                 currentRow.packs = packs;
                 currentRow.cycle = cycle;
                 currentRow.itemComment = itemComment;
+                currentRow.boxSize = boxSize;
+                currentRow.totalGrossWeight = totalGrossWeight;
 
                 var currentIndex = $("#orderList").datagrid("getRowIndex", currentRow);                
 
@@ -236,28 +250,32 @@
     </div>
 </div>
 
-<div id="pack_dlg" class="easyui-dialog" style="width:400px;padding:10px 20px" title="出货额外信息维护" closed="true" buttons="#dlg-buttons">
-    <div class="ftitle">录入其它信息</div>    
-        <div class="fitem">
-            <label>件数:</label>
-            <input id="packs" class="easyui-numberbox" />
-        </div>
-        <div class="fitem">
-            <label>叉板数:</label>
-            <input id="cardboardNum" class="easyui-numberbox"  />
-        </div>   
-        <div class="fitem">
-            <label>周期:</label>
-            <input id="cycle" class="easyui-textbox" />
-        </div>
-        <div class="fitem">
-            <label>快递单号:</label>
-            <input id="deliveryNumber" class="easyui-textbox"  />
-        </div>   
-        <div class="fitem">
-            <label>备注:</label>
-            <input id="itemComment" class="easyui-textbox"  />
-        </div>  
+<div id="pack_dlg" class="easyui-dialog" style="width:600px;padding:10px 20px" title="出货额外信息维护" closed="true" buttons="#dlg-buttons">
+    <div class="ftitle">录入其它信息</div>
+        <table cellspacing="4">
+            <tr>
+                <td width="15%">件数:</td>
+                <td width="35%"><input id="packs" class="easyui-numberbox" /></td>
+                <td width="15%">叉板数:</td>
+                <td width="35%"><input id="cardboardNum" class="easyui-numberbox"  /></td>
+            </tr>
+            <tr>
+                <td>周期:</td>
+                <td><input id="cycle" class="easyui-textbox" /></td>
+                <td>快递单号:</td>
+                <td><input id="deliveryNumber" class="easyui-textbox"  /></td>
+            </tr>
+            <tr>
+                <td>装箱规格尺寸/MM:</td>
+                <td><input id="boxSize" class="easyui-textbox"  /></td>
+                <td>总毛重/KG:</td>
+                <td><input id="totalGrossWeight" class="easyui-numberbox" precision="2" /></td>
+            </tr>
+            <tr>
+                <td>备注:</td>
+                <td colspan="3"><input id="itemComment" class="easyui-textbox"  /></td>
+            </tr>
+        </table>        
 </div>
 
 <div id="dlg-buttons">
