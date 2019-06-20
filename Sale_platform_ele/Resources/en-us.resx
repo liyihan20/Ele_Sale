@@ -1471,4 +1471,7 @@
     <value>Reverse Audit</value>
     <comment>反审核</comment>
   </data>
+  <data name="ind_eqm_ch_bill" xml:space="preserve">
+    <value>IND &amp; EQM Bills</value>
+  </data>
 </root>

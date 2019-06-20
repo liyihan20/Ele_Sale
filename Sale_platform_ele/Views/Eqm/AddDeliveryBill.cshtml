@@ -1,0 +1,315 @@
+﻿@using Sale_platform_ele.Models;
+@using Newtonsoft.Json;
+@{
+    var bill = ViewData["bill"] as Sale_eqm_ch_bill;
+    string account = ViewData["account"] as string;
+    string isInd = account == "IND" ? "true" : "false"; //工业账套
+}
+<script type="text/javascript" src="@Url.Content("~/Scripts/json2.js")"></script>
+<script type="text/javascript">
+    $(function () {
+        $("#dg_detail").datagrid({
+            loadMsg: "@Html.Lang("loading")",
+            rownumbers: true,
+            singleSelect: true,
+            fit:true,
+            columns: [[
+                { field: 'FItemName', title: '产品名称', width: 120 },
+                { field: 'FQty', title: '数量', width: 80, align: 'right' },
+                { field: 'FUnitName', title: '单位', width: 60 },
+                { field: 'FEveryNum', title: '装箱数', width: 80, align: 'right', editor: { type: 'numberbox' } },
+                { field: 'FPackNum', title: '件数', width: 80, align: 'right', editor: { type: 'numberbox' } },
+                { field: 'FBoxSize', title: '装箱规格尺寸（CM）', width: 120, editor: { type: 'textbox' } },
+                { field: 'FTotalGrossWeight', title: '总毛重（KG）', width: 100, editor: { type: 'numberbox', options: { precision: 4 } } },
+                { field: 'FEntryComment', title: '行备注', width: 120, editor: { type: 'textbox' } },
+                { field: 'FBatch', title: '生产批号', width: 80, editor: { type: 'textbox' },hidden:@isInd },
+                { field: 'FProduceDate', title: '生产日期', width: 80, editor: { type: 'datebox', options: { editable: false } },hidden:@isInd,
+                    formatter: function(value,row,index){
+                        if(value && value.indexOf("T")>=0){
+                            return value.split("T")[0];
+                        }else{
+                            return value;
+                        }
+                    } 
+                },
+                { field: 'FUseYearSpan', title: '使用年限', width: 80, editor: { type: 'textbox' },hidden:@isInd },
+                { field: 'FPrice', title: '单价', width: 80, align: 'right' },
+                { field: 'FAmount', title: '金额', width: 80, align: 'right' },
+                { field: 'FIndex', hidden: true },
+                { field: 'FItemNumber', hidden: true }
+            ]],
+            frozenColumns: [[
+                { field: 'FItemModel', title: '规格型号', width: 160 }
+            ]],
+            toolbar: [{
+                text: "删除行",
+                iconCls: 'icon-remove',
+                handler: function () {
+                    var row = $('#dg_detail').datagrid('getSelected');
+                    if (row) {
+                        $.messager.confirm('@Html.Lang("confirm")', '@Html.Lang("are_you_sure")?', function (r) {
+                            if (r) {
+                                var index = $('#dg_detail').datagrid('getRowIndex', row);
+                                $('#dg_detail').datagrid('deleteRow', index);
+                            }
+                        });
+                    }
+                }
+            }],
+            onClickRow: onClickRow
+        });
+
+        $("#getStockInfoBtn").on("click", function () {
+            var stockNo = $.trim($("#FBillNo").textbox("getValue"));
+            if (stockNo == "") {
+                showTip("请先填写出库单号");
+                return;
+            }
+            $.post("GetK3StockBill", { account: "@account", billNo: stockNo }, function (data) {
+                if (data.suc) {
+                    $('#order_form').form("load", data.bill);
+                    $('#dg_detail').datagrid("loadData", data.details);
+                    $("#delivery_unit").combogrid('grid').datagrid("loadData", data.deliveryInfo);
+
+                    $("#FBillNo").textbox("readonly");
+                    $('#getStockInfoBtn').linkbutton('disable');
+                } else {
+                    showTip(data.msg);
+                }
+            });
+        });
+
+        $("#delivery_unit").combogrid({
+            textField: "deliveryUnit",
+            panelWidth: 520,
+            required: 'true',
+            nowrap: false,
+            columns: [[
+                        {field: 'deliveryUnit', title: '收货客户', width: 140 },
+        				{field: 'attn', title: '联系人', width: 60 },
+                        {field: 'phone', title: '电话', width: 100 },
+        				{field: 'addr', title: '收货地址', width: 200 }
+            ]]
+        });
+
+        $("#delivery_unit").combogrid('grid').datagrid({
+            onClickRow: function (rowIndex, rowData) {
+                $("#delivery_unit").combogrid("setText", rowData.deliveryUnit);
+                $("#delivery_unit").combogrid("setValue", rowData.deliveryUnit);
+                $("#delivery_attn").textbox("setValue", rowData.attn);
+                $("#delivery_addr").textbox("setValue", rowData.addr);
+                $("#delivery_phone").textbox("setValue", rowData.phone);
+                $("#delivery_unit").combogrid('hidePanel');
+            }
+        });
+
+        $("#order_div").click(function () {
+            endEditing();
+        });
+
+    });
+
+    var editIndex = undefined;
+    function endEditing() {
+        if (editIndex == undefined) { return true; }
+        if ($('#dg_detail').datagrid('validateRow', editIndex)) {
+            $('#dg_detail').datagrid('endEdit', editIndex);
+            editIndex = undefined;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    function onClickRow(index) {
+        if (editIndex != index) {
+            if (endEditing()) {
+                $('#dg_detail').datagrid('selectRow', index)
+                        .datagrid('beginEdit', index);
+                editIndex = index;
+            } else {
+                $('#dg_detail').datagrid('selectRow', editIndex);
+            }
+        }
+        preventBubble();
+    }
+
+    //阻止冒泡事件
+    function preventBubble() {
+        if (navigator.userAgent.indexOf("Firefox") > 0) {
+            var $E = function () { var c = $E.caller; while (c.caller) c = c.caller; return c.arguments[0] };
+            __defineGetter__("event", $E);
+        }
+        if (window.event) {
+            event.cancelBubble = true;
+        } else if (evt) {
+            event.stopPropagation();
+        }
+    }
+</script>
+
+<script>
+
+    $(function () {
+        //保存表单
+        $("#saveAllBut").on("click", function () {            
+            if (validateBeforeSave()) {
+                $('#saveAllBut').linkbutton('disable');
+                $.messager.progress();
+                $('#order_form').form('submit', {
+                    url: 'SaveDeliveryBill',
+                    onSubmit: function (param) {
+                        param.ch_bill_details = JSON.stringify($("#dg_detail").datagrid("getRows"));                        
+                        param.FDeliveryUnit = $("#delivery_unit").combobox("getText");                    
+                        return true;
+                    },
+                    success: function (data) {
+                        var result = eval('(' + data + ')');
+                        if (result.suc) {
+                            showTip("保存成功，请等待跳转...");
+                            setTimeout(function(){ window.location.href="CheckDeliveryBills?account=@account";},1000);                    
+                        } else {
+                            showTip("@Html.Lang("failure_save"):" + result.msg);
+                            $('#saveAllBut').linkbutton('enable');
+                        }
+                    }
+                });
+                $.messager.progress("close");
+            }
+        });        
+
+    });
+
+    //保存之前先验证
+    function validateBeforeSave() {
+        if (!$('#order_form').form('validate')) {
+            return false;
+        }
+        if (!endEditing()) {
+            return false;
+        }
+        var rows = $("#dg_detail").datagrid("getRows");
+        if (rows.length == 0) {
+            showTip("保存失败：出货信息明细必须至少有一条数据");
+            return false;
+        }       
+
+        return true;
+    }
+
+</script>
+
+@if (bill != null) {
+    
+    var details = bill.Sale_eqm_ch_bill_detail.ToList();
+    details.ForEach(d => d.Sale_eqm_ch_bill = null);
+    var detailsJson = JsonConvert.SerializeObject(details);
+    bill.Sale_eqm_ch_bill_detail=null;
+    var billJson = JsonConvert.SerializeObject(bill);
+    
+    <script>
+        $(function(){
+            $.post("GetDeliveryInfo",{customerNumber:"@bill.FCustomerNumber"},function(data){
+                if(data.suc){
+                    $("#delivery_unit").combogrid('grid').datagrid("loadData", data.deliveryInfo);
+                }
+            });
+
+            $('#order_form').form("load", @Html.Raw(billJson));
+            $("#delivery_unit").combogrid("setText","@bill.FDeliveryUnit");
+            $("#delivery_unit").combogrid("setValue","@bill.FDeliveryUnit");
+            $('#dg_detail').datagrid("loadData", @Html.Raw(detailsJson));            
+
+            $("#FBillNo").textbox("readonly");
+            $('#getStockInfoBtn').linkbutton('disable');
+        });
+    </script>
+    
+}
+
+<form id="order_form" method="post">
+    <div id="order_div" class="easyui-panel" title="新增送货单" style="width: 840px; padding: 10px; background: #fafafa;">
+        <div>
+            <input type="hidden" name="FSysNo" />
+            <table border="0" cellpadding="1" cellspacing="3" width="800">
+                <tr>
+                    <td>
+                        发货公司:
+                    </td>
+                    <td>
+                        <input class="easyui-textbox" style="width: 140px" editable="false" value="@(account.Equals("EQM")?"信利仪器有限公司":"信利工业有限公司")"/>
+                        <input type="hidden" name="FAccount" />
+                    </td>
+                    <td>
+                        出库单号:
+                    </td>
+                    <td colspan="3">
+                        <input class="easyui-textbox" style="width: 140px" name="FBillNo" id="FBillNo" />
+                        <a href="#" class="easyui-linkbutton" id="getStockInfoBtn">获取K3出库信息</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        客户名称:
+                    </td>
+                    <td>
+                        <input class="easyui-textbox" name="FCustomerName" style="width: 140px" editable="false" />
+                        <input type="hidden" name="FCustomerNumber" />
+                    </td>
+                    <td>
+                        发货日期:
+                    </td>
+                    <td>
+                        <input class="easyui-datebox" id="FDate" name="FDate" style="width: 140px" editable="false" />
+                    </td>
+                    <td>
+                        备注:
+                    </td>
+                    <td>
+                        <input class="easyui-textbox" id="FComment" name="FComment" style="width: 200px" />
+                    </td>
+                </tr>
+            </table>
+            <br />
+            <div id="detail_div" class="easyui-panel" title="出货信息明细" style="width: 815px; height: 300px">
+                <table id="dg_detail"></table>
+            </div>
+            <br />
+            <table border="0" cellpadding="1" cellspacing="3" width="800">
+                <tr>
+                    <td>
+                        收货客户:
+                    </td>
+                    <td>
+                        <input class="easyui-combogrid" id="delivery_unit" style="width: 160px" required />
+                    </td>
+                    <td>
+                        联系人:
+                    </td>
+                    <td>
+                        <input class="easyui-textbox" name="FCustomerContact" id="delivery_attn" style="width:140px" />
+                    </td>
+                    <td>
+                        收货电话:
+                    </td>
+                    <td>
+                        <input class="easyui-textbox" name="FCustomerPhone" id="delivery_phone" style="width:140px" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        收货地址:
+                    </td>
+                    <td colspan="5">
+                        <input class="easyui-textbox" name="FCustomerAddr" id="delivery_addr" required style="width:680px" />
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <div align="center">
+            <a id="saveAllBut" href="#" class="easyui-linkbutton" iconcls='icon-save' style="margin: 10px 20px;">保存</a>
+        </div>
+
+    </div>
+</form>

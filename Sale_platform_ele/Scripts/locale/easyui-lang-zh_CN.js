@@ -41,14 +41,18 @@ if ($.fn.datebox){
 	$.fn.datebox.defaults.closeText = '关闭';
 	$.fn.datebox.defaults.okText = '确定';
 	$.fn.datebox.defaults.missingMessage = '该输入项为必输项';
-	$.fn.datebox.defaults.formatter = function(date){
+	$.fn.datebox.defaults.formatter = function (date) {	    
 		var y = date.getFullYear();
 		var m = date.getMonth()+1;
 		var d = date.getDate();
-		return y+'-'+(m<10?('0'+m):m)+'-'+(d<10?('0'+d):d);
+		return y + '-' + (m < 10 ? ('0' + m) : m) + '-' + (d < 10 ? ('0' + d) : d);
 	};
-	$.fn.datebox.defaults.parser = function(s){
-		if (!s) return new Date();
+	$.fn.datebox.defaults.parser = function (s) {	    
+	    if (!s) return new Date();
+	    if (s.indexOf("Date(") >= 0) {
+	        // /Date(1539532800000)/格式：
+	        return eval('new ' + eval(s).source);
+	    }
 		var ss = s.split('-');
 		var y = parseInt(ss[0],10);
 		var m = parseInt(ss[1],10);

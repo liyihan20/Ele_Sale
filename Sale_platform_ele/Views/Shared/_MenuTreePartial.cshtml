@@ -7,69 +7,78 @@
     <li>
         <span>@Html.Lang("invoice_manage")</span>
         <ul>
-            @if (Array.IndexOf(powers, "new_order") != -1) {
-                <li>
-                    <span>@Html.Lang("sale_order")</span>
-                    <ul>
-                        <li id="~/Saler/CreateBill?billType=SO"><span>@Html.Lang("new_sale_order")</span> </li>
-                        <li id="~/Saler/CheckBillList?billType=SO"><span>@Html.Lang("check_add_apply")</span> </li>
-                    </ul>
-                </li>
-            }
-            @if (Array.IndexOf(powers, "clerk_customer") != -1 || Array.IndexOf(powers, "new_ch") != -1 || Array.IndexOf(powers, "CH_FPC_Team") != -1 || Array.IndexOf(powers, "CH_PCB_Team") != -1) {
-                <li>
-                    <span>@Html.Lang("ch_apply")</span>
-                    <ul>
-                        @if (Array.IndexOf(powers, "new_ch") != -1) { 
-                            <li id="~/Saler/CreateBill?billType=CH"><span>@Html.Lang("new_ch_bill")</span> </li>
-                            <li id="~/Saler/CheckBillList?billType=CH"><span>@Html.Lang("check_add_apply")</span> </li>
-                            <li id="~/CHSP/K3OrderInfo"><span>@Html.Lang("k3_order_info")</span> </li>
-                        }
-                        @if (Array.IndexOf(powers, "clerk_customer") != -1) { 
-                            <li id="~/CHSP/ClerkAndCustomer"><span>@Html.Lang("clerk_customer")</span> </li>          
-                        }
-                        @if (Array.IndexOf(powers, "CH_FPC_Team") != -1 || Array.IndexOf(powers, "CH_PCB_Team") != -1) { 
-                            <li id="~/CHSP/StockTeamReport"><span>@Html.Lang("stock_team_report")</span> </li>          
-                        }
-                    </ul>
-                </li>
-            }
-            <li id="~/Audit/CheckAuditList"><span>@Html.Lang("audit_apply")</span></li>
-         </ul>
-    </li>
-    @if (Array.IndexOf(powers, "ua_manage") != -1) {
+    @if (Array.IndexOf(powers, "new_order") != -1) {
         <li>
-            <span>@Html.Lang("User_depart")</span>
+            <span>@Html.Lang("sale_order")</span>
             <ul>
-                @if (Array.IndexOf(powers, "dep_manage") != -1) {
-                    <li id="~/Authority/Departments"><span>@Html.Lang("dep_manage")</span> </li>
-                }
-                @if (Array.IndexOf(powers, "user_manage") != -1) {
-                    <li id="~/Authority/Users"><span>@Html.Lang("user_manage")</span> </li>
-                }
-                @if (Array.IndexOf(powers, "group_manage") != -1) {
-                    <li id="~/Authority/Groups"><span>@Html.Lang("group_manage")</span> </li>
-                }                
-                @if (Array.IndexOf(powers, "auditor_manage") != -1) {
-                    <li id="~/Authority/StepAuditor"><span>@Html.Lang("auditor_manage")</span> </li>
-                }
+                <li id="~/Saler/CreateBill?billType=SO"><span>@Html.Lang("new_sale_order")</span> </li>
+                <li id="~/Saler/CheckBillList?billType=SO"><span>@Html.Lang("check_add_apply")</span> </li>
+            </ul>
+        </li>
+            }
+    @if (Array.IndexOf(powers, "clerk_customer") != -1 || Array.IndexOf(powers, "new_ch") != -1 || Array.IndexOf(powers, "CH_FPC_Team") != -1 || Array.IndexOf(powers, "CH_PCB_Team") != -1) {
+        <li>
+            <span>@Html.Lang("ch_apply")</span>
+            <ul>
+                @if (Array.IndexOf(powers, "new_ch") != -1) {
+                    <li id="~/Saler/CreateBill?billType=CH"><span>@Html.Lang("new_ch_bill")</span> </li>
+                    <li id="~/Saler/CheckBillList?billType=CH"><span>@Html.Lang("check_add_apply")</span> </li>
+                    <li id="~/CHSP/K3OrderInfo"><span>@Html.Lang("k3_order_info")</span> </li>
+                        }
+                @if (Array.IndexOf(powers, "clerk_customer") != -1) {
+                    <li id="~/CHSP/ClerkAndCustomer"><span>@Html.Lang("clerk_customer")</span> </li>
+                        }
+                @if (Array.IndexOf(powers, "CH_FPC_Team") != -1 || Array.IndexOf(powers, "CH_PCB_Team") != -1) {
+                    <li id="~/CHSP/StockTeamReport"><span>@Html.Lang("stock_team_report")</span> </li>
+                        }
+            </ul>
+        </li>
+            }
+    @if (Array.IndexOf(powers, "ind_eqm_ch_bill") != -1) {
+        <li>
+            <span>@Html.Lang("ind_eqm_ch_bill")</span>
+            <ul>
+                <li id="~/Eqm/CheckDeliveryBills?account=IND"><span>工业送货单</span> </li>
+                <li id="~/Eqm/CheckDeliveryBills?account=EQM"><span>仪器送货单</span> </li>
             </ul>
         </li>
     }
-    @if (Array.IndexOf(powers, "data_manage") != -1) {
-        <li>
-            <span>@Html.Lang("data_manage")</span>
-            <ul>
-                @if (Array.IndexOf(powers, "process_manage") != -1) {
-                    <li id="~/Authority/Processes"><span>@Html.Lang("process_manage")</span> </li>
-                }
-                @if (Array.IndexOf(powers, "commission_manage") != -1) {
-                    <li id="~/Authority/Commission"><span>@Html.Lang("commission_manage")</span> </li>
-                }
+                <li id="~/Audit/CheckAuditList"><span>@Html.Lang("audit_apply")</span></li>
             </ul>
         </li>
+        @if (Array.IndexOf(powers, "ua_manage") != -1) {
+            <li>
+                <span>@Html.Lang("User_depart")</span>
+                <ul>
+                    @if (Array.IndexOf(powers, "dep_manage") != -1) {
+                        <li id="~/Authority/Departments"><span>@Html.Lang("dep_manage")</span> </li>
+                }
+                    @if (Array.IndexOf(powers, "user_manage") != -1) {
+                        <li id="~/Authority/Users"><span>@Html.Lang("user_manage")</span> </li>
+                }
+                    @if (Array.IndexOf(powers, "group_manage") != -1) {
+                        <li id="~/Authority/Groups"><span>@Html.Lang("group_manage")</span> </li>
+                }
+                    @if (Array.IndexOf(powers, "auditor_manage") != -1) {
+                        <li id="~/Authority/StepAuditor"><span>@Html.Lang("auditor_manage")</span> </li>
+                }
+                </ul>
+            </li>
     }
-</ul>
+        @if (Array.IndexOf(powers, "data_manage") != -1) {
+            <li>
+                <span>@Html.Lang("data_manage")</span>
+                <ul>
+                    @if (Array.IndexOf(powers, "process_manage") != -1) {
+                        <li id="~/Authority/Processes"><span>@Html.Lang("process_manage")</span> </li>
+                }
+                    @if (Array.IndexOf(powers, "commission_manage") != -1) {
+                        <li id="~/Authority/Commission"><span>@Html.Lang("commission_manage")</span> </li>
+                }
+                </ul>
+            </li>
+    }
+    </ul>
 
 <script type="text/javascript">
     $(function () {

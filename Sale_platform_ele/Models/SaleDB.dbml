@@ -390,7 +390,7 @@
       <Column Name="k3_audit2_date" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
       <Column Name="sale_style" Type="System.String" DbType="VarChar(500)" CanBeNull="true" />
       <Column Name="k3_audit1_date" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
-      <Association Name="ChBill_Sale_ch_bill_detail" Member="ChBillDetail" ThisKey="id" OtherKey="ch_bill_id" Type="ChBillDetail" />
+      <Association Name="ChBill_ChBillDetail" Member="ChBillDetail" ThisKey="id" OtherKey="ch_bill_id" Type="ChBillDetail" />
       <Association Name="User_ChBill" Member="User" ThisKey="user_id" OtherKey="id" Type="User" IsForeignKey="true" />
     </Type>
   </Table>
@@ -498,7 +498,7 @@
       <Column Name="cycle" Type="System.String" DbType="VarChar(100)" CanBeNull="true" />
       <Column Name="box_size" Type="System.String" DbType="NVarChar(200)" CanBeNull="true" />
       <Column Name="total_gross_weight" Type="System.Decimal" DbType="Decimal(10,2)" CanBeNull="true" />
-      <Association Name="ChBill_Sale_ch_bill_detail" Member="ChBill" ThisKey="ch_bill_id" OtherKey="id" Type="ChBill" IsForeignKey="true" />
+      <Association Name="ChBill_ChBillDetail" Member="ChBill" ThisKey="ch_bill_id" OtherKey="id" Type="ChBill" IsForeignKey="true" />
     </Type>
   </Table>
   <Table Name="dbo.vw_ch_print_report" Member="VwChPrintReport">
@@ -528,6 +528,49 @@
       <Column Name="cardboard_num" Type="System.Int32" DbType="Int" CanBeNull="true" />
       <Column Name="box_size" Type="System.String" DbType="NVarChar(200)" CanBeNull="true" />
       <Column Name="total_gross_weight" Type="System.Decimal" DbType="Decimal(10,2)" CanBeNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Sale_eqm_ch_bill_detail" Member="Sale_eqm_ch_bill_detail">
+    <Type Name="Sale_eqm_ch_bill_detail">
+      <Column Name="id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="FChId" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="FIndex" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="FItemName" Type="System.String" DbType="NVarChar(200)" CanBeNull="true" />
+      <Column Name="FItemModel" Type="System.String" DbType="NVarChar(500)" CanBeNull="true" />
+      <Column Name="FItemNumber" Type="System.String" DbType="VarChar(100)" CanBeNull="true" />
+      <Column Name="FQty" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="FPrice" Type="System.Decimal" DbType="Decimal(18,6)" CanBeNull="true" />
+      <Column Name="FAmount" Type="System.Decimal" DbType="Decimal(18,2)" CanBeNull="true" />
+      <Column Name="FUnitName" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="FPackNum" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="FEveryNum" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="FBoxSize" Type="System.String" DbType="VarChar(100)" CanBeNull="true" />
+      <Column Name="FTotalGrossWeight" Type="System.Decimal" DbType="Decimal(18,4)" CanBeNull="true" />
+      <Column Name="FEntryComment" Type="System.String" DbType="NVarChar(500)" CanBeNull="true" />
+      <Column Name="FBatch" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="FProduceDate" Type="System.DateTime" DbType="SmallDateTime" CanBeNull="true" />
+      <Column Name="FUseYearSpan" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Association Name="Sale_eqm_ch_bill_Sale_eqm_ch_bill_detail" Member="Sale_eqm_ch_bill" ThisKey="FChId" OtherKey="id" Type="Sale_eqm_ch_bill" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Sale_eqm_ch_bill" Member="Sale_eqm_ch_bill">
+    <Type Name="Sale_eqm_ch_bill">
+      <Column Name="id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="FDate" Type="System.DateTime" DbType="SmallDateTime" CanBeNull="true" />
+      <Column Name="FBillNo" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="FCustomerName" Type="System.String" DbType="NVarChar(200)" CanBeNull="true" />
+      <Column Name="FCustomerAddr" Type="System.String" DbType="NVarChar(500)" CanBeNull="true" />
+      <Column Name="FCustomerContact" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="FCustomerPhone" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="FComment" Type="System.String" DbType="NVarChar(500)" CanBeNull="true" />
+      <Column Name="FUserName" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="FSaveDate" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="FAccount" Type="System.String" DbType="VarChar(10)" CanBeNull="true" />
+      <Column Name="FCustomerNumber" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="FDeliveryUnit" Type="System.String" DbType="NVarChar(200)" CanBeNull="true" />
+      <Column Name="FSysNo" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="FDeleted" Type="System.Boolean" DbType="Bit" CanBeNull="true" />
+      <Association Name="Sale_eqm_ch_bill_Sale_eqm_ch_bill_detail" Member="Sale_eqm_ch_bill_detail" ThisKey="id" OtherKey="FChId" Type="Sale_eqm_ch_bill_detail" />
     </Type>
   </Table>
   <Function Name="dbo.getClerk" Method="getClerk">
@@ -592,5 +635,26 @@
   <Function Name="dbo.GetItemStockQty" Method="GetItemStockQty" IsComposable="true">
     <Parameter Name="item_id" Type="System.Int32" DbType="Int" />
     <Return Type="System.Int32" />
+  </Function>
+  <Function Name="dbo.getK3EqmChData" Method="getK3EqmChData">
+    <Parameter Name="FAcount" Parameter="fAcount" Type="System.String" DbType="VarChar(10)" />
+    <Parameter Name="FBillNo" Parameter="fBillNo" Type="System.String" DbType="VarChar(50)" />
+    <ElementType Name="getK3EqmChDataResult">
+      <Column Name="FDate" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="FBillNo" Type="System.String" DbType="NVarChar(255) NOT NULL" CanBeNull="false" />
+      <Column Name="FEntryID" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="FCustomerName" Type="System.String" DbType="VarChar(80)" CanBeNull="true" />
+      <Column Name="FCustomerAddr" Type="System.String" DbType="VarChar(255)" CanBeNull="true" />
+      <Column Name="FCustomerContract" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="FCustomerNumber" Type="System.String" DbType="VarChar(255)" CanBeNull="true" />
+      <Column Name="FCustomerPhone" Type="System.String" DbType="VarChar(40)" CanBeNull="true" />
+      <Column Name="FName" Type="System.String" DbType="VarChar(80) NOT NULL" CanBeNull="false" />
+      <Column Name="FModel" Type="System.String" DbType="VarChar(255)" CanBeNull="true" />
+      <Column Name="FNumber" Type="System.String" DbType="VarChar(80)" CanBeNull="true" />
+      <Column Name="FAuxQty" Type="System.Decimal" DbType="Decimal(28,10) NOT NULL" CanBeNull="false" />
+      <Column Name="FConsignPrice" Type="System.Decimal" DbType="Decimal(28,10) NOT NULL" CanBeNull="false" />
+      <Column Name="FConsignAmount" Type="System.Decimal" DbType="Decimal(20,2) NOT NULL" CanBeNull="false" />
+      <Column Name="FUnitName" Type="System.String" DbType="VarChar(80) NOT NULL" CanBeNull="false" />
+    </ElementType>
   </Function>
 </Database>

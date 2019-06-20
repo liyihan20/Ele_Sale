@@ -22,7 +22,22 @@
         }
     </style>
 }
-
+<script src="@Url.Content("~/Scripts/JsBarcode.code128.min.js")"></script>
+<script>
+    $(function () {
+        $(".bar").each(function (index, ele) {
+            JsBarcode(ele, "@h.k3_stock_no", {
+                width: 1,//设置条之间的宽度
+                margin: 4,
+                height: 28,//高度            
+                displayValue: false,
+                fontSize: 12,
+                font: '黑体'
+            });
+        });
+    })
+    
+</script>
 <div class="noPrint" style="text-align:center;margin-bottom:6px;"><a href="#" class="easyui-linkbutton" iconcls="icon-print" onclick="javascript: window.print();">打印</a></div>
 
 @for (var p = 1; p <= pageNum; p++) { 
@@ -44,13 +59,38 @@
             <span>送货单</span> <br/>
             <span style="border-top:1px solid;">Delivery Note</span>
         </div>
-    </div>
-
-    <p></p>
+    </div>    
 
     <p style="clear:both;"></p>
 
-    <div style="float:left;width:40%;">
+    <table style="width:100%;">
+        <tr>
+            <td style="width:40%;"></td>
+            <td style="width:20%;"></td>
+            <td style="width:40%;">
+                <img class="bar" />
+            </td>
+        </tr>
+        <tr>
+            <td style="vertical-align:top;">
+                <div>发货日期：@DateTime.Now.ToString("yyyy-MM-dd")</div>
+                <div>客户名称：@h.customer_name</div>
+                <div>客户地址：@h.customerAddr</div>
+                <div>联系人：@h.customer_attn</div>
+                <div>电话：@h.customer_phone</div>
+            </td>
+            <td></td>
+            <td style="vertical-align:top;">
+                <div>发货编号：@h.k3_stock_no</div>
+                <div>收货客户：@h.delivery_unit</div>
+                <div>收货地址：@h.delivery_addr</div>
+                <div>联系人：@h.delivery_attn</div>
+                <div>电话：@h.delivery_phone</div>
+            </td>
+        </tr>
+    </table>
+
+    @*<div style="float:left;width:40%;">
         发货日期：@DateTime.Now.ToString("yyyy-MM-dd") <br/>
         <br/>
         客户名称：@h.customer_name <br/>
@@ -58,8 +98,8 @@
         联系人：@h.customer_attn <br/>
         电话：@h.customer_phone
     </div>
-    <div style="float:right;width:40%;">
-        发货编号：@h.k3_stock_no <br/>
+    <div style="float:right;width:40%;">        
+        <div>发货编号：@h.k3_stock_no </div>
         <br/>
         收货客户：@h.delivery_unit <br/>
         收货地址：@h.delivery_addr <br/>
@@ -67,7 +107,7 @@
         电话：@h.delivery_phone
     </div>
 
-    <p style="clear:both;"></p>
+    <p style="clear:both;"></p>*@
 
     <table style="width:100%;" cellpadding="4" cellspacing="4" id="printTb">
         <tr>
@@ -151,7 +191,7 @@
                         @list[i].box_size
                     </td>
                     <td style="text-align:center;">
-                        @(list[i].total_gross_weight==null?"":list[i].total_gross_weight.ToString())
+                        @((list[i].total_gross_weight??0)==0?"":list[i].total_gross_weight.ToString())
                     </td>
                     <td>
                         @list[i].customer_po
@@ -171,7 +211,7 @@
                     </td>
                 </tr>
             }
-        }                
+        }
         <tr>
             <td colspan="10">
                 <hr style="margin-bottom:-4px;" />

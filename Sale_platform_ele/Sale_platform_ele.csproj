@@ -147,6 +147,7 @@
     <Compile Include="Controllers\AuthorityController.cs" />
     <Compile Include="Controllers\BaseController.cs" />
     <Compile Include="Controllers\CHSPController.cs" />
+    <Compile Include="Controllers\EqmController.cs" />
     <Compile Include="Controllers\FileController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ItemsController.cs" />
@@ -177,6 +178,7 @@
     <Compile Include="Services\CHSv.cs" />
     <Compile Include="Services\CommissionSv.cs" />
     <Compile Include="Services\DepSv.cs" />
+    <Compile Include="Services\EqmSv.cs" />
     <Compile Include="Services\GroupSv.cs" />
     <Compile Include="Services\OtherSv.cs" />
     <Compile Include="Services\ProcessSv.cs" />
@@ -583,6 +585,7 @@
     <Content Include="Scripts\jquery-1.8.2.min.js" />
     <Content Include="Scripts\jquery.easyui-1.5.2.min.js" />
     <Content Include="Scripts\jquery.easyui.min.js" />
+    <Content Include="Scripts\JsBarcode.code128.min.js" />
     <Content Include="Scripts\json2.js" />
     <Content Include="Scripts\locale\easyui-lang-en.js" />
     <Content Include="Scripts\locale\easyui-lang-zh_CN.js" />
@@ -635,6 +638,10 @@
     <Content Include="Views\CHSP\K3OrderInfo.cshtml" />
     <Content Include="Views\CHSP\StockTeamReport.cshtml" />
     <Content Include="Views\File\PrintChReport.cshtml" />
+    <Content Include="Views\Eqm\CheckDeliveryBills.cshtml" />
+    <Content Include="Views\Eqm\AddDeliveryBill.cshtml" />
+    <Content Include="Views\Eqm\PrintDeliveryBill.cshtml" />
+    <Content Include="Views\Eqm\CheckADeliveryBill.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

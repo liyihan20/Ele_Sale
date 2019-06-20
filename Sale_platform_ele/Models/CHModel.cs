@@ -45,4 +45,23 @@ namespace Sale_platform_ele.Models
         public decimal? totalGrossWeight { get; set; }
     }
 
+    public class EqmChListModel
+    {
+        public int FId { get; set; }
+        public int FDetailId { get; set; }
+        public string FDate { get; set; }
+        public string FSysNo { get; set; }
+        public string FBillNo { get; set; }
+        public string FCustomerName { get; set; }
+        public string FDeliveryUnit { get; set; }
+        public string FItemName { get; set; }
+        public string FItemModel { get; set; }
+        public int? FQty { get; set; }
+        public string FUnitName { get; set; }
+        public decimal? FPrice { get; set; }
+        public decimal? FAmount { get; set; }
+        public string FUserName { get; set; }
+    }
+    
+
 }

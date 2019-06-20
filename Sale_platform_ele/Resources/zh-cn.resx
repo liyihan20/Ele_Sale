@@ -1450,7 +1450,7 @@
     <comment>结算方式</comment>
   </data>
   <data name="ch_apply" xml:space="preserve">
-    <value>出货申请</value>
+    <value>电子出货</value>
     <comment>出货申请</comment>
   </data>
   <data name="clerk_customer" xml:space="preserve">
@@ -1469,5 +1469,8 @@
   <data name="un_audit" xml:space="preserve">
     <value>反审核</value>
     <comment>反审核</comment>
+  </data>
+  <data name="ind_eqm_ch_bill" xml:space="preserve">
+    <value>工业/仪器出货</value>
   </data>
 </root>

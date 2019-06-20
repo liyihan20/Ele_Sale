@@ -108,6 +108,12 @@ namespace Sale_platform_ele.Models
     partial void InsertChBillDetail(ChBillDetail instance);
     partial void UpdateChBillDetail(ChBillDetail instance);
     partial void DeleteChBillDetail(ChBillDetail instance);
+    partial void InsertSale_eqm_ch_bill_detail(Sale_eqm_ch_bill_detail instance);
+    partial void UpdateSale_eqm_ch_bill_detail(Sale_eqm_ch_bill_detail instance);
+    partial void DeleteSale_eqm_ch_bill_detail(Sale_eqm_ch_bill_detail instance);
+    partial void InsertSale_eqm_ch_bill(Sale_eqm_ch_bill instance);
+    partial void UpdateSale_eqm_ch_bill(Sale_eqm_ch_bill instance);
+    partial void DeleteSale_eqm_ch_bill(Sale_eqm_ch_bill instance);
     #endregion
 		
 		public SaleDBDataContext() : 
@@ -420,6 +426,22 @@ namespace Sale_platform_ele.Models
 			}
 		}
 		
+		public System.Data.Linq.Table<Sale_eqm_ch_bill_detail> Sale_eqm_ch_bill_detail
+		{
+			get
+			{
+				return this.GetTable<Sale_eqm_ch_bill_detail>();
+			}
+		}
+		
+		public System.Data.Linq.Table<Sale_eqm_ch_bill> Sale_eqm_ch_bill
+		{
+			get
+			{
+				return this.GetTable<Sale_eqm_ch_bill>();
+			}
+		}
+		
 		[global::System.Data.Linq.Mapping.FunctionAttribute(Name="dbo.getClerk")]
 		public ISingleResult<getClerkResult> getClerk([global::System.Data.Linq.Mapping.ParameterAttribute(DbType="VarChar(20)")] string queryString)
 		{
@@ -481,6 +503,13 @@ namespace Sale_platform_ele.Models
 		public System.Nullable<int> GetItemStockQty([global::System.Data.Linq.Mapping.ParameterAttribute(DbType="Int")] System.Nullable<int> item_id)
 		{
 			return ((System.Nullable<int>)(this.ExecuteMethodCall(this, ((MethodInfo)(MethodInfo.GetCurrentMethod())), item_id).ReturnValue));
+		}
+		
+		[global::System.Data.Linq.Mapping.FunctionAttribute(Name="dbo.getK3EqmChData")]
+		public ISingleResult<getK3EqmChDataResult> getK3EqmChData([global::System.Data.Linq.Mapping.ParameterAttribute(Name="FAcount", DbType="VarChar(10)")] string fAcount, [global::System.Data.Linq.Mapping.ParameterAttribute(Name="FBillNo", DbType="VarChar(50)")] string fBillNo)
+		{
+			IExecuteResult result = this.ExecuteMethodCall(this, ((MethodInfo)(MethodInfo.GetCurrentMethod())), fAcount, fBillNo);
+			return ((ISingleResult<getK3EqmChDataResult>)(result.ReturnValue));
 		}
 	}
 	
@@ -8026,7 +8055,7 @@ namespace Sale_platform_ele.Models
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="ChBill_Sale_ch_bill_detail", Storage="_ChBillDetail", ThisKey="id", OtherKey="ch_bill_id")]
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="ChBill_ChBillDetail", Storage="_ChBillDetail", ThisKey="id", OtherKey="ch_bill_id")]
 		public EntitySet<ChBillDetail> ChBillDetail
 		{
 			get
@@ -10033,7 +10062,7 @@ namespace Sale_platform_ele.Models
 			}
 		}
 		
-		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="ChBill_Sale_ch_bill_detail", Storage="_ChBill", ThisKey="ch_bill_id", OtherKey="id", IsForeignKey=true)]
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="ChBill_ChBillDetail", Storage="_ChBill", ThisKey="ch_bill_id", OtherKey="id", IsForeignKey=true)]
 		public ChBill ChBill
 		{
 			get
@@ -10547,6 +10576,943 @@ namespace Sale_platform_ele.Models
 		}
 	}
 	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Sale_eqm_ch_bill_detail")]
+	public partial class Sale_eqm_ch_bill_detail : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _id;
+		
+		private System.Nullable<int> _FChId;
+		
+		private System.Nullable<int> _FIndex;
+		
+		private string _FItemName;
+		
+		private string _FItemModel;
+		
+		private string _FItemNumber;
+		
+		private System.Nullable<int> _FQty;
+		
+		private System.Nullable<decimal> _FPrice;
+		
+		private System.Nullable<decimal> _FAmount;
+		
+		private string _FUnitName;
+		
+		private System.Nullable<int> _FPackNum;
+		
+		private System.Nullable<int> _FEveryNum;
+		
+		private string _FBoxSize;
+		
+		private System.Nullable<decimal> _FTotalGrossWeight;
+		
+		private string _FEntryComment;
+		
+		private string _FBatch;
+		
+		private System.Nullable<System.DateTime> _FProduceDate;
+		
+		private string _FUseYearSpan;
+		
+		private EntityRef<Sale_eqm_ch_bill> _Sale_eqm_ch_bill;
+		
+    #region 可扩展性方法定义
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnidChanging(int value);
+    partial void OnidChanged();
+    partial void OnFChIdChanging(System.Nullable<int> value);
+    partial void OnFChIdChanged();
+    partial void OnFIndexChanging(System.Nullable<int> value);
+    partial void OnFIndexChanged();
+    partial void OnFItemNameChanging(string value);
+    partial void OnFItemNameChanged();
+    partial void OnFItemModelChanging(string value);
+    partial void OnFItemModelChanged();
+    partial void OnFItemNumberChanging(string value);
+    partial void OnFItemNumberChanged();
+    partial void OnFQtyChanging(System.Nullable<int> value);
+    partial void OnFQtyChanged();
+    partial void OnFPriceChanging(System.Nullable<decimal> value);
+    partial void OnFPriceChanged();
+    partial void OnFAmountChanging(System.Nullable<decimal> value);
+    partial void OnFAmountChanged();
+    partial void OnFUnitNameChanging(string value);
+    partial void OnFUnitNameChanged();
+    partial void OnFPackNumChanging(System.Nullable<int> value);
+    partial void OnFPackNumChanged();
+    partial void OnFEveryNumChanging(System.Nullable<int> value);
+    partial void OnFEveryNumChanged();
+    partial void OnFBoxSizeChanging(string value);
+    partial void OnFBoxSizeChanged();
+    partial void OnFTotalGrossWeightChanging(System.Nullable<decimal> value);
+    partial void OnFTotalGrossWeightChanged();
+    partial void OnFEntryCommentChanging(string value);
+    partial void OnFEntryCommentChanged();
+    partial void OnFBatchChanging(string value);
+    partial void OnFBatchChanged();
+    partial void OnFProduceDateChanging(System.Nullable<System.DateTime> value);
+    partial void OnFProduceDateChanged();
+    partial void OnFUseYearSpanChanging(string value);
+    partial void OnFUseYearSpanChanged();
+    #endregion
+		
+		public Sale_eqm_ch_bill_detail()
+		{
+			this._Sale_eqm_ch_bill = default(EntityRef<Sale_eqm_ch_bill>);
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_id", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int id
+		{
+			get
+			{
+				return this._id;
+			}
+			set
+			{
+				if ((this._id != value))
+				{
+					this.OnidChanging(value);
+					this.SendPropertyChanging();
+					this._id = value;
+					this.SendPropertyChanged("id");
+					this.OnidChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_FChId", DbType="Int")]
+		public System.Nullable<int> FChId
+		{
+			get
+			{
+				return this._FChId;
+			}
+			set
+			{
+				if ((this._FChId != value))
+				{
+					if (this._Sale_eqm_ch_bill.HasLoadedOrAssignedValue)
+					{
+						throw new System.Data.Linq.ForeignKeyReferenceAlreadyHasValueException();
+					}
+					this.OnFChIdChanging(value);
+					this.SendPropertyChanging();
+					this._FChId = value;
+					this.SendPropertyChanged("FChId");
+					this.OnFChIdChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_FIndex", DbType="Int")]
+		public System.Nullable<int> FIndex
+		{
+			get
+			{
+				return this._FIndex;
+			}
+			set
+			{
+				if ((this._FIndex != value))
+				{
+					this.OnFIndexChanging(value);
+					this.SendPropertyChanging();
+					this._FIndex = value;
+					this.SendPropertyChanged("FIndex");
+					this.OnFIndexChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_FItemName", DbType="NVarChar(200)")]
+		public string FItemName
+		{
+			get
+			{
+				return this._FItemName;
+			}
+			set
+			{
+				if ((this._FItemName != value))
+				{
+					this.OnFItemNameChanging(value);
+					this.SendPropertyChanging();
+					this._FItemName = value;
+					this.SendPropertyChanged("FItemName");
+					this.OnFItemNameChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_FItemModel", DbType="NVarChar(500)")]
+		public string FItemModel
+		{
+			get
+			{
+				return this._FItemModel;
+			}
+			set
+			{
+				if ((this._FItemModel != value))
+				{
+					this.OnFItemModelChanging(value);
+					this.SendPropertyChanging();
+					this._FItemModel = value;
+					this.SendPropertyChanged("FItemModel");
+					this.OnFItemModelChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_FItemNumber", DbType="VarChar(100)")]
+		public string FItemNumber
+		{
+			get
+			{
+				return this._FItemNumber;
+			}
+			set
+			{
+				if ((this._FItemNumber != value))
+				{
+					this.OnFItemNumberChanging(value);
+					this.SendPropertyChanging();
+					this._FItemNumber = value;
+					this.SendPropertyChanged("FItemNumber");
+					this.OnFItemNumberChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_FQty", DbType="Int")]
+		public System.Nullable<int> FQty
+		{
+			get
+			{
+				return this._FQty;
+			}
+			set
+			{
+				if ((this._FQty != value))
+				{
+					this.OnFQtyChanging(value);
+					this.SendPropertyChanging();
+					this._FQty = value;
+					this.SendPropertyChanged("FQty");
+					this.OnFQtyChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_FPrice", DbType="Decimal(18,6)")]
+		public System.Nullable<decimal> FPrice
+		{
+			get
+			{
+				return this._FPrice;
+			}
+			set
+			{
+				if ((this._FPrice != value))
+				{
+					this.OnFPriceChanging(value);
+					this.SendPropertyChanging();
+					this._FPrice = value;
+					this.SendPropertyChanged("FPrice");
+					this.OnFPriceChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_FAmount", DbType="Decimal(18,2)")]
+		public System.Nullable<decimal> FAmount
+		{
+			get
+			{
+				return this._FAmount;
+			}
+			set
+			{
+				if ((this._FAmount != value))
+				{
+					this.OnFAmountChanging(value);
+					this.SendPropertyChanging();
+					this._FAmount = value;
+					this.SendPropertyChanged("FAmount");
+					this.OnFAmountChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_FUnitName", DbType="NVarChar(50)")]
+		public string FUnitName
+		{
+			get
+			{
+				return this._FUnitName;
+			}
+			set
+			{
+				if ((this._FUnitName != value))
+				{
+					this.OnFUnitNameChanging(value);
+					this.SendPropertyChanging();
+					this._FUnitName = value;
+					this.SendPropertyChanged("FUnitName");
+					this.OnFUnitNameChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_FPackNum", DbType="Int")]
+		public System.Nullable<int> FPackNum
+		{
+			get
+			{
+				return this._FPackNum;
+			}
+			set
+			{
+				if ((this._FPackNum != value))
+				{
+					this.OnFPackNumChanging(value);
+					this.SendPropertyChanging();
+					this._FPackNum = value;
+					this.SendPropertyChanged("FPackNum");
+					this.OnFPackNumChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_FEveryNum", DbType="Int")]
+		public System.Nullable<int> FEveryNum
+		{
+			get
+			{
+				return this._FEveryNum;
+			}
+			set
+			{
+				if ((this._FEveryNum != value))
+				{
+					this.OnFEveryNumChanging(value);
+					this.SendPropertyChanging();
+					this._FEveryNum = value;
+					this.SendPropertyChanged("FEveryNum");
+					this.OnFEveryNumChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_FBoxSize", DbType="VarChar(100)")]
+		public string FBoxSize
+		{
+			get
+			{
+				return this._FBoxSize;
+			}
+			set
+			{
+				if ((this._FBoxSize != value))
+				{
+					this.OnFBoxSizeChanging(value);
+					this.SendPropertyChanging();
+					this._FBoxSize = value;
+					this.SendPropertyChanged("FBoxSize");
+					this.OnFBoxSizeChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_FTotalGrossWeight", DbType="Decimal(18,4)")]
+		public System.Nullable<decimal> FTotalGrossWeight
+		{
+			get
+			{
+				return this._FTotalGrossWeight;
+			}
+			set
+			{
+				if ((this._FTotalGrossWeight != value))
+				{
+					this.OnFTotalGrossWeightChanging(value);
+					this.SendPropertyChanging();
+					this._FTotalGrossWeight = value;
+					this.SendPropertyChanged("FTotalGrossWeight");
+					this.OnFTotalGrossWeightChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_FEntryComment", DbType="NVarChar(500)")]
+		public string FEntryComment
+		{
+			get
+			{
+				return this._FEntryComment;
+			}
+			set
+			{
+				if ((this._FEntryComment != value))
+				{
+					this.OnFEntryCommentChanging(value);
+					this.SendPropertyChanging();
+					this._FEntryComment = value;
+					this.SendPropertyChanged("FEntryComment");
+					this.OnFEntryCommentChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_FBatch", DbType="NVarChar(50)")]
+		public string FBatch
+		{
+			get
+			{
+				return this._FBatch;
+			}
+			set
+			{
+				if ((this._FBatch != value))
+				{
+					this.OnFBatchChanging(value);
+					this.SendPropertyChanging();
+					this._FBatch = value;
+					this.SendPropertyChanged("FBatch");
+					this.OnFBatchChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_FProduceDate", DbType="SmallDateTime")]
+		public System.Nullable<System.DateTime> FProduceDate
+		{
+			get
+			{
+				return this._FProduceDate;
+			}
+			set
+			{
+				if ((this._FProduceDate != value))
+				{
+					this.OnFProduceDateChanging(value);
+					this.SendPropertyChanging();
+					this._FProduceDate = value;
+					this.SendPropertyChanged("FProduceDate");
+					this.OnFProduceDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_FUseYearSpan", DbType="NVarChar(50)")]
+		public string FUseYearSpan
+		{
+			get
+			{
+				return this._FUseYearSpan;
+			}
+			set
+			{
+				if ((this._FUseYearSpan != value))
+				{
+					this.OnFUseYearSpanChanging(value);
+					this.SendPropertyChanging();
+					this._FUseYearSpan = value;
+					this.SendPropertyChanged("FUseYearSpan");
+					this.OnFUseYearSpanChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Sale_eqm_ch_bill_Sale_eqm_ch_bill_detail", Storage="_Sale_eqm_ch_bill", ThisKey="FChId", OtherKey="id", IsForeignKey=true)]
+		public Sale_eqm_ch_bill Sale_eqm_ch_bill
+		{
+			get
+			{
+				return this._Sale_eqm_ch_bill.Entity;
+			}
+			set
+			{
+				Sale_eqm_ch_bill previousValue = this._Sale_eqm_ch_bill.Entity;
+				if (((previousValue != value) 
+							|| (this._Sale_eqm_ch_bill.HasLoadedOrAssignedValue == false)))
+				{
+					this.SendPropertyChanging();
+					if ((previousValue != null))
+					{
+						this._Sale_eqm_ch_bill.Entity = null;
+						previousValue.Sale_eqm_ch_bill_detail.Remove(this);
+					}
+					this._Sale_eqm_ch_bill.Entity = value;
+					if ((value != null))
+					{
+						value.Sale_eqm_ch_bill_detail.Add(this);
+						this._FChId = value.id;
+					}
+					else
+					{
+						this._FChId = default(Nullable<int>);
+					}
+					this.SendPropertyChanged("Sale_eqm_ch_bill");
+				}
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+	}
+	
+	[global::System.Data.Linq.Mapping.TableAttribute(Name="dbo.Sale_eqm_ch_bill")]
+	public partial class Sale_eqm_ch_bill : INotifyPropertyChanging, INotifyPropertyChanged
+	{
+		
+		private static PropertyChangingEventArgs emptyChangingEventArgs = new PropertyChangingEventArgs(String.Empty);
+		
+		private int _id;
+		
+		private System.Nullable<System.DateTime> _FDate;
+		
+		private string _FBillNo;
+		
+		private string _FCustomerName;
+		
+		private string _FCustomerAddr;
+		
+		private string _FCustomerContact;
+		
+		private string _FCustomerPhone;
+		
+		private string _FComment;
+		
+		private string _FUserName;
+		
+		private System.Nullable<System.DateTime> _FSaveDate;
+		
+		private string _FAccount;
+		
+		private string _FCustomerNumber;
+		
+		private string _FDeliveryUnit;
+		
+		private string _FSysNo;
+		
+		private System.Nullable<bool> _FDeleted;
+		
+		private EntitySet<Sale_eqm_ch_bill_detail> _Sale_eqm_ch_bill_detail;
+		
+    #region 可扩展性方法定义
+    partial void OnLoaded();
+    partial void OnValidate(System.Data.Linq.ChangeAction action);
+    partial void OnCreated();
+    partial void OnidChanging(int value);
+    partial void OnidChanged();
+    partial void OnFDateChanging(System.Nullable<System.DateTime> value);
+    partial void OnFDateChanged();
+    partial void OnFBillNoChanging(string value);
+    partial void OnFBillNoChanged();
+    partial void OnFCustomerNameChanging(string value);
+    partial void OnFCustomerNameChanged();
+    partial void OnFCustomerAddrChanging(string value);
+    partial void OnFCustomerAddrChanged();
+    partial void OnFCustomerContactChanging(string value);
+    partial void OnFCustomerContactChanged();
+    partial void OnFCustomerPhoneChanging(string value);
+    partial void OnFCustomerPhoneChanged();
+    partial void OnFCommentChanging(string value);
+    partial void OnFCommentChanged();
+    partial void OnFUserNameChanging(string value);
+    partial void OnFUserNameChanged();
+    partial void OnFSaveDateChanging(System.Nullable<System.DateTime> value);
+    partial void OnFSaveDateChanged();
+    partial void OnFAccountChanging(string value);
+    partial void OnFAccountChanged();
+    partial void OnFCustomerNumberChanging(string value);
+    partial void OnFCustomerNumberChanged();
+    partial void OnFDeliveryUnitChanging(string value);
+    partial void OnFDeliveryUnitChanged();
+    partial void OnFSysNoChanging(string value);
+    partial void OnFSysNoChanged();
+    partial void OnFDeletedChanging(System.Nullable<bool> value);
+    partial void OnFDeletedChanged();
+    #endregion
+		
+		public Sale_eqm_ch_bill()
+		{
+			this._Sale_eqm_ch_bill_detail = new EntitySet<Sale_eqm_ch_bill_detail>(new Action<Sale_eqm_ch_bill_detail>(this.attach_Sale_eqm_ch_bill_detail), new Action<Sale_eqm_ch_bill_detail>(this.detach_Sale_eqm_ch_bill_detail));
+			OnCreated();
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_id", AutoSync=AutoSync.OnInsert, DbType="Int NOT NULL IDENTITY", IsPrimaryKey=true, IsDbGenerated=true)]
+		public int id
+		{
+			get
+			{
+				return this._id;
+			}
+			set
+			{
+				if ((this._id != value))
+				{
+					this.OnidChanging(value);
+					this.SendPropertyChanging();
+					this._id = value;
+					this.SendPropertyChanged("id");
+					this.OnidChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_FDate", DbType="SmallDateTime")]
+		public System.Nullable<System.DateTime> FDate
+		{
+			get
+			{
+				return this._FDate;
+			}
+			set
+			{
+				if ((this._FDate != value))
+				{
+					this.OnFDateChanging(value);
+					this.SendPropertyChanging();
+					this._FDate = value;
+					this.SendPropertyChanged("FDate");
+					this.OnFDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_FBillNo", DbType="VarChar(50)")]
+		public string FBillNo
+		{
+			get
+			{
+				return this._FBillNo;
+			}
+			set
+			{
+				if ((this._FBillNo != value))
+				{
+					this.OnFBillNoChanging(value);
+					this.SendPropertyChanging();
+					this._FBillNo = value;
+					this.SendPropertyChanged("FBillNo");
+					this.OnFBillNoChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_FCustomerName", DbType="NVarChar(200)")]
+		public string FCustomerName
+		{
+			get
+			{
+				return this._FCustomerName;
+			}
+			set
+			{
+				if ((this._FCustomerName != value))
+				{
+					this.OnFCustomerNameChanging(value);
+					this.SendPropertyChanging();
+					this._FCustomerName = value;
+					this.SendPropertyChanged("FCustomerName");
+					this.OnFCustomerNameChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_FCustomerAddr", DbType="NVarChar(500)")]
+		public string FCustomerAddr
+		{
+			get
+			{
+				return this._FCustomerAddr;
+			}
+			set
+			{
+				if ((this._FCustomerAddr != value))
+				{
+					this.OnFCustomerAddrChanging(value);
+					this.SendPropertyChanging();
+					this._FCustomerAddr = value;
+					this.SendPropertyChanged("FCustomerAddr");
+					this.OnFCustomerAddrChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_FCustomerContact", DbType="NVarChar(50)")]
+		public string FCustomerContact
+		{
+			get
+			{
+				return this._FCustomerContact;
+			}
+			set
+			{
+				if ((this._FCustomerContact != value))
+				{
+					this.OnFCustomerContactChanging(value);
+					this.SendPropertyChanging();
+					this._FCustomerContact = value;
+					this.SendPropertyChanged("FCustomerContact");
+					this.OnFCustomerContactChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_FCustomerPhone", DbType="VarChar(50)")]
+		public string FCustomerPhone
+		{
+			get
+			{
+				return this._FCustomerPhone;
+			}
+			set
+			{
+				if ((this._FCustomerPhone != value))
+				{
+					this.OnFCustomerPhoneChanging(value);
+					this.SendPropertyChanging();
+					this._FCustomerPhone = value;
+					this.SendPropertyChanged("FCustomerPhone");
+					this.OnFCustomerPhoneChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_FComment", DbType="NVarChar(500)")]
+		public string FComment
+		{
+			get
+			{
+				return this._FComment;
+			}
+			set
+			{
+				if ((this._FComment != value))
+				{
+					this.OnFCommentChanging(value);
+					this.SendPropertyChanging();
+					this._FComment = value;
+					this.SendPropertyChanged("FComment");
+					this.OnFCommentChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_FUserName", DbType="NVarChar(50)")]
+		public string FUserName
+		{
+			get
+			{
+				return this._FUserName;
+			}
+			set
+			{
+				if ((this._FUserName != value))
+				{
+					this.OnFUserNameChanging(value);
+					this.SendPropertyChanging();
+					this._FUserName = value;
+					this.SendPropertyChanged("FUserName");
+					this.OnFUserNameChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_FSaveDate", DbType="DateTime")]
+		public System.Nullable<System.DateTime> FSaveDate
+		{
+			get
+			{
+				return this._FSaveDate;
+			}
+			set
+			{
+				if ((this._FSaveDate != value))
+				{
+					this.OnFSaveDateChanging(value);
+					this.SendPropertyChanging();
+					this._FSaveDate = value;
+					this.SendPropertyChanged("FSaveDate");
+					this.OnFSaveDateChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_FAccount", DbType="VarChar(10)")]
+		public string FAccount
+		{
+			get
+			{
+				return this._FAccount;
+			}
+			set
+			{
+				if ((this._FAccount != value))
+				{
+					this.OnFAccountChanging(value);
+					this.SendPropertyChanging();
+					this._FAccount = value;
+					this.SendPropertyChanged("FAccount");
+					this.OnFAccountChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_FCustomerNumber", DbType="VarChar(50)")]
+		public string FCustomerNumber
+		{
+			get
+			{
+				return this._FCustomerNumber;
+			}
+			set
+			{
+				if ((this._FCustomerNumber != value))
+				{
+					this.OnFCustomerNumberChanging(value);
+					this.SendPropertyChanging();
+					this._FCustomerNumber = value;
+					this.SendPropertyChanged("FCustomerNumber");
+					this.OnFCustomerNumberChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_FDeliveryUnit", DbType="NVarChar(200)")]
+		public string FDeliveryUnit
+		{
+			get
+			{
+				return this._FDeliveryUnit;
+			}
+			set
+			{
+				if ((this._FDeliveryUnit != value))
+				{
+					this.OnFDeliveryUnitChanging(value);
+					this.SendPropertyChanging();
+					this._FDeliveryUnit = value;
+					this.SendPropertyChanged("FDeliveryUnit");
+					this.OnFDeliveryUnitChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_FSysNo", DbType="VarChar(50)")]
+		public string FSysNo
+		{
+			get
+			{
+				return this._FSysNo;
+			}
+			set
+			{
+				if ((this._FSysNo != value))
+				{
+					this.OnFSysNoChanging(value);
+					this.SendPropertyChanging();
+					this._FSysNo = value;
+					this.SendPropertyChanged("FSysNo");
+					this.OnFSysNoChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_FDeleted", DbType="Bit")]
+		public System.Nullable<bool> FDeleted
+		{
+			get
+			{
+				return this._FDeleted;
+			}
+			set
+			{
+				if ((this._FDeleted != value))
+				{
+					this.OnFDeletedChanging(value);
+					this.SendPropertyChanging();
+					this._FDeleted = value;
+					this.SendPropertyChanged("FDeleted");
+					this.OnFDeletedChanged();
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.AssociationAttribute(Name="Sale_eqm_ch_bill_Sale_eqm_ch_bill_detail", Storage="_Sale_eqm_ch_bill_detail", ThisKey="id", OtherKey="FChId")]
+		public EntitySet<Sale_eqm_ch_bill_detail> Sale_eqm_ch_bill_detail
+		{
+			get
+			{
+				return this._Sale_eqm_ch_bill_detail;
+			}
+			set
+			{
+				this._Sale_eqm_ch_bill_detail.Assign(value);
+			}
+		}
+		
+		public event PropertyChangingEventHandler PropertyChanging;
+		
+		public event PropertyChangedEventHandler PropertyChanged;
+		
+		protected virtual void SendPropertyChanging()
+		{
+			if ((this.PropertyChanging != null))
+			{
+				this.PropertyChanging(this, emptyChangingEventArgs);
+			}
+		}
+		
+		protected virtual void SendPropertyChanged(String propertyName)
+		{
+			if ((this.PropertyChanged != null))
+			{
+				this.PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+			}
+		}
+		
+		private void attach_Sale_eqm_ch_bill_detail(Sale_eqm_ch_bill_detail entity)
+		{
+			this.SendPropertyChanging();
+			entity.Sale_eqm_ch_bill = this;
+		}
+		
+		private void detach_Sale_eqm_ch_bill_detail(Sale_eqm_ch_bill_detail entity)
+		{
+			this.SendPropertyChanging();
+			entity.Sale_eqm_ch_bill = null;
+		}
+	}
+	
 	public partial class getClerkResult
 	{
 		
@@ -10950,6 +11916,284 @@ namespace Sale_platform_ele.Models
 				if ((this._attn != value))
 				{
 					this._attn = value;
+				}
+			}
+		}
+	}
+	
+	public partial class getK3EqmChDataResult
+	{
+		
+		private System.Nullable<System.DateTime> _FDate;
+		
+		private string _FBillNo;
+		
+		private int _FEntryID;
+		
+		private string _FCustomerName;
+		
+		private string _FCustomerAddr;
+		
+		private string _FCustomerContract;
+		
+		private string _FCustomerNumber;
+		
+		private string _FCustomerPhone;
+		
+		private string _FName;
+		
+		private string _FModel;
+		
+		private string _FNumber;
+		
+		private decimal _FAuxQty;
+		
+		private decimal _FConsignPrice;
+		
+		private decimal _FConsignAmount;
+		
+		private string _FUnitName;
+		
+		public getK3EqmChDataResult()
+		{
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_FDate", DbType="DateTime")]
+		public System.Nullable<System.DateTime> FDate
+		{
+			get
+			{
+				return this._FDate;
+			}
+			set
+			{
+				if ((this._FDate != value))
+				{
+					this._FDate = value;
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_FBillNo", DbType="NVarChar(255) NOT NULL", CanBeNull=false)]
+		public string FBillNo
+		{
+			get
+			{
+				return this._FBillNo;
+			}
+			set
+			{
+				if ((this._FBillNo != value))
+				{
+					this._FBillNo = value;
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_FEntryID", DbType="Int NOT NULL")]
+		public int FEntryID
+		{
+			get
+			{
+				return this._FEntryID;
+			}
+			set
+			{
+				if ((this._FEntryID != value))
+				{
+					this._FEntryID = value;
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_FCustomerName", DbType="VarChar(80)")]
+		public string FCustomerName
+		{
+			get
+			{
+				return this._FCustomerName;
+			}
+			set
+			{
+				if ((this._FCustomerName != value))
+				{
+					this._FCustomerName = value;
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_FCustomerAddr", DbType="VarChar(255)")]
+		public string FCustomerAddr
+		{
+			get
+			{
+				return this._FCustomerAddr;
+			}
+			set
+			{
+				if ((this._FCustomerAddr != value))
+				{
+					this._FCustomerAddr = value;
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_FCustomerContract", DbType="VarChar(50)")]
+		public string FCustomerContract
+		{
+			get
+			{
+				return this._FCustomerContract;
+			}
+			set
+			{
+				if ((this._FCustomerContract != value))
+				{
+					this._FCustomerContract = value;
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_FCustomerNumber", DbType="VarChar(255)")]
+		public string FCustomerNumber
+		{
+			get
+			{
+				return this._FCustomerNumber;
+			}
+			set
+			{
+				if ((this._FCustomerNumber != value))
+				{
+					this._FCustomerNumber = value;
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_FCustomerPhone", DbType="VarChar(40)")]
+		public string FCustomerPhone
+		{
+			get
+			{
+				return this._FCustomerPhone;
+			}
+			set
+			{
+				if ((this._FCustomerPhone != value))
+				{
+					this._FCustomerPhone = value;
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_FName", DbType="VarChar(80) NOT NULL", CanBeNull=false)]
+		public string FName
+		{
+			get
+			{
+				return this._FName;
+			}
+			set
+			{
+				if ((this._FName != value))
+				{
+					this._FName = value;
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_FModel", DbType="VarChar(255)")]
+		public string FModel
+		{
+			get
+			{
+				return this._FModel;
+			}
+			set
+			{
+				if ((this._FModel != value))
+				{
+					this._FModel = value;
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_FNumber", DbType="VarChar(80)")]
+		public string FNumber
+		{
+			get
+			{
+				return this._FNumber;
+			}
+			set
+			{
+				if ((this._FNumber != value))
+				{
+					this._FNumber = value;
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_FAuxQty", DbType="Decimal(28,10) NOT NULL")]
+		public decimal FAuxQty
+		{
+			get
+			{
+				return this._FAuxQty;
+			}
+			set
+			{
+				if ((this._FAuxQty != value))
+				{
+					this._FAuxQty = value;
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_FConsignPrice", DbType="Decimal(28,10) NOT NULL")]
+		public decimal FConsignPrice
+		{
+			get
+			{
+				return this._FConsignPrice;
+			}
+			set
+			{
+				if ((this._FConsignPrice != value))
+				{
+					this._FConsignPrice = value;
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_FConsignAmount", DbType="Decimal(20,2) NOT NULL")]
+		public decimal FConsignAmount
+		{
+			get
+			{
+				return this._FConsignAmount;
+			}
+			set
+			{
+				if ((this._FConsignAmount != value))
+				{
+					this._FConsignAmount = value;
+				}
+			}
+		}
+		
+		[global::System.Data.Linq.Mapping.ColumnAttribute(Storage="_FUnitName", DbType="VarChar(80) NOT NULL", CanBeNull=false)]
+		public string FUnitName
+		{
+			get
+			{
+				return this._FUnitName;
+			}
+			set
+			{
+				if ((this._FUnitName != value))
+				{
+					this._FUnitName = value;
 				}
 			}
 		}

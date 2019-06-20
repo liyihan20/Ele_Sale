@@ -1,0 +1,280 @@
+﻿@using Sale_platform_ele.Models;
+@{
+    Sale_eqm_ch_bill h = ViewData["bill"] as Sale_eqm_ch_bill;
+    bool seePrice = (bool)ViewData["seePrice"];
+    var list = h.Sale_eqm_ch_bill_detail;    
+    int numPerPage = 8;
+    int pageNum = (int)Math.Ceiling((decimal)list.Count() / numPerPage);
+    string companyName = "", companyAddr = "";
+    string[] columnName;
+    int[] columnWidth;    
+    if (h.FAccount == "IND") {
+        companyName = "信利工业（汕尾）有限公司";
+        companyAddr = "广东省汕尾市工业大道城区信利工业城计算器市场部";
+        if (seePrice) {
+            columnName = new string[] { "产品名称", "规格型号", "数量", "单位", "单价", "金额", "装箱数", "件数", "装箱规格尺寸/CM", "总毛重/KG", "备注" };
+            columnWidth = new int[] { 12, 12, 8, 8, 8, 8, 8, 6, 12, 8, 10 };
+        }
+        else {
+            columnName = new string[] { "产品名称", "规格型号", "数量", "单位", "装箱数", "件数", "装箱规格尺寸/CM", "总毛重/KG", "备注" };
+            columnWidth=new int[] { 16, 16, 9, 9, 9, 6, 14, 9, 12 };
+        }
+    }
+    else {
+        companyName = "信利仪器（汕尾）有限公司";
+        companyAddr = "广东省汕尾市工业大道信利城区工业城仪器市场部";
+        if (seePrice) {
+            columnName=new string[] { "产品名称", "规格型号", "数量", "单位", "单价", "金额", "装箱数", "件数", "装箱规格尺寸/CM", "总毛重/KG", "生产批号", "生产日期", "使用年限", "备注" };
+            columnWidth = new int[] { 10, 10, 7, 7, 7, 7, 7, 6, 9, 6, 6, 6, 6, 6 };
+        }
+        else {
+            columnName=new string[] { "产品名称", "规格型号", "数量", "单位", "装箱数", "件数", "装箱规格尺寸/CM", "总毛重/KG", "生产批号", "生产日期", "使用年限", "备注" };
+            columnWidth = new int[] { 12, 12, 7, 7, 7, 6, 10, 7, 8, 8, 8, 8 };
+        }
+    }
+}
+
+@section CSS{
+    <style type="text/css" media="print">
+        .noPrint {
+            display: none;
+        }
+
+        .pageNext {
+            page-break-after: always;
+        }
+    </style>
+    <style type="text/css">
+        #printTb tr td {
+            overflow: hidden;
+            word-break: break-all;
+        }
+    </style>
+}
+<script src="@Url.Content("~/Scripts/JsBarcode.code128.min.js")"></script>
+<script>
+    $(function () {
+        $(".bar").each(function (index, ele) {
+            JsBarcode(ele, "@h.FBillNo", {
+                width: 1,//设置条之间的宽度
+                margin: 4,
+                height: 28,//高度
+                displayValue: false,
+                fontSize: 12,
+                font: '黑体'
+            });
+        });
+    })
+
+</script>
+<div class="noPrint" style="text-align:center;margin-bottom:6px;"><a href="#" class="easyui-linkbutton" iconcls="icon-print" onclick="javascript: window.print();">打印</a></div>
+
+@for (var p = 1; p <= pageNum; p++) {
+    <div style="padding:4px;font-size:9pt;">
+        <div><img src="@Url.Content("~/Content/Images/Truly.gif")" /></div>
+
+        <div style="text-align:center;">
+            <div style="font-size:14pt;font-weight:bold;">@companyName </div>            
+            <div style="font-size:12pt;font-weight:bold;margin-top:6px;">
+                <span>送货单</span> <br />
+                <span style="border-top:1px solid;">Delivery Note</span>
+            </div>
+        </div>
+
+        <p style="clear:both;"></p>
+
+        <table style="width:100%;">
+            <tr>
+                <td style="width:40%;"></td>
+                <td style="width:20%;"></td>
+                <td style="width:40%;">
+                    <img class="bar" />
+                </td>
+            </tr>
+            <tr>
+                <td style="vertical-align:top;">
+                    <div>发货日期：@(((DateTime)h.FDate).ToString("yyyy-MM-dd"))</div>
+                    <div>公司名称：@companyName</div>                    
+                    <div>公司地址：@companyAddr</div>
+                    <div>联系人：贝楚溶</div>
+                    <div>电话：0660-3382101</div>
+                </td>
+                <td></td>
+                <td style="vertical-align:top;">
+                    <div>发货编号：@h.FBillNo</div>
+                    <div>收货客户：@h.FDeliveryUnit</div>
+                    <div>收货地址：@h.FCustomerAddr</div>
+                    <div>联系人：@h.FCustomerContact</div>
+                    <div>电话：@h.FCustomerPhone</div>
+                </td>
+            </tr>
+        </table>
+        
+
+        <table style="width:100%;" cellpadding="4" cellspacing="4" id="printTb">
+            <tr>
+                <td colspan="@columnName.Length">
+                    <hr style="margin-bottom:-4px;" />
+                </td>
+            </tr>
+            <tr>
+                @for (var i = 0; i < columnName.Length; i++) {
+                    <th style="width: @columnWidth[i]%">
+                        @columnName[i]
+                    </th>
+                }                
+            </tr>
+            <tr>
+                <td colspan="@columnName.Length">
+                    <hr style="margin-top:-4px;" />
+                </td>
+            </tr>
+            @{
+            int totalQtyInPage = 0;
+            int totalPacksInPage = 0;
+            decimal totalGrossWeightInPage = 0;
+            decimal totalAmountInPage = 0;
+            }
+            @for (int i = (p - 1) * numPerPage; i < p * numPerPage; i++) {
+                if (i < list.Count()) {
+
+                    totalQtyInPage += (int)list[i].FQty;
+                    totalPacksInPage += list[i].FPackNum ?? 0;
+                    totalGrossWeightInPage += list[i].FTotalGrossWeight ?? 0;
+                    totalAmountInPage += list[i].FAmount ?? 0;
+                    <tr>                        
+                        <td>
+                            @list[i].FItemName
+                        </td>
+                        <td>
+                            @list[i].FItemModel
+                        </td>
+                        <td style="text-align:center;">
+                            @list[i].FQty
+                        </td>
+                        <td style="text-align:center;">
+                            @list[i].FUnitName
+                        </td>
+                        @if (seePrice) {
+                            <td style="text-align:center;">@string.Format("{0:0.0#####}", list[i].FPrice)</td>
+                            <td style="text-align:center;">@string.Format("{0:0.0#}", list[i].FAmount)</td>
+                        }
+                        <td style="text-align:center;">
+                            @list[i].FEveryNum
+                        </td>
+                        <td style="text-align:center;">
+                            @list[i].FPackNum
+                        </td>
+                        <td style="text-align:center;">
+                            @list[i].FBoxSize
+                        </td>
+                        <td style="text-align:center;">
+                            @(list[i].FTotalGrossWeight == null ? "" : string.Format("{0:0.0#}", list[i].FTotalGrossWeight))
+                        </td>
+                        @if (h.FAccount == "EQM") { 
+                            <td>
+                                @list[i].FBatch
+                            </td>
+                            <td>
+                                @(list[i].FProduceDate==null?"":((DateTime)list[i].FProduceDate).ToString("yyyy-MM-dd"))
+                            </td>
+                            <td>@list[i].FUseYearSpan</td>
+                        }
+                        <td>
+                            @list[i].FEntryComment
+                        </td>
+                    </tr>
+                }
+                else {
+                    <tr>
+                        <td colspan="@columnName.Length">
+                            &nbsp;
+                        </td>
+                    </tr>
+                }
+            }
+            <tr>
+                <td colspan="@columnName.Length">
+                    <hr style="margin-bottom:-4px;" />
+                </td>
+            </tr>
+            <tr>
+                <td style="text-align:right;">
+                    TOTAL:
+                </td>
+                <td></td>
+                <td style="text-align:center;">
+                    @totalQtyInPage
+                </td>
+                <td></td>
+                @if (seePrice) {
+                    <td></td>
+                    <td style="text-align:center;">@totalAmountInPage.ToString("0.0#")</td>
+                }
+                <td></td>
+                <td style="text-align:center;">
+                    @(totalPacksInPage == 0 ? "" : totalPacksInPage.ToString("N0"))
+                </td>
+                <td></td>
+                <td style="text-align:center;">
+                    @(totalGrossWeightInPage == 0 ? "" : totalGrossWeightInPage.ToString("0.0#"))
+                </td>
+            </tr>
+
+        </table>
+        <p>备注:@h.FComment</p>
+        <p>注:本送货单所列产品验收无误，请即盖章及签收后交货运公司/快递公司带回，或邮寄回本司出货员收。谢谢合作！</p>
+
+        <table style="width:100%;margin-top:16px;" cellpadding="1" cellspacing="1">
+            <tr>
+                <td style="width:35%;">
+                    收货人
+                </td>
+                <td style="width:30%;"></td>
+                <td style="width:35%;text-align:center;">
+                    @companyName
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    盖章及签收
+                </td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td colspan="3">&nbsp;</td>
+            </tr>
+            <tr>
+                <td></td>
+                <td></td>
+                <td style="text-align:center;font-size:10pt;font-weight:bold;">@h.FUserName</td>
+            </tr>
+            <tr>
+                <td>
+                    <hr />
+                </td>
+                <td></td>
+                <td>
+                    <hr />
+                </td>
+            </tr>
+            <tr>
+                <td style="font-size:10pt;font-weight:bold;">
+                    Signed With Company Chop
+                </td>
+                <td></td>
+                <td style="font-size:10pt;font-weight:bold;">
+                    Authorized Signature
+                </td>
+            </tr>
+        </table>
+
+        <div style="margin-top:8px;text-align:center;">第 @p 页/共 @pageNum 页</div>
+
+    </div>
+    if (p < pageNum) {
+        <div class="pageNext"></div>
+    }
+}
+

@@ -1,0 +1,196 @@
+﻿@{
+    string account = ViewData["account"] as string;
+}
+<script type="text/javascript">
+    var currentRow;
+    document.onkeydown = function (event) {
+        var e = event || window.event || arguments.callee.caller.arguments[0];
+        if (e && e.keyCode == 13) { // enter 键
+            $("#checkBt").click();
+        }
+    };
+    $(function () {
+        $("#orderList").datagrid({
+            fit: true,
+            rownumbers: true,
+            singleSelect: true,
+            idField: "FDetailId",
+            columns: [[
+                        { field: 'FSysNo', title: '流水号', width: 100 },
+                        { field: 'FDate', title: '出货日期', width: 100 },
+                        { field: 'FBillNo', title: '出库单号', width: 120 },
+    					{ field: 'FCustomerName', title: '客户名称', width: 160 },
+                        { field: 'FDeliveryUnit', title: '收货客户', width: 160 },
+    					{ field: 'FItemName', title: '产品名称', width: 140 },
+                        { field: 'FItemModel', title: '规格型号', width: 160 },
+    					{ field: 'FQty', title: '出货数量', width: 70 },
+                        { field: 'FUnitName', title: '单位', width: 60 },
+                        { field: 'FPrice', title: '单价', width: 60 },
+                        { field: 'FAmount', title: '金额', width: 60 },
+                        { field: 'FUserName', title: '制单人', width: 70 }
+            ]],
+            toolbar: [{
+                text: "新增送货单",
+                iconCls: 'icon-add',
+                handler: function () {
+                    window.location.href = "AddDeliveryBill?account=@account";
+                }
+            }, {
+                text: "修改送货单",
+                iconCls: 'icon-edit',
+                handler: function () {
+                    var row = $("#orderList").datagrid("getSelected");
+                    if (row) {
+                        window.location.href = "ModifyDeliveryBill?sysNo=" + row.FSysNo;
+                    }
+                }
+            }, {
+                text: "删除送货单",
+                iconCls: 'icon-remove',
+                handler: function () {
+                    var row = $("#orderList").datagrid("getSelected");
+                    if (row) {
+                        $.messager.confirm('@Html.Lang("confirm")', '@Html.Lang("confirm_delete")?', function (r) {
+                            if (r) {
+                                $.post("DeletedDeliveryBill", { sysNo: row.FSysNo }, function (data) {
+                                    if (data.suc) {
+                                        $("#checkBt").trigger("click");
+                                    }
+                                    showTip(data.msg);
+                                });
+                            }
+                        });
+                    }
+                }
+            }, {
+                text: "送货单详情",
+                iconCls: 'icon-search',
+                handler: CheckDetail
+            }, {
+                text: "送货excel报表",
+                iconCls: 'icon-xls',
+                handler: ExportExcel
+            }, {
+                text: "打印送货单",
+                iconCls: 'icon-print',
+                handler: function () { PrintReport(false); }
+            }, {
+                text: "打印送货单(有金额）",
+                iconCls: 'icon-print',
+                handler: function () { PrintReport(true); }
+            }],
+            onDblClickRow: CheckDetail
+        });
+
+
+        $("#checkBt").click(function () {
+            $.ajax({
+                type: 'post',
+                url: 'SearchDeliveryBills',
+                data: $("#fm").serialize(),
+                cache: false,
+                dataType: 'json',
+                success: function (data) {
+                    if (data.suc) {
+                        if (data.result.length > 0) {
+                            $("#orderList").datagrid("loadData", data.result);
+                        } else {
+                            showTip("找不到符合当前查询条件的记录");
+                        }
+                    } else {
+                        $("#orderList").datagrid("loadData", []);
+                        showTip(data.msg);
+                    }
+
+                }
+            });
+
+        });
+
+    });
+
+    function PrintReport(seePrice) {
+        var row = $("#orderList").datagrid("getSelected");
+        if (row) {
+            window.open("PrintDeliveryBill?sysNo=" + row.FSysNo + "&seePrice=" + seePrice);
+        }
+    }
+
+    function ExportExcel() {
+        var rows = $("#orderList").datagrid("getData").rows;
+        if (rows.length < 1) {
+            showTip("列表中没有数据可导出");
+            return;
+        }
+        var ids = "";
+        for (var i = 0; i < rows.length; i++) {
+            if (ids == "") {
+                ids = rows[i].FId;
+            } else {
+                ids += "," + rows[i].FId;
+            }
+        }
+        showTip("数据正在准备中，请等待...");
+        console.log(ids);
+        window.open("ExportDeliveryExcel?FIds=" + ids);
+    }
+
+    function CheckDetail() {
+        var row = $("#orderList").datagrid("getSelected");
+        if (row) {
+            window.location.href = "@Url.Content("CheckADeliveryBill?sysNo=")" + row.FSysNo;
+        }
+    }
+
+</script>
+<div class="easyui-layout" data-options="fit:true">
+    <div data-options="region:'north',collapsed:false,split:true" style="height: 65px; background: #fafafa;
+        padding: 1px;">
+        <form id="fm" method="post" style="padding:2px 5px;">
+            <input type="hidden" name="account" value="@account" />
+            <table>
+                <tr>
+                    <td>
+                        客户名称:
+                    </td>
+                    <td>
+                        出库日期:
+                    </td>
+                    <td>
+                        到:
+                    </td>
+                    <td>
+                        规格型号:
+                    </td>
+                    <td>
+                        出库单号:
+                    </td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>
+                        <input class="easyui-textbox" id="customer" name="customer" style="width: 100px" />
+                    </td>
+                    <td>
+                        <input class="easyui-datebox" id="fromDate" name="fromDate" style="width: 90px" value="@(DateTime.Now.AddDays(-10).ToString("yyyy-MM-dd"))" />
+                    </td>
+                    <td>
+                        <input class="easyui-datebox" id="toDate" name="toDate" style="width: 90px" value="@DateTime.Now.ToString("yyyy-MM-dd")" />
+                    </td>
+                    <td>
+                        <input class="easyui-textbox" id="itemModel" name="itemModel" style="width: 100px" />
+                    </td>
+                    <td>
+                        <input class="easyui-textbox" id="stockNo" name="stockNo" style="width: 100px" />
+                    </td>
+                    <td>
+                        <a id="checkBt" href="#" class="easyui-linkbutton" data-options="iconCls:'icon-search'">查询</a>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </div>
+    <div data-options="region:'center'">
+        <table id="orderList"></table>
+    </div>
+</div>

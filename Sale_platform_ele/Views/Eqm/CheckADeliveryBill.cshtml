@@ -1,0 +1,136 @@
+﻿@using Sale_platform_ele.Models;
+@using Newtonsoft.Json;
+@{
+    Sale_eqm_ch_bill h = ViewData["bill"] as Sale_eqm_ch_bill;
+    var details = h.Sale_eqm_ch_bill_detail.ToList();
+    details.ForEach(d => d.Sale_eqm_ch_bill = null);
+    var detailsJson = JsonConvert.SerializeObject(details);
+    string isInd = h.FAccount == "IND" ? "true" : "false"; //工业账套
+ }    
+<script type="text/javascript">
+    $(function () {
+        $("#dg_detail").datagrid({
+            loadMsg: "@Html.Lang("loading")",
+            rownumbers: true,
+            singleSelect: true,
+            fit:true,
+            data:@Html.Raw(detailsJson),
+            columns: [[
+                { field: 'FItemName', title: '产品名称', width: 120 },
+                { field: 'FQty', title: '数量', width: 80, align: 'right' },
+                { field: 'FUnitName', title: '单位', width: 60 },
+                { field: 'FEveryNum', title: '装箱数', width: 80, align: 'right' },
+                { field: 'FPackNum', title: '件数', width: 80, align: 'right' },
+                { field: 'FBoxSize', title: '装箱规格尺寸（CM）', width: 120 },
+                { field: 'FTotalGrossWeight', title: '总毛重（KG）', width: 100 },
+                { field: 'FEntryComment', title: '行备注', width: 120 },
+                { field: 'FBatch', title: '生产批号', width: 80,hidden:@isInd },
+                { field: 'FProduceDate', title: '生产日期', width: 80,hidden:@isInd,
+                    formatter: function(value,row,index){
+                        if(value && value.indexOf("T")>=0){
+                            return value.split("T")[0];
+                        }else{
+                            return value;
+                        }
+                    } 
+                },
+                { field: 'FUseYearSpan', title: '使用年限', width: 80,hidden:@isInd },
+                { field: 'FPrice', title: '单价', width: 80, align: 'right' },
+                { field: 'FAmount', title: '金额', width: 80, align: 'right' },
+                { field: 'FIndex', hidden: true },
+                { field: 'FItemNumber', hidden: true }
+            ]],
+            frozenColumns: [[
+                { field: 'FItemModel', title: '规格型号', width: 160 }
+            ]]
+        });
+
+        $("#order_div .easyui-textbox,#order_div .easyui-datebox").textbox("readonly");
+
+    });
+
+</script>
+
+
+<div id="order_div" class="easyui-panel" title="新增送货单" style="width: 840px; padding: 10px; background: #fafafa;">
+    <div>
+        <table border="0" cellpadding="1" cellspacing="3" width="800">
+            <tr>
+                <td>
+                    发货公司:
+                </td>
+                <td>
+                    <input class="easyui-textbox" style="width: 140px" value="@(h.FAccount.Equals("EQM")?"信利仪器有限公司":"信利工业有限公司")"/>
+                </td>
+                <td>
+                    出库单号:
+                </td>
+                <td>
+                    <input class="easyui-textbox" style="width: 140px" value="@h.FBillNo" />                        
+                </td>
+                <td>
+                    流水号:
+                </td>
+                <td>
+                    <input class="easyui-textbox" style="width: 200px" value="@h.FSysNo" />                        
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    客户名称:
+                </td>
+                <td>
+                    <input class="easyui-textbox" style="width: 140px" value="@h.FCustomerName" />                        
+                </td>
+                <td>
+                    发货日期:
+                </td>
+                <td>
+                    <input class="easyui-datebox" style="width: 140px" value="@(((DateTime)h.FDate).ToString("yyyy-MM-dd"))" />
+                </td>
+                <td>
+                    备注:
+                </td>
+                <td>
+                    <input class="easyui-textbox" style="width: 200px" value="@h.FComment" />
+                </td>
+            </tr>
+        </table>
+        <br />
+        <div id="detail_div" class="easyui-panel" title="出货信息明细" style="width: 815px; height: 300px">
+            <table id="dg_detail"></table>
+        </div>
+        <br />
+        <table border="0" cellpadding="1" cellspacing="3" width="800">
+            <tr>
+                <td>
+                    收货客户:
+                </td>
+                <td>
+                    <input class="easyui-textbox" style="width: 160px" value="@h.FDeliveryUnit" />
+                </td>
+                <td>
+                    联系人:
+                </td>
+                <td>
+                    <input class="easyui-textbox" style="width:140px" value="@h.FCustomerContact" />
+                </td>
+                <td>
+                    收货电话:
+                </td>
+                <td>
+                    <input class="easyui-textbox" style="width:140px" value="@h.FCustomerPhone" />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    收货地址:
+                </td>
+                <td colspan="5">
+                    <input class="easyui-textbox" style="width:680px" value="@h.FCustomerAddr" />
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+

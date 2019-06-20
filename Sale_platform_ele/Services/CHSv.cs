@@ -795,11 +795,11 @@ namespace Sale_platform_ele.Services
 
             //列宽：
             ushort[] colWidth = new ushort[] { 26, 24, 24, 16, 16, 20, 32, 12, 10, 12, 10,
-                                            18, 18,18, 24, 48,18,18 };
+                                            18, 18, 24, 18, 18, 24, 48, 18, 18 };
 
             //列名：
             string[] colName = new string[] { "销售订单号","K3出库单号","客户名称","客户P/O","客户P/N","产品名称","规格型号","出货数量","单位","叉板数","件数",
-                                            "快递单号","周期","备注","收货单位","送货地址","收件人","收件人电话" };
+                                            "快递单号","周期","装箱规格尺寸/MM","总毛重/KG","备注","收货单位","送货地址","收件人","收件人电话" };
 
             //設置excel文件名和sheet名
             XlsDocument xls = new XlsDocument();
@@ -836,7 +836,7 @@ namespace Sale_platform_ele.Services
             foreach (var d in datas) {
                 colIndex = 1;
                 //"销售订单号","出库单号","客户名称","客户P/O","客户P/N","产品名称","规格型号","出货数量","单位","叉板数","件数",
-                //"快递单号","周期","收货单位","送货地址"
+                //"快递单号","周期","装箱规格尺寸/MM","总毛重/KG","收货单位","送货地址"
                 cells.Add(++rowIndex, colIndex, d.orderNo);
                 cells.Add(rowIndex, ++colIndex, d.k3StockNo);
                 cells.Add(rowIndex, ++colIndex, d.customerName);
@@ -851,6 +851,8 @@ namespace Sale_platform_ele.Services
 
                 cells.Add(rowIndex, ++colIndex, d.deliveryNumber);
                 cells.Add(rowIndex, ++colIndex, d.cycle);
+                cells.Add(rowIndex, ++colIndex, d.boxSize);
+                cells.Add(rowIndex, ++colIndex, d.totalGrossWeight);
                 cells.Add(rowIndex, ++colIndex, d.itemComment);
                 cells.Add(rowIndex, ++colIndex, d.deliveryUnit);
                 cells.Add(rowIndex, ++colIndex, d.deliveryAddr);
