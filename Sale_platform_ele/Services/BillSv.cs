@@ -50,7 +50,7 @@ namespace Sale_platform_ele.Services
         /// </summary>
         /// <param name="userId">用户名</param>
         /// <returns>单据对象</returns>
-        public abstract object GetNewBill(int userId);
+        public abstract object GetNewBill(UserInfo currentUser);
 
         /// <summary>
         /// 获取单据对象
@@ -188,6 +188,36 @@ namespace Sale_platform_ele.Services
             }
             db.SubmitChanges();
             return result + "E";
+        }
+
+        /// <summary>
+        /// 获取下一个编号
+        /// </summary>
+        /// <param name="prefix">前缀</param>
+        /// <param name="dateStr">日期限定符，不需要传空字符串</param>
+        /// <param name="digitByte">数字位数</param>
+        /// <returns></returns>
+        public virtual string GetNextNo(string prefix,string dateStr, int digitByte = 3)
+        {
+            string result = prefix;
+            var maxRecord = db.SystemNo.Where(sn => sn.bill_type == prefix && sn.date_string == dateStr);
+            if (maxRecord.Count() == 0) {
+                SystemNo sysNo = new SystemNo()
+                {
+                    bill_type = prefix,
+                    date_string = dateStr,
+                    max_num = 1
+                };
+                db.SystemNo.InsertOnSubmit(sysNo);
+                result += dateStr + string.Format("{0:D" + digitByte + "}", 1);
+            }
+            else {
+                var firstRecord = maxRecord.First();
+                firstRecord.max_num = firstRecord.max_num + 1;
+                result += dateStr + string.Format("{0:D" + digitByte + "}", firstRecord.max_num);
+            }
+            db.SubmitChanges();
+            return result;
         }
 
         /// <summary>

@@ -167,5 +167,32 @@ namespace Sale_platform_ele.Controllers
             return Json(new ResultModel() { suc = true, msg = "反审批成功" });
         }
 
+
+        [SessionTimeOutFilter]
+        public ActionResult CeoBatchAudit()
+        {
+            return View();
+        }
+
+        public JsonResult GetCeoBatchAuditBills()
+        {
+            AuditSearchParamModel pm = new AuditSearchParamModel();
+            pm.auditResult = 0;
+            pm.finalResult = 0;
+
+            return Json(new ApplySv().GetAuditList(currentUser.userId, pm));
+        }
+
+        public JsonResult BeginCeoBatchAudit(string applyDetailIds, bool pass, string opinion)
+        {
+            var idArr = applyDetailIds.Split(new char[] { ',' },StringSplitOptions.RemoveEmptyEntries);
+            int[] idInt = new int[idArr.Length];
+            for (int i = 0; i < idArr.Length; i++) {
+                idInt[i] = Int32.Parse(idArr[i]);
+            }
+            string result = new ApplySv().CeoBatchAudit(idInt, currentUser.userId, pass, opinion, GetIPAddr());
+            return Json(new ResultModel() { suc = true, msg = result });
+        }
+
     }
 }

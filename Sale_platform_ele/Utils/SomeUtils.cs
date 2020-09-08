@@ -5,6 +5,7 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 using System.Web.Mvc;
+using System.Linq;
 
 namespace Sale_platform_ele.Utils
 {
@@ -155,7 +156,23 @@ namespace Sale_platform_ele.Utils
             return url.Replace("(equal)", "=").Replace("(and)", "&").Replace("(slash)", "/").Replace("(ask)", "?");
         }
 
-        
+        /// <summary>
+        /// 将指定对象的属性值设置到目标对象，名称相同有效
+        /// </summary>
+        /// <param name="fromObj"></param>
+        /// <param name="toObj"></param>
+        public static void CopyPropertyValue(object fromObj, object toObj)
+        {
+            foreach (var p in fromObj.GetType().GetProperties()) {
+                if (p.Name.ToUpper().Equals("ID")) continue; //ID不复制，因为是主键
+                var tp = toObj.GetType().GetProperties().Where(t => t.Name == p.Name).FirstOrDefault();
+                if (tp != null) {
+                    if (tp.PropertyType.Equals(p.PropertyType)) {
+                        tp.SetValue(toObj, p.GetValue(fromObj, null), null);
+                    }
+                }
+            }
+        }
 
     }
 }

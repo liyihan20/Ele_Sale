@@ -230,12 +230,12 @@
     <form id="fm" method="post">
         <div style="text-align: center">
             流程类型:
-            <input class="easyui-validatebox" name="proc_type" id="proc_type" style="width: 90px;" />
+            <input class="easyui-textbox" name="proc_type" id="proc_type" style="width: 90px;" />
             生效时间：
             <input id="begin_time" name="begin_time" class="easyui-datebox" style="width: 90px" />
             失效时间：
             <input id="end_time" name="end_time" class="easyui-datebox" style="width: 90px" /><br />
-            说明：<input id="info" name="info" class="easyui-validatebox" style="width: 500px" />
+            <div style="margin-top:8px;">说明：<input id="info" name="info" class="easyui-textbox" style="width: 500px" /></div>
         </div>
         <br />
         <table id="tbDet"></table>
@@ -262,7 +262,7 @@
             <label>
                 步骤名称:
             </label>
-            <input type="text" id="stepName" name="stepName" style="width: 140px;" require="true" />
+            <input class="easyui-textbox" id="stepName" name="stepName" style="width: 140px;" require="true" />
         </div>
         <div class="fitem">
             <label>

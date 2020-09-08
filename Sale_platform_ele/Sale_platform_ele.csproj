@@ -178,6 +178,7 @@
     <Compile Include="Services\CHSv.cs" />
     <Compile Include="Services\CommissionSv.cs" />
     <Compile Include="Services\DepSv.cs" />
+    <Compile Include="Services\EBSv.cs" />
     <Compile Include="Services\EqmSv.cs" />
     <Compile Include="Services\GroupSv.cs" />
     <Compile Include="Services\OtherSv.cs" />
@@ -190,7 +191,7 @@
     <Compile Include="Utils\SomeUtils.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="bin\org.in2bits.MyXls.dll" />
+    <Content Include="bin\Sale_platform_ele.dll" />
     <Content Include="Content\images\Truly.gif" />
     <Content Include="Content\MyCSS.css" />
     <Content Include="Content\Site.css" />
@@ -642,6 +643,10 @@
     <Content Include="Views\Eqm\AddDeliveryBill.cshtml" />
     <Content Include="Views\Eqm\PrintDeliveryBill.cshtml" />
     <Content Include="Views\Eqm\CheckADeliveryBill.cshtml" />
+    <Content Include="Views\Audit\CeoBatchAudit.cshtml" />
+    <Content Include="Views\Saler\CheckEB.cshtml" />
+    <Content Include="Views\Saler\CheckEBList.cshtml" />
+    <Content Include="Views\Saler\CreateEB.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

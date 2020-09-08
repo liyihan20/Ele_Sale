@@ -36,14 +36,14 @@ namespace Sale_platform_ele.Controllers
             return Json(new ProcessSv().GetAuditorRelateTypes());
         }
 
-        public JsonResult GetCustomers(string q)
+        public JsonResult GetCustomers(string q,string account = "ele")
         {
-            return Json(new OtherSv().GetCustomers(q));
+            return Json(new OtherSv().GetCustomers(q, account));
         }
 
-        public JsonResult GetClerks(string q)
+        public JsonResult GetClerks(string q,string account="ele")
         {
-            return Json(new OtherSv().GetClerks(q));
+            return Json(new OtherSv().GetClerks(q,account));
         }
 
         public JsonResult GetExchangeRate(string currencyNo)
@@ -51,9 +51,9 @@ namespace Sale_platform_ele.Controllers
             return Json(new OtherSv().GetExchangeRate(currencyNo));
         }
 
-        public JsonResult GetProducts(string q)
+        public JsonResult GetProducts(string q,string account="ele")
         {
-            return Json(new OtherSv().GetProducts(q));
+            return Json(new OtherSv().GetProducts(q,account));
         }
 
         public JsonResult GetUnitGroup(int groupId)

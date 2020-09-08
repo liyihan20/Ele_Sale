@@ -52,6 +52,7 @@ namespace Sale_platform_ele.Models
     {
         public string billType { get; set; }
         public string searchValue { get; set; }
+        public string itemModel { get; set; }
         public string fromDate { get; set; }
         public string toDate { get; set; }
         public int auditResult { get; set; }

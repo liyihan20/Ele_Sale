@@ -46,4 +46,17 @@ namespace Sale_platform_ele.Models
         public string customerName { get; set; }
     }
 
+    public class EBListModel
+    {
+        public int billId { get; set; }
+        public string billDate { get; set; }
+        public string sysNo { get; set; }
+        public string customerName { get; set; }
+        public string productName { get; set; }
+        public string productModel { get; set; }
+        public int qty { get; set; }
+        public decimal dealPrice { get; set; }
+        public string auditStatus { get; set; }
+    }
+
 }

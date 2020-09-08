@@ -192,14 +192,11 @@ namespace Sale_platform_ele.Services
 
         public Process GetProcessByNo(string processNo)
         {
-            var pros = db.Process.Where(p => p.billType == processNo);
-            if (pros.Count() == 0) {
-                throw new Exception("此流程编号不存在");
+            var pro = db.Process.Where(p => p.billType == processNo && p.beginTime <= DateTime.Now && p.endTime > DateTime.Now).FirstOrDefault();
+            if (pro == null) {
+                throw new Exception("流程引擎不存在或已过期");
             }
-            var pro = pros.First();
-            if (pro.beginTime > DateTime.Now || pro.endTime < DateTime.Now) {
-                throw new Exception("此流程已过期");
-            }
+
             return pro;
         }
 

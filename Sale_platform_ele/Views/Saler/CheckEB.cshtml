@@ -1,0 +1,167 @@
+﻿@using Sale_platform_ele.Models;
+@{
+    Sale_eb_bill bill = ViewData["bill"] as Sale_eb_bill;
+}
+
+<script>
+    $(function () {
+        $("#order_div input").textbox({ width: 140, editable: false });
+        $("#order_div").css("visibility", "visible");
+    });
+</script>
+
+<div id="order_div" class="easyui-panel" title="查看备料单" style="width: 840px; padding: 10px; background: #fafafa;visibility:hidden">
+    <div>
+        <table border="0" cellpadding="1" cellspacing="3" width="800">
+            <tr>
+                <td>
+                    备料单号:
+                </td>
+                <td>
+                    <input value="@bill.bl_no" />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    系统流水号:
+                </td>
+                <td>
+                    <input value="@bill.sys_no" />
+                </td>
+                <td>
+                    备料日期:
+                </td>
+                <td>
+                    <input value="@(bill.bl_date == DateTime.MinValue ? "" : bill.bl_date.ToString("yyyy-MM-dd"))" />
+                </td>
+                <td>
+                    事业部:
+                </td>
+                <td>
+                    <input value="@bill.bus_name" />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    产品类别:
+                </td>
+                <td>
+                    <input value="@bill.product_type" />
+                </td>
+                <td>
+                    备料类型:
+                </td>
+                <td>
+                    <input value="@bill.bl_type" />
+                </td>
+                <td>
+                    协议号:
+                </td>
+                <td>
+                    <input value="@bill.protocol_num" />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    客户编码:
+                </td>
+                <td>
+                    <input value="@bill.customer_no" />
+                </td>
+                <td>
+                    客户名称:
+                </td>
+                <td>
+                    <input value="@bill.customer_name" />
+                </td>
+                <td>
+                    对应项目组:
+                </td>
+                <td>
+                    <input value="@bill.project_group_name" />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    产品代码:
+                </td>
+                <td>
+                    <input value="@bill.product_no" />
+                </td>
+                <td>
+                    产品名称:
+                </td>
+                <td>
+                    <input value="@bill.product_name" />
+                </td>
+                <td>
+                    产品型号:
+                </td>
+                <td>
+                    <input value="@bill.product_model" />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    办事处:
+                </td>
+                <td>
+                    <input value="仪器市场部" />
+                </td>
+                <td>
+                    营业员:
+                </td>
+                <td>
+                    <input value="@bill.clerk_name" />
+                </td>
+                <td>
+                    计划下单日期:
+                </td>
+                <td>
+                    <input value="@(bill.plan_ch_date == DateTime.MinValue ? "" : bill.plan_ch_date.ToString("yyyy-MM-dd"))" />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    贸易类型:
+                </td>
+                <td>
+                    <input value="@bill.trade_type_name" />
+                </td>
+                <td>
+                    产品用途:
+                </td>
+                <td>
+                    <input value="@bill.product_usage" />
+                </td>
+                <td>
+                    计划出货日期:
+                </td>
+                <td>
+                    <input value="@(bill.plan_order_date == DateTime.MinValue ? "" : bill.plan_order_date.ToString("yyyy-MM-dd"))" required />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    订单数量:
+                </td>
+                <td>
+                    <input value="@(bill.qty>0?bill.qty.ToString():"")" />
+                </td>
+                <td>
+                    不含税成交价:
+                </td>
+                <td>
+                    <input value="@(bill.deal_price>0?bill.deal_price.ToString():"")" />
+                </td>
+                <td>
+                    制单人:
+                </td>
+                <td>
+                    <input value="@bill.applier_name" />
+                </td>
+            </tr>
+        </table>
+    </div>
+
+</div>

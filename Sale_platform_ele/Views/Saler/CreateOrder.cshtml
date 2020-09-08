@@ -598,14 +598,23 @@
                                 <td>
                                     <input class="easyui-combobox" id="agency_no" name="agency_no" style="width: 120px" panelwidth="120" valuefield="value" textfield="name" url="@Url.Content("~/Items/getItems?what=agency")" required="true" value="@order.agency_no" />
                                 </td>*@
+                            
+                            <td>
+                                生产部门:
+                            </td>
+                            <td>
+                                <input class="easyui-combobox" name="produce_dep_name" id="produce_dep_name" style="width:120px"
+                               data-options="textField:'value',valueField:'value',panelHeight:'auto',required:true,editable:false,
+                                           data:[
+                                           {value:'PCB'},{value:'PCBa'},{value:'PCB钻孔'}
+                                           ]" value="@order.produce_dep_name" />
+                            </td>
                             <td>
                                 @Html.Lang("biller"):
                             </td>
                             <td>
                                 <input class="easyui-textbox" readonly="readonly" style="width:120px" value="@order.User.real_name" />
                             </td>
-                            <td></td>
-                            <td></td>
                         </tr>
                     </table>
                     <br />

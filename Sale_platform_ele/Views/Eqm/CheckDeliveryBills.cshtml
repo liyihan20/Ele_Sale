@@ -21,6 +21,7 @@
                         { field: 'FBillNo', title: '出库单号', width: 120 },
     					{ field: 'FCustomerName', title: '客户名称', width: 160 },
                         { field: 'FDeliveryUnit', title: '收货客户', width: 160 },
+                        { field: 'FDeliveryNum', title: '货运单号', width: 160 },
     					{ field: 'FItemName', title: '产品名称', width: 140 },
                         { field: 'FItemModel', title: '规格型号', width: 160 },
     					{ field: 'FQty', title: '出货数量', width: 70 },
@@ -78,6 +79,16 @@
                 text: "打印送货单(有金额）",
                 iconCls: 'icon-print',
                 handler: function () { PrintReport(true); }
+            }, {
+                text: "货运单号",
+                iconCls: 'icon-email',
+                handler: function () {
+                    var row = $("#orderList").datagrid("getSelected");
+                    if (row) {
+                        $("#delivery_dlg").dialog("open");
+                        $("#deliveryNum").textbox("setValue", row.FDeliveryNum);
+                    }
+                }
             }],
             onDblClickRow: CheckDetail
         });
@@ -142,6 +153,22 @@
         }
     }
 
+    function SaveDeliveryNum() {
+        var row = $("#orderList").datagrid("getSelected");
+        if (row) {
+            $.post("SaveDeliveryNum", { sysNo: row.FSysNo, deliveryNum: $("#deliveryNum").textbox("getValue") }, function (data) {
+                if (data.suc) {
+                    showTip("保存成功");
+                    $("#delivery_dlg").dialog("close");
+                    $("#checkBt").trigger("click");
+                } else {
+                    showTip(data.msg);
+                }
+            });
+        }
+    }
+
+
 </script>
 <div class="easyui-layout" data-options="fit:true">
     <div data-options="region:'north',collapsed:false,split:true" style="height: 65px; background: #fafafa;
@@ -193,4 +220,17 @@
     <div data-options="region:'center'">
         <table id="orderList"></table>
     </div>
+</div>
+<div id="delivery_dlg" class="easyui-dialog" style="width:360px;padding:10px 20px" title="货运单号维护" closed="true" buttons="#dlg-buttons">
+    <div class="ftitle">录入货运单号</div>
+        <table cellspacing="4">
+            <tr>
+                <td width="30%">货运单号:</td>
+                <td width="70%"><input id="deliveryNum" class="easyui-textbox" style="width:200px;" /></td>
+            </tr>
+        </table>        
+</div>
+
+<div id="dlg-buttons">
+    <a href="#" class="easyui-linkbutton" iconcls="icon-ok" onclick="SaveDeliveryNum()">@Html.Lang("save")</a>
 </div>

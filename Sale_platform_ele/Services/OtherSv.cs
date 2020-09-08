@@ -18,9 +18,9 @@ namespace Sale_platform_ele.Services
             return result;
         }
 
-        public List<ComboResult> GetCustomers(string v)
+        public List<ComboResult> GetCustomers(string v,string account)
         {
-            var result = (from c in db.getCustomer(v)
+            var result = (from c in db.getCustomer(v,account)
                           select new ComboResult()
                           {
                               name = c.customer_name,
@@ -30,9 +30,9 @@ namespace Sale_platform_ele.Services
             
         }
 
-        public List<ComboResult> GetClerks(string v)
+        public List<ComboResult> GetClerks(string v,string account)
         {
-            var result = (from c in db.getClerk(v)
+            var result = (from c in db.getClerk(v,account)
                           select new ComboResult()
                           {
                               name = c.name,
@@ -49,9 +49,9 @@ namespace Sale_platform_ele.Services
             return (decimal)rate;
         }
 
-        public List<ProductModel> GetProducts(string v)
+        public List<ProductModel> GetProducts(string v,string account="ele")
         {
-            var result = (from p in db.getProducts(v)
+            var result = (from p in db.getProducts(v,account)
                           select new ProductModel()
                           {
                               number = p.item_no,
@@ -76,18 +76,18 @@ namespace Sale_platform_ele.Services
             return result;
         }
 
-        public int GetCustomerId(string customerNo)
+        public int GetCustomerId(string customerNo,string account="ele")
         {
-            var customers = db.getCustomer(customerNo).ToList();
+            var customers = db.getCustomer(customerNo,account).ToList();
             if (customers.Count() > 0) {
-                return customers.First().customer_id;
+                return (int)customers.First().customer_id;
             }
             return 0;
         }
 
         public int GetCurrencyId(string currencyNo)
         {
-            var currencies=db.vwItems.Where(v=>v.what=="currency" && v.fid==currencyNo).ToList();
+            var currencies = db.vwItems.Where(v => v.what == "currency" && v.fid == currencyNo).ToList();
             if (currencies.Count() > 0) {
                 return currencies.First().interid;
             }

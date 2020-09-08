@@ -28,8 +28,8 @@ namespace Sale_platform_ele.Utils
             string ty = billType.Length >= 2 ? billType.Substring(0, 2) : "";
             if (!string.IsNullOrEmpty(ty)) {
                 Type t = Type.GetType(string.Format("Sale_platform_ele.Services.{0}Sv", ty));
-                if (t.IsClass) {
-                    return Activator.CreateInstance(t);                    
+                if (t != null && t.IsClass) {
+                    return Activator.CreateInstance(t);
                 }
             }
             return null;

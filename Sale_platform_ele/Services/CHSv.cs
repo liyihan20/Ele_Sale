@@ -58,15 +58,15 @@ namespace Sale_platform_ele.Services
             get { return CHECK_VIEW_LIST_NAME; }
         }
 
-        public override object GetNewBill(int userId)
+        public override object GetNewBill(UserInfo currentUser)
         {
             var vw = new vwChBill();
             vw.sys_no = GetNextSysNo("CH");
             vw.bill_date = DateTime.Now;
-            vw.real_name = new UA(userId).GetUser().real_name;
+            vw.real_name = currentUser.realName;
 
-            var existedBill = db.ChBill.Where(c => c.user_id == userId).OrderByDescending(c => c.id).FirstOrDefault();
-            if (existedBill!=null) {
+            var existedBill = db.ChBill.Where(c => c.user_id == currentUser.userId).OrderByDescending(c => c.id).FirstOrDefault();
+            if (existedBill != null) {
                 vw.clerk_name = existedBill.clerk_name;
                 vw.clerk_phone = existedBill.clerk_phone;
             }
@@ -199,7 +199,15 @@ namespace Sale_platform_ele.Services
 
         public override Dictionary<string, int?> GetProcessDic()
         {
-            return null;
+            var dep = db.Department.Where(d => d.name == bill.product_type).FirstOrDefault();
+            if (dep == null) {
+                throw new Exception("此产品类别【" + bill.product_type + "】未设置对应的审核人");
+            }
+
+            var dic = new Dictionary<string, int?>();
+            dic.Add("出货组NO", dep.dep_no);
+            dic.Add("部门NO", bill.User.department_no);
+            return dic;
         }
 
         public override string GetProductModel()
@@ -890,7 +898,7 @@ namespace Sale_platform_ele.Services
         {
             if (!isPass) return null;
 
-            return "laitt.sale@truly.com.cn,linhh.sale@truly.com.cn";
+            return "linhh.sale@truly.com.cn";
         }
 
         public override void BeforeRollBack(int step)

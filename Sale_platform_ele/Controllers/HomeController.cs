@@ -18,6 +18,7 @@ namespace Sale_platform_ele.Controllers
             ViewData["powers"] = ua.GetUserPowers();
             ViewData["username"] = currentUser.realName;
             ViewData["depName"] = ua.GetUserDepartmentName();
+            ViewData["copName"] = currentAccount.Equals("ele") ? "信利电子有限公司" : "信利仪器/工业有限公司";
             return View();
         }
 

@@ -190,5 +190,17 @@ namespace Sale_platform_ele.Controllers
                 return Json(new { suc = false, msg = ex.Message });
             }
         }
+
+        public JsonResult SaveDeliveryNum(string sysNo, string deliveryNum)
+        {
+            try {
+                new EqmSv().SaveDeliveryNum(sysNo, deliveryNum);
+            }
+            catch (Exception ex) {
+                return Json(new { suc = false, msg = ex.Message });
+            }
+            return Json(new { suc = true });
+        }
+
     }
 }

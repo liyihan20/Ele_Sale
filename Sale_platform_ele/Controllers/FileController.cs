@@ -157,7 +157,7 @@ namespace Sale_platform_ele.Controllers
             SomeUtils.SetFieldValueToModel(fc, pm);
 
             BillSv bill = (BillSv)new BillUtils().GetBillSvInstance(pm.billType);
-
+            
             Wlog("营业员导出Excel："+JsonConvert.SerializeObject(pm));
 
             bill.ExportSalerExcle(pm, currentUser.userId);

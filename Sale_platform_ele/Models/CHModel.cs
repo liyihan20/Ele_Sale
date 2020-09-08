@@ -61,6 +61,7 @@ namespace Sale_platform_ele.Models
         public decimal? FPrice { get; set; }
         public decimal? FAmount { get; set; }
         public string FUserName { get; set; }
+        public string FDeliveryNum { get; set; }
     }
     
 

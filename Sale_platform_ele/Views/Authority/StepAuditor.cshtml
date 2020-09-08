@@ -16,7 +16,7 @@
                         { field: 'department_id', title: 'department_id', width: 120, align: "center",hidden:"true" },
                         { field: 'step_name', title: '步骤名称', width: 120, align: "center" },
                         { field: 'relate_type', title: '关联类型', width: 120, align: "center" },
-                        { field: 'department_name', title: '关联部门名称', width: 120, align: "center"},
+                        { field: 'department_name', title: '关联名称', width: 120, align: "center"},
                         { field: 'auditor_name', title: '审核人', width: 120, align: "center" }
                     ]]
         });
@@ -118,7 +118,7 @@
             <input class="easyui-combobox" id="relateType" name="relateType" valuefield="value" textfield="name" url="@Url.Content("~/Items/GetAuditorRelateTypes")" style="width: 160px;" />
         </div>
         <div class="fitem">
-            <label>关联部门名称:</label>
+            <label>关联名称:</label>
             <input class="easyui-combobox" id="relateValue" name="relateValue" style="width: 160px;" valuefield="value" textfield="name" panelheight="150px" />
         </div>
         <div class="fitem">

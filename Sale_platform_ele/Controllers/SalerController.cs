@@ -43,7 +43,7 @@ namespace Sale_platform_ele.Controllers
             Wlog("新建单据，billType:" + billType);
 
             SetBillByType(billType);
-            ViewData["bill"] = bill.GetNewBill(currentUser.userId);
+            ViewData["bill"] = bill.GetNewBill(currentUser);
 
             return View(bill.CreateViewName);
         }

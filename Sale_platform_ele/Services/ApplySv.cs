@@ -690,8 +690,7 @@ namespace Sale_platform_ele.Services
             return arm;
 
         }
-
-
+        
         /// <summary>
         /// (有参构造)开始审核
         /// </summary>
@@ -705,13 +704,14 @@ namespace Sale_platform_ele.Services
             if (ap.success != null) {
                 return "此申请已结束";
             }
-            var ad = ap.ApplyDetails.Where(a => a.step == step && a.user_id == userId).OrderBy(a => a.pass).First();
+            var details = ap.ApplyDetails.ToList();
+            var ad = details.Where(a => a.step == step && a.user_id == userId).OrderBy(a => a.pass).First();
             if (ad.pass != null) {
                 return "不能重复审批";
             }
             else {
                 if (ad.countersign == null || ad.countersign == false) {
-                    if (ap.ApplyDetails.Where(a => a.step == step && a.pass == true).Count() > 0) {
+                    if (details.Where(a => a.step == step && a.pass == true).Count() > 0) {
                         return "已被同组其它人审批";
                     }
                 }
@@ -733,9 +733,9 @@ namespace Sale_platform_ele.Services
             ad.finish_date = DateTime.Now;
 
             //是否最后一步审批
-            bool isLastStep = ad.step == db.ApplyDetails.Where(a => a.apply_id == ap.id).Max(a => a.step);
+            bool isLastStep = ad.step == details.Max(a => a.step);
             if (isLastStep && ad.countersign == true) {
-                if (ap.ApplyDetails.Where(a => a.step == ad.step && a.pass == null).Count() > 0) {
+                if (details.Where(a => a.step == ad.step && a.pass == null && a.user_id != userId).Count() > 0) {
                     isLastStep = false;
                 }
             }
@@ -794,5 +794,70 @@ namespace Sale_platform_ele.Services
 
         }
 
+
+        public string CeoBatchAudit(int[] applyDetailIds, int userId, bool isPass, string comment,string ipAdd){
+            int record = 0;
+            foreach (int detailId in applyDetailIds) {
+                var ad = db.ApplyDetails.SingleOrDefault(a => a.id == detailId);
+                ap = ad.Apply;
+
+                if (ap.success != null) {
+                    continue;
+                }
+                var details = ap.ApplyDetails.ToList();
+                
+                if (ad.pass != null) {
+                    continue;
+                }
+                else {
+                    if (ad.countersign == null || ad.countersign == false) {
+                        if (details.Where(a => a.step == ad.step && a.pass == true).Count() > 0) {
+                            continue;
+                        }
+                    }
+                }
+
+                BillSv bill = (BillSv)new BillUtils().GetBillSvInstanceBySysNo(ap.sys_no);
+
+                //审批之前，单据需要做的事,批量处理的时候不做，不然时间太长
+                //try {
+                //    bill.DoWhenBeforeAudit((int)ad.step, ad.step_name, isPass, userId);
+                //}
+                //catch {
+                //    continue;
+                //}
+
+                ad.pass = isPass;
+                ad.comment = comment;
+                ad.ip = ipAdd;
+                ad.finish_date = DateTime.Now;
+
+                //是否最后一步审批
+                bool isLastStep = ad.step == details.Max(a => a.step);
+                if (isLastStep && ad.countersign == true) {
+                    if (details.Where(a => a.step == ad.step && a.pass == null && a.user_id != userId).Count() > 0) {
+                        isLastStep = false;
+                    }
+                }
+
+                if (!isPass || isLastStep) {
+                    ap.success = isPass;
+                    ap.finish_date = DateTime.Now;
+
+                    //审批完成之后需要做的事情
+                    bill.DoWhenFinishAudit(isPass);
+                }
+                try {
+                    db.SubmitChanges();
+                }
+                catch {
+                    continue;
+                }
+
+                SendNotificationEmail();
+                record++;
+            }
+            return "已批量处理" + record.ToString() + "行记录";
+        }
     }
 }

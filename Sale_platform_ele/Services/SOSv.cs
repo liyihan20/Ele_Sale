@@ -87,16 +87,16 @@ namespace Sale_platform_ele.Services
         /// </summary>
         /// <param name="userId"></param>
         /// <returns></returns>
-        public override object GetNewBill(int userId)
+        public override object GetNewBill(UserInfo currentUser)
         {
-            UA ua = new UA(userId);
+            
             order = new Order();
             order.sys_no = GetNextSysNo(BILL_TYPE);
             order.order_date = DateTime.Now;
             order.step_version = 0;
-            order.User = ua.GetUser();
+            order.User = new UA(currentUser.userId).GetUser();
 
-            var agencys = new OtherSv().GetItems("agency").Where(a => a.name == ua.GetUserDepartmentName());
+            var agencys = new OtherSv().GetItems("agency").Where(a => a.name == currentUser.departmentName);
             if (agencys.Count() > 0) {
                 order.agency_no = agencys.First().value;
                 order.agency_name = agencys.First().name;
@@ -323,8 +323,8 @@ namespace Sale_platform_ele.Services
                           && o.order_date <= td
                           && (o.sys_no.Contains(pm.searchValue) || d.item_model.Contains(pm.searchValue))
                           && o.customer_name.Contains(pm.customerName)
-                          && (pm.productType==null || o.product_type_name.Contains(pm.productType))
-                          && (pm.saleRange==null || (pm.saleRange=="内销" && o.currency_no=="RMB") ||(pm.saleRange=="外销" && o.currency_no!="RMB"))
+                          && (pm.productType == null || o.product_type_name.Contains(pm.productType))
+                          && (pm.saleRange == null || (pm.saleRange == "内销" && o.currency_no == "RMB") || (pm.saleRange == "外销" && o.currency_no != "RMB"))
                           && (pm.auditResult == 10 || (pm.auditResult == 0 && (Y == null || (Y != null && Y.success == null))) || (pm.auditResult == 1 && Y != null && Y.success == true) || pm.auditResult == -1 && Y != null && Y.success == false)
                           orderby o.order_date descending
                           select new SOListModel()
@@ -339,7 +339,7 @@ namespace Sale_platform_ele.Services
                               productName = d.item_name,
                               auditStatus = (Y == null ? "未开始申请" : Y.success == true ? "申请成功" : Y.success == false ? "申请失败" : "审批之中")
                           }).Take(200).ToList<object>();
-                        
+            
             return result;
         }
 
@@ -685,5 +685,9 @@ namespace Sale_platform_ele.Services
                 }
             }
         }
+
+        
+
+
     }
 }

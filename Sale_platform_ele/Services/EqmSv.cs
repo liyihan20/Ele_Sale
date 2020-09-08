@@ -81,7 +81,8 @@ namespace Sale_platform_ele.Services
                              FItemName = e.FItemName,
                              FPrice = e.FPrice,
                              FQty = e.FQty,
-                             FUnitName = e.FUnitName
+                             FUnitName = e.FUnitName,
+                             FDeliveryNum = b.FDeliveryNum
                          };
             if (!string.IsNullOrWhiteSpace(billNo)) {
                 result = result.Where(r => r.FBillNo.Contains(billNo));
@@ -188,6 +189,15 @@ namespace Sale_platform_ele.Services
             var b = db.Sale_eqm_ch_bill.Single(c => c.FSysNo == sysNo && (c.FDeleted == null || c.FDeleted == false));
             b.FDeleted = true;
             db.SubmitChanges();
+        }
+
+        public void SaveDeliveryNum(string sysNo,string deliveryNum)
+        {
+            var b = db.Sale_eqm_ch_bill.Where(s => s.FSysNo == sysNo).FirstOrDefault();
+            if (b != null) {
+                b.FDeliveryNum = deliveryNum;
+                db.SubmitChanges();
+            }
         }
 
         private string GetNextSysNo()

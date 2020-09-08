@@ -9,6 +9,7 @@ namespace Sale_platform_ele.Controllers
     {
         
         private UserInfo _currentUser;
+        private string _currentAccount;
         public UserInfo currentUser
         {
             get
@@ -29,6 +30,19 @@ namespace Sale_platform_ele.Controllers
                     Session["currentUser"] = _currentUser;
                 }
                 return _currentUser;
+            }
+        }
+
+        public string currentAccount
+        {
+            get
+            {
+                _currentAccount = (string)Session["currentAccount"];
+                if (string.IsNullOrEmpty(_currentAccount)) {
+                    _currentAccount = Request.Cookies["order_ele_cookie"]["cop"];
+                    Session["currentAccount"] = _currentAccount;
+                }
+                return _currentAccount;
             }
         }
 

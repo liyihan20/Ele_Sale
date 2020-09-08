@@ -308,6 +308,7 @@
       <Column Name="order_no" Type="System.String" DbType="VarChar(100)" CanBeNull="true" />
       <Column Name="clear_way_no" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
       <Column Name="clear_way_name" Type="System.String" DbType="VarChar(200)" CanBeNull="true" />
+      <Column Name="produce_dep_name" Type="System.String" DbType="varchar(50)" CanBeNull="true" />
       <Association Name="Order_OrderDetail" Member="OrderDetail" ThisKey="id" OtherKey="order_id" Type="OrderDetail" />
       <Association Name="User_Order" Member="User" ThisKey="original_id" OtherKey="id" Type="User" IsForeignKey="true" />
     </Type>
@@ -570,32 +571,43 @@
       <Column Name="FDeliveryUnit" Type="System.String" DbType="NVarChar(200)" CanBeNull="true" />
       <Column Name="FSysNo" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
       <Column Name="FDeleted" Type="System.Boolean" DbType="Bit" CanBeNull="true" />
+      <Column Name="FDeliveryNum" Type="System.String" DbType="NVarChar(100)" CanBeNull="true" />
       <Association Name="Sale_eqm_ch_bill_Sale_eqm_ch_bill_detail" Member="Sale_eqm_ch_bill_detail" ThisKey="id" OtherKey="FChId" Type="Sale_eqm_ch_bill_detail" />
     </Type>
   </Table>
-  <Function Name="dbo.getClerk" Method="getClerk">
-    <Parameter Name="queryString" Type="System.String" DbType="VarChar(20)" />
-    <ElementType Name="getClerkResult">
-      <Column Name="id" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="name" Type="System.String" DbType="VarChar(255) NOT NULL" CanBeNull="false" />
-      <Column Name="number" Type="System.String" DbType="VarChar(255)" CanBeNull="true" />
-    </ElementType>
-  </Function>
+  <Table Name="dbo.Sale_eb_bill" Member="Sale_eb_bill">
+    <Type Name="Sale_eb_bill">
+      <Column Name="id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="sys_no" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="applier_id" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="applier_name" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="apply_time" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="bl_date" Type="System.DateTime" DbType="SmallDateTime NOT NULL" CanBeNull="false" />
+      <Column Name="bl_no" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="bl_type" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="agency_name" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="protocol_num" Type="System.String" DbType="NVarChar(100)" CanBeNull="true" />
+      <Column Name="plan_order_date" Type="System.DateTime" DbType="SmallDateTime NOT NULL" CanBeNull="false" />
+      <Column Name="plan_ch_date" Type="System.DateTime" DbType="SmallDateTime NOT NULL" CanBeNull="false" />
+      <Column Name="customer_no" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="customer_name" Type="System.String" DbType="NVarChar(200)" CanBeNull="true" />
+      <Column Name="trade_type_name" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="product_usage" Type="System.String" DbType="NVarChar(200)" CanBeNull="true" />
+      <Column Name="product_type" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="bus_name" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="project_group_name" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="clerk_name" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="product_no" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="product_name" Type="System.String" DbType="NVarChar(200)" CanBeNull="true" />
+      <Column Name="product_model" Type="System.String" DbType="NVarChar(200)" CanBeNull="true" />
+      <Column Name="qty" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="deal_price" Type="System.Decimal" DbType="Decimal(12,4) NOT NULL" CanBeNull="false" />
+    </Type>
+  </Table>
   <Function Name="dbo.getExchangeRate" Method="getExchangeRate">
     <Parameter Name="cur_number" Type="System.String" DbType="VarChar(20)" />
     <Parameter Name="result" Type="System.Decimal" DbType="Decimal(8,3)" Direction="InOut" />
     <Return Type="System.Int32" />
-  </Function>
-  <Function Name="dbo.getProducts" Method="getProducts">
-    <Parameter Name="queryString" Type="System.String" DbType="VarChar(100)" />
-    <ElementType Name="getProductsResult">
-      <Column Name="item_no" Type="System.String" DbType="VarChar(80)" CanBeNull="true" />
-      <Column Name="item_name" Type="System.String" DbType="VarChar(80) NOT NULL" CanBeNull="false" />
-      <Column Name="item_model" Type="System.String" DbType="VarChar(255)" CanBeNull="true" />
-      <Column Name="unit_no" Type="System.String" DbType="VarChar(30)" CanBeNull="true" />
-      <Column Name="unit_name" Type="System.String" DbType="VarChar(80)" CanBeNull="true" />
-      <Column Name="unit_group_id" Type="System.Int32" DbType="Int" CanBeNull="true" />
-    </ElementType>
   </Function>
   <Function Name="dbo.getK3OrderNo" Method="getK3OrderNo">
     <Parameter Name="sysNo" Type="System.String" DbType="VarChar(20)" />
@@ -612,14 +624,6 @@
     <ElementType Name="getCustomerCreditInfoResult">
       <Column Name="suc" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
       <Column Name="msg" Type="System.String" DbType="VarChar(1) NOT NULL" CanBeNull="false" />
-    </ElementType>
-  </Function>
-  <Function Name="dbo.getCustomer" Method="getCustomer">
-    <Parameter Name="queryString" Type="System.String" DbType="VarChar(100)" />
-    <ElementType Name="getCustomerResult">
-      <Column Name="customer_name" Type="System.String" DbType="VarChar(80)" CanBeNull="true" />
-      <Column Name="customer_number" Type="System.String" DbType="VarChar(255)" CanBeNull="true" />
-      <Column Name="customer_id" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
     </ElementType>
   </Function>
   <Function Name="dbo.getDeliveryUnitInfo" Method="getDeliveryUnitInfo">
@@ -655,6 +659,39 @@
       <Column Name="FConsignPrice" Type="System.Decimal" DbType="Decimal(28,10) NOT NULL" CanBeNull="false" />
       <Column Name="FConsignAmount" Type="System.Decimal" DbType="Decimal(20,2) NOT NULL" CanBeNull="false" />
       <Column Name="FUnitName" Type="System.String" DbType="VarChar(80) NOT NULL" CanBeNull="false" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.getCustomer" Method="getCustomer">
+    <Parameter Name="queryString" Type="System.String" DbType="VarChar(100)" />
+    <Parameter Name="account" Type="System.String" DbType="VarChar(10)" />
+    <ElementType Name="getCustomerResult">
+      <Column Name="account" Type="System.String" DbType="VarChar(20)" CanBeNull="true" />
+      <Column Name="customer_name" Type="System.String" DbType="VarChar(200)" CanBeNull="true" />
+      <Column Name="customer_number" Type="System.String" DbType="VarChar(200)" CanBeNull="true" />
+      <Column Name="customer_id" Type="System.Int32" DbType="Int" CanBeNull="true" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.getProducts" Method="getProducts">
+    <Parameter Name="queryString" Type="System.String" DbType="VarChar(100)" />
+    <Parameter Name="account" Type="System.String" DbType="VarChar(20)" />
+    <ElementType Name="getProductsResult">
+      <Column Name="account" Type="System.String" DbType="VarChar(20)" CanBeNull="true" />
+      <Column Name="item_no" Type="System.String" DbType="VarChar(200)" CanBeNull="true" />
+      <Column Name="item_name" Type="System.String" DbType="VarChar(500)" CanBeNull="true" />
+      <Column Name="item_model" Type="System.String" DbType="VarChar(500)" CanBeNull="true" />
+      <Column Name="unit_no" Type="System.String" DbType="VarChar(100)" CanBeNull="true" />
+      <Column Name="unit_name" Type="System.String" DbType="VarChar(200)" CanBeNull="true" />
+      <Column Name="unit_group_id" Type="System.Int32" DbType="Int" CanBeNull="true" />
+    </ElementType>
+  </Function>
+  <Function Name="dbo.getClerk" Method="getClerk">
+    <Parameter Name="queryString" Type="System.String" DbType="VarChar(20)" />
+    <Parameter Name="account" Type="System.String" DbType="VarChar(10)" />
+    <ElementType Name="getClerkResult">
+      <Column Name="account" Type="System.String" DbType="VarChar(20)" CanBeNull="true" />
+      <Column Name="id" Type="System.Int32" DbType="Int" CanBeNull="true" />
+      <Column Name="name" Type="System.String" DbType="VarChar(200)" CanBeNull="true" />
+      <Column Name="number" Type="System.String" DbType="VarChar(200)" CanBeNull="true" />
     </ElementType>
   </Function>
 </Database>
