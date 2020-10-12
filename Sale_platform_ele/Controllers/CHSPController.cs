@@ -5,6 +5,8 @@ using System.Web;
 using System.Web.Mvc;
 using Sale_platform_ele.Services;
 using Sale_platform_ele.Filters;
+using Newtonsoft.Json;
+using Sale_platform_ele.Models;
 
 namespace Sale_platform_ele.Controllers
 {
@@ -171,7 +173,18 @@ namespace Sale_platform_ele.Controllers
             }
         }
 
-        
+        //营业员确认时更新实出数量和地址信息
+        public JsonResult UpdateRealQtyAndAddr(string updateJson)
+        {
+            var info = JsonConvert.DeserializeObject<ApplierConfirmCHInfo>(updateJson);
+            try {
+                new CHSv().ApplierUpdateChInfo(info);
+            }
+            catch (Exception ex) {
+                return Json(new { suc = false, msg = "保存失败："+ex.Message });
+            }
+            return Json(new { suc = true });
+        }
 
     }
 }

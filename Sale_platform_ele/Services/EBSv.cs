@@ -59,7 +59,7 @@ namespace Sale_platform_ele.Services
             return bill;
         }
 
-        public override string SaveBill(System.Web.Mvc.FormCollection fc, int userId)
+        public override string SaveBill(System.Web.Mvc.FormCollection fc, UserInfo user)
         {
             bill = new Sale_eb_bill();
             SomeUtils.SetFieldValueToModel(fc, bill);
@@ -71,7 +71,11 @@ namespace Sale_platform_ele.Services
                 return "产品必须填写，请在代码处输入后按回车搜索";
             }
 
-            bill.applier_id = userId;
+            if (string.IsNullOrEmpty(bill.bl_project)) {
+                return "备料明细必须至少勾选一个";
+            }
+
+            bill.applier_id = user.userId;
             bill.apply_time = DateTime.Now;
 
             var existedBill = db.Sale_eb_bill.Where(e => e.sys_no == bill.sys_no).FirstOrDefault();
@@ -196,7 +200,12 @@ namespace Sale_platform_ele.Services
         public override void DoWhenFinishAudit(bool isPass)
         {
             if (isPass) {
-                bill.bl_no = GetNextNo("AO", "", 1);
+                if (bill.bus_name.Equals("仪器")) {
+                    bill.bl_no = GetNextNo("AO", "", 1);
+                }
+                else {
+                    bill.bl_no = GetNextNo("C", DateTime.Now.ToString("yyyy-"));
+                }
                 db.SubmitChanges();
             }
         }
@@ -216,7 +225,7 @@ namespace Sale_platform_ele.Services
             //列名：
             string[] colName = new string[] { "审核结果","流水号","备料单号","备料日期","事业部","产品类别","备料类型","协议号","客户编码","客户名称",
                                             "对应项目组","产品代码","产品名称","产品型号","办事处","营业员","计划下单日期","贸易类型","产品用途","计划出货日期",
-                                            "订单数量","不含税成交价","制单人" };
+                                            "订单数量","不含税成交价","制单人","备料明细" };
 
             //設置excel文件名和sheet名
             XlsDocument xls = new XlsDocument();
@@ -282,6 +291,7 @@ namespace Sale_platform_ele.Services
                 cells.Add(rowIndex, ++colIndex, d.h.qty);
                 cells.Add(rowIndex, ++colIndex, d.h.deal_price);
                 cells.Add(rowIndex, ++colIndex, d.h.applier_name);
+                cells.Add(rowIndex, ++colIndex, d.h.bl_project + "," + (d.h.bl_project_other ?? ""));
             }
 
             xls.Send();

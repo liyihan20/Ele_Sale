@@ -1,0 +1,139 @@
+﻿@using Sale_platform_ele.Models;
+@{
+    Sale_eo_bill order = (Sale_eo_bill)ViewData["bill"];
+}
+
+
+<script type="text/javascript">
+    $(function () {
+
+        $("#dg_detail").datagrid({
+            width: 1800,
+            height: 240,
+            loadMsg: "@Html.Lang("loading")",
+            rownumbers: true,
+            singleSelect: true,
+            fitColumns: true,
+            showFooter: true,
+            columns: [[
+                { field: 'product_no', title: '产品代码', width: 120 },
+                { field: 'product_name', title: '产品名称', width: 140 },
+                { field: 'product_model', title: '规格型号', width: 180 },
+                { field: 'unit_no', title: 'unit_no', hidden: true },
+                { field: 'unit_name', title: '单位', width: 60, align: 'center' },
+                { field: 'qty', title: '数量', width: 80, align: 'right' },
+                { field: 'tax_price', title: '含税单价', width: 80, align: 'right' },
+                { field: 'total', title: '含税金额', width: 100, align: 'right' },
+                { field: 'tax_rate', title: '税率%', width: 80, align: 'center' },
+                { field: 'cost', title: '成本', width: 80, align: 'right' },
+                { field: 'fetch_date', title: '交货日期', width: 100, align: 'center' },
+                { field: 'bl_no', title: '备料单号', width: 120 },
+                { field: 'bom_no', title: 'BOM表码', width: 120 },
+                { field: 'comment', title: '备注', width: 160 }
+            ]]
+        });
+
+        $("#order_div input:not(:checkbox)").textbox({ width: 140, editable: false });
+        $("#summary").textbox({ width: 660, editable: false });
+    });
+</script>
+
+
+<div class="easyui-layout" data-options="fit:true" id="order_div">
+    <div data-options="region:'center'">
+            <div id="order_div" class="easyui-panel" title="查看订单" style="width: 840px; padding: 10px; background: #fafafa;">
+                <table border="0" cellpadding="1" cellspacing="3" width="800">
+                    <tr>
+                        <td>
+                            公司：
+                        </td>
+                        <td>
+                            <input value="@order.account" />
+                        </td>
+                        <td>
+                            订单类型：
+                        </td>
+                        <td>
+                            <input value="@order.order_type_name" />
+                        </td>
+                        <td>
+                            制单人：
+                        </td>
+                        <td>
+                            <input value="@order.applier_name" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            系统流水号:
+                        </td>
+                        <td>
+                            <input value="@order.sys_no" />
+                        </td>
+                        <td>
+                            客户编码:
+                        </td>
+                        <td>
+                            <input value="@order.customer_no"  />
+                        </td>
+                        <td>
+                            客户名称:
+                        </td>
+                        <td>
+                            <input value="@order.customer_name" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            产品类别:
+                        </td>
+                        <td>
+                            <input style="width:140px" value="@order.product_type_name" />
+                        </td>
+                        <td>
+                            付款条款:
+                        </td>
+                        <td>
+                            <input style="width:140px" value="@order.clear_type_name" />
+                        </td>
+                        <td>
+                            业务员:
+                        </td>
+                        <td>
+                            <input value="@order.clerk_name" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>摘要:</td>
+                        <td colspan="5">
+                            <input class="easyui-textbox" id="summary" multiline="true" style="height:60px;" value="@order.summary" />
+                        </td>
+                    </tr>
+                </table>
+                <br />
+                <div id="detail_div" class="easyui-panel" title="@Html.Lang("sale_order_detail")" style="width: 815px;">
+                    <table id="dg_detail">
+                        @foreach (var det in order.Sale_eo_bill_detail) {
+                            <tr>
+                                <td>@det.product_no</td>
+                                <td>@det.product_name</td>
+                                <td>@det.product_model</td>
+                                <td>@det.unit_no</td>
+                                <td>@det.unit_name</td>
+                                <td>@det.qty</td>
+                                <td>@det.tax_price</td>
+                                <td>@(Math.Round((decimal)(det.qty * det.tax_price), 2))</td>
+                                <td>@det.tax_rate</td>
+                                <td>@det.cost</td>
+                                <td>@(det.fetch_date == null ? "" : ((DateTime)det.fetch_date).ToString("yyyy-MM-dd"))</td>
+                                <td>@det.bl_no</td>
+                                <td>@det.bom_no</td>
+                                <td>@det.comment</td>
+                            </tr>
+                        }
+                    </table>
+                </div>
+            </div>
+        
+    </div>
+</div>

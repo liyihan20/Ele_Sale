@@ -64,10 +64,9 @@ namespace Sale_platform_ele.Services
             return result;
         }
 
-        public List<ComboResult> GetUnitGroup(int groupId)
+        public List<ComboResult> GetUnitGroup(int groupId,string account="ele")
         {
-            var result = (from v in db.vwProductUnits
-                          where v.unit_group_id == groupId
+            var result = (from v in db.getProductUnits(groupId,account)
                           select new ComboResult()
                           {
                               name = v.unit_name,
@@ -148,6 +147,29 @@ namespace Sale_platform_ele.Services
                               feeRate = e.fee_rate
                           }).FirstOrDefault();
             return result;
+        }
+
+        //获取结算方式
+        public List<ComboResult> GetClearType(string account)
+        {
+            var result = (from c in db.getClearType(account)
+                          select new ComboResult()
+                          {
+                              name = c.name,
+                              value = c.number
+                          }).ToList();
+            return result;
+        }
+
+        //获取仪器和工业的产品类别
+        public List<ComboResult> GetProductType(string account)
+        {
+            if ("工业".Equals(account)) {
+                return new List<ComboResult>() { new ComboResult() { name = "计算器", value = "计算器" } };
+            }
+            //仪器的到k3获取
+            return db.ExecuteQuery<ComboResult>("select FName as name,FNumber as value from [192.168.100.201].[AIS20060821075402].[dbo].t_item where FDeleted = 0 and fitemclassid={0}", "3001").ToList();
+
         }
 
     }

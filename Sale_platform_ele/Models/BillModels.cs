@@ -28,6 +28,7 @@ namespace Sale_platform_ele.Models
         public string productName { get; set; }
         public string productModel { get; set; }
         public string qty { get; set; }
+        public string realQty { get; set; }
         public string orderNo { get; set; }
         public int? orderEntryNo { get; set; }
         public string auditStatus { get; set; }
@@ -56,6 +57,20 @@ namespace Sale_platform_ele.Models
         public string productModel { get; set; }
         public int qty { get; set; }
         public decimal dealPrice { get; set; }
+        public string auditStatus { get; set; }
+    }
+
+    public class EOListModel
+    {
+        public string account { get; set; }
+        public int billId { get; set; }
+        public string applyDate { get; set; }
+        public string sysNo { get; set; }
+        public string customerName { get; set; }
+        public string productName { get; set; }
+        public string productModel { get; set; }
+        public int qty { get; set; }
+        public decimal taxedPrice { get; set; }
         public string auditStatus { get; set; }
     }
 

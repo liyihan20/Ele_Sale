@@ -56,9 +56,9 @@ namespace Sale_platform_ele.Controllers
             return Json(new OtherSv().GetProducts(q,account));
         }
 
-        public JsonResult GetUnitGroup(int groupId)
+        public JsonResult GetUnitGroup(int groupId,string account="ele")
         {
-            return Json(new OtherSv().GetUnitGroup(groupId));
+            return Json(new OtherSv().GetUnitGroup(groupId,account));
         }
 
         public JsonResult GetMUAndCommisson(decimal dealPrice, decimal cost, int taxRate, int feeRate, decimal exchangeRate, string productType, decimal qty, decimal unitPrice)
@@ -107,6 +107,16 @@ namespace Sale_platform_ele.Controllers
                 return Json(new ResultModel() { suc = false });
             }
             return Json(new ResultModel() { suc = true, extra = result });
+        }
+
+        public JsonResult GetClearType(string account)
+        {
+            return Json(new OtherSv().GetClearType(account));
+        }
+
+        public JsonResult GetProductType(string account)
+        {
+            return Json(new OtherSv().GetProductType(account));
         }
 
     }

@@ -31,6 +31,7 @@
                                 <li id="~/CHSP/ClerkAndCustomer"><span>@Html.Lang("clerk_customer")</span> </li>
                             }
                             @if (Array.IndexOf(powers, "CH_FPC_Team") != -1 || Array.IndexOf(powers, "CH_PCB_Team") != -1) {
+                                <li id="~/Saler/CheckBillList?billType=CH"><span>@Html.Lang("check_add_apply")</span> </li>
                                 <li id="~/CHSP/StockTeamReport"><span>@Html.Lang("stock_team_report")</span> </li>
                             }
                         </ul>
@@ -38,7 +39,15 @@
                 }
             }
             @if (copName.Contains("仪器")) {
-                
+
+                <li>
+                    <span>仪器/工业销售订单</span>
+                    <ul>
+                        <li id="~/Saler/CreateBill?billType=EO"><span>新建销售订单</span></li>
+                        <li id="~/Saler/CheckBillList?billType=EO"><span>查看销售订单</span> </li>
+                    </ul>
+                </li>
+
                 <li>
                     <span>仪器/工业备料单</span>
                     <ul>

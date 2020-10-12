@@ -143,7 +143,7 @@ namespace Sale_platform_ele.Services
         /// <param name="fc">表单form</param>
         /// <param name="userId">用户id</param>
         /// <returns></returns>
-        public override string SaveBill(System.Web.Mvc.FormCollection fc, int userId)
+        public override string SaveBill(System.Web.Mvc.FormCollection fc, UserInfo user)
         {
             order = new Order();
             SomeUtils.SetFieldValueToModel(fc, order);
@@ -165,7 +165,7 @@ namespace Sale_platform_ele.Services
 
             try {
                 var existed = db.Order.Where(o => o.sys_no == order.sys_no);
-                order.update_user_id = userId;
+                order.update_user_id = user.userId;
                 if (existed.Count() > 0) {
                     order.original_id = existed.First().original_id;
                     //备份旧订单
@@ -174,7 +174,7 @@ namespace Sale_platform_ele.Services
                     bd.secondary_data = SomeUtils.ModelsToString<OrderDetail>(existed.First().OrderDetail.ToList());
                     bd.op_date = DateTime.Now;
                     bd.sys_no = order.sys_no;
-                    bd.user_id = userId;
+                    bd.user_id = user.userId;
                     db.BackupData.InsertOnSubmit(bd);
 
                     //删除旧订单
@@ -182,7 +182,7 @@ namespace Sale_platform_ele.Services
                     db.Order.DeleteAllOnSubmit(existed);
                 }
                 else {
-                    order.original_id = userId;
+                    order.original_id = user.userId;
                 }
 
                 //在后台再计算一次佣金、MU等
@@ -685,8 +685,6 @@ namespace Sale_platform_ele.Services
                 }
             }
         }
-
-        
 
 
     }

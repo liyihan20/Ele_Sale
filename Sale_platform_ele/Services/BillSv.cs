@@ -65,7 +65,7 @@ namespace Sale_platform_ele.Services
         /// <param name="fc">表单值</param>
         /// <param name="userId">用户名</param>
         /// <returns>保存结果</returns>
-        public abstract string SaveBill(FormCollection fc,int userId);
+        public abstract string SaveBill(FormCollection fc,UserInfo user);
 
         /// <summary>
         /// 取得单据列表

@@ -745,7 +745,7 @@ namespace Sale_platform_ele.Services
                 ap.finish_date = DateTime.Now;
           
                 //审批完成之后需要做的事情
-                bill.DoWhenFinishAudit(isPass);                
+                bill.DoWhenFinishAudit(isPass);
             }
             try {
                 db.SubmitChanges();

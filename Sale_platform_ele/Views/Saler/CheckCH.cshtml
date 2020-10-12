@@ -21,6 +21,7 @@
                 { field: 'unit_name', title: '单位', width: 60 },
                 { field: 'order_qty', title: '订单数量', width: 80, align: 'right' },
                 { field: 'apply_qty', title: '申请数量', width: 80, align: 'right' },
+                { field: 'real_qty', title: '实发数量', width: 80, align: 'right' },
                 { field: 'unit_price', title: '含税单价', width: 80, align: 'right' },
                 { field: 'total_price', title: '金额', width: 80, align: 'right' },
                 { field: 'tax_rate', title: '折扣率%', width: 60, align: 'right' },
@@ -125,6 +126,7 @@
                                 <td>@l.unit_name</td>
                                 <td>@l.order_qty</td>
                                 <td>@l.apply_qty</td>
+                                <td>@l.real_qty</td>
                                 <td>@l.unit_price.ToString("###,##0.####")</td>
                                 <td>@(l.total_price == null ? "0" : ((decimal)l.total_price).ToString("###,##0.####"))</td>
                                 <td>@l.tax_rate</td>

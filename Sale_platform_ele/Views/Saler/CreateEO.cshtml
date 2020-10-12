@@ -1,0 +1,509 @@
+﻿@using Sale_platform_ele.Models;
+@{
+    Sale_eo_bill order = (Sale_eo_bill)ViewData["bill"];
+}
+
+<script type="text/javascript" src="@Url.Content("~/Scripts/json2.js")"></script>
+<script type="text/javascript">
+    var taxRate = 13; //税率
+    var editRowIndex = -1; //当前编辑行行号
+
+    $(function () {
+        if ("@order.account" == "") {
+            $("#dlg_sel_company").dialog("open");
+        } else {
+            init("@order.account");
+        }
+    });
+
+    function companySel(account) {        
+        $("#dlg_sel_company").dialog("close");
+        init(account);
+    }
+
+    function init(account) {
+
+        $("#account").textbox("setValue", account);
+        $("#product_no").combogrid({
+            idField: "number",
+            textField: "number",
+            panelWidth: 420,
+            required: true,
+            columns: [[
+                    { field: 'number', title: '产品代码', width: 120 },
+                    { field: 'name', title: '产品名称', width: 120 },
+                    { field: 'model', title: '产品型号', width: 160 }
+            ]],
+            keyHandler: {
+                query: function () { },
+                enter: function () {
+                    var q = $("#product_no").combogrid('getText');
+                    if (q != "") {
+                        $.post("@Url.Content("~/Items/GetProducts")", { q: q, account: account },
+                            function (data) {
+                                $("#product_no").combogrid('grid').datagrid('loadData', data);
+                                $("#product_no").combogrid('setText', q);
+                            },
+                            "json"
+                            );
+                    }
+                }
+            },
+            onClickRow: function (rowIndex, rowData) {
+                $("#product_no").combogrid('setValue', rowData.number);
+                $("#product_no").combogrid('setText', rowData.number);
+                $("#product_name").textbox("setValue", rowData.name);
+                $("#product_model").textbox("setValue", rowData.model);
+
+                $.post("@Url.Content("~/Items/GetUnitGroup")", { groupId: rowData.unitGroupId, account: account }, function (data) {
+                    $("#unit_no").combobox("loadData", data);
+                    $("#unit_no").combobox("setValue", rowData.unitNo);
+                    $("#unit_no").combobox("setText", rowData.unitName);
+                });
+
+                $("#product_no").combogrid('hidePanel');
+            }
+        });
+
+        $("#clear_type_no").combobox({
+            required: true,
+            valueField: "value",
+            textField: "name",
+            panelWidth: 240,
+            url: "../Items/GetClearType?account=" + account,
+            require: true,
+            value: "@order.clear_type_no"
+        });
+
+        $("#product_type_no").combobox({
+            valueField: "value",
+            textField: "name",
+            panelHeight: "auto",
+            url: "../Items/GetProductType?account=" + account,
+            required: true,
+            editable: false,
+            value: "@order.product_type_no"
+        });
+
+        $(".remotebox").combobox({
+            valueField: "value",
+            textField: "name",
+            required: true,
+            keyHandler: {
+                query: function () { },
+                enter: function () {
+                    var box_id = $(this).attr("id");
+                    var _this = "#" + box_id;
+                    var url = "@Url.Content("~/Items/GetClerks")";
+                    var q = $(_this).combobox('getText');
+                    if (q != "") {
+                        $.post(url, { q: q, account: account },
+                        function (data) {
+                            $(_this).combobox('loadData', data);
+                            $(_this).combobox('setText', q);
+                        },
+                        "json"
+                        );
+                    }
+                }
+            }
+        });
+
+        $("#dg_detail").datagrid({
+            width: 1800,
+            height: 240,
+            loadMsg: "@Html.Lang("loading")",
+            rownumbers: true,
+            singleSelect: true,
+            fitColumns: true,
+            showFooter: true,
+            columns: [[
+                { field: 'product_no', title: '产品代码', width: 120 },
+                { field: 'product_name', title: '产品名称', width: 140 },
+                { field: 'product_model', title: '规格型号', width: 180 },
+                { field: 'unit_no', title: 'unit_no', hidden: true },
+                { field: 'unit_name', title: '单位', width: 60, align: 'center' },
+                { field: 'qty', title: '数量', width: 80, align: 'right' },
+                { field: 'tax_price', title: '含税单价', width: 80, align: 'right' },
+                { field: 'total', title: '含税金额', width: 100, align: 'right' },
+                { field: 'tax_rate', title: '税率%', width: 80, align: 'center' },
+                { field: 'cost', title: '成本', width: 80, align: 'right' },
+                { field: 'fetch_date', title: '交货日期', width: 100, align: 'center' },
+                { field: 'bl_no', title: '备料单号', width: 120 },
+                { field: 'bom_no', title: 'BOM表码', width: 120 },
+                { field: 'comment', title: '备注', width: 160 },
+            ]],
+            toolbar: [{
+                text: "@Html.Lang("add_item")",
+                iconCls: 'icon-add',
+                handler: function () {
+                    $("#fm_detail").form("clear");
+                    editRowIndex = -1;
+                    $("#dlg_details").dialog("setTitle", "@Html.Lang("add_item")").dialog("open");
+                }
+            }, '-', {
+                text: "@Html.Lang("edit_item")",
+                iconCls: 'icon-edit',
+                handler: function () {
+                    var row = $('#dg_detail').datagrid('getSelected');
+                    if (row) {
+                        editRowIndex = $('#dg_detail').datagrid('getRowIndex', row);
+                        $("#fm_detail").form("load", row);
+                        $("#product_no").combogrid('grid').datagrid('loadData', []);
+                        $("#unit_no").combobox("loadData", []);
+                        $("#unit_no").combobox("setText", row.unit_name);
+                        $("#dlg_details").dialog("setTitle", "@Html.Lang("edit_item")").dialog("open");
+                    }
+                }
+            }, '-', {
+                text: "@Html.Lang("del_item")",
+                iconCls: 'icon-remove',
+                handler: function () {
+                    var row = $('#dg_detail').datagrid('getSelected');
+                    if (row) {
+                        $.messager.confirm('@Html.Lang("confirm")', '@Html.Lang("are_you_sure")?', function (r) {
+                            if (r) {
+                                var index = $('#dg_detail').datagrid('getRowIndex', row);
+                                $('#dg_detail').datagrid('deleteRow', index);
+                            }
+                        });
+                    }
+                }
+            }]
+        });
+
+        $(".customerbox").combogrid({
+            loadMsg: "Please wait...",
+            idField: "value",
+            textField: "name",
+            panelWidth: 400,
+            columns: [[
+                    { field: 'value', title: '@Html.Lang("customer_num")', width: 150 },
+                    { field: 'name', title: '@Html.Lang("customer_name")', width: 220 }
+            ]],
+            keyHandler: {
+                query: function () { },
+                enter: function () {
+                    var box_id = $(this).attr("id");
+                    var _this = "#" + box_id;
+                    var q = $(_this).combogrid('getText');
+                    if (q != "") {
+                        $.post("@Url.Content("~/Items/GetCustomers")", { q: q, account: account },
+                            function (data) {
+                                $(_this).combogrid('grid').datagrid('loadData', data);
+                                $(_this).combogrid('setText', q);
+                            },
+                            "json"
+                            );
+                    }
+                }
+            },
+            onClickRow: function (rowIndex, rowData) {
+                $("#customer_no").combogrid('setValue', rowData.value);
+                $("#customer_no").combogrid('setText', rowData.value);
+                $("#customer_name").textbox("setValue", rowData.name);
+
+                $("#customer_no").combogrid('hidePanel');
+            }
+        });
+
+        //保存订单
+        $('#saveAllBut').bind('click', function () {
+            var clear_type_no = $("#clear_type_no").combobox("getValue");
+            if ($.grep($("#clear_type_no").combobox("getData"), function (n, i) { return n.value == clear_type_no; }).length == 0) {
+                showTip("付款条款不合法，请从列表中选择");
+                return;
+            }
+            if ($("#dg_detail").datagrid("getRows").length < 1) {
+                showTip("订单明细必须至少录入1行，保存失败");
+                return;
+            }
+
+            $.messager.progress();
+            $('#order_form').form('submit', {
+                url: '@Url.Content("~/Saler/SaveBill")',
+                onSubmit: function (param) {
+                    if (!$('#order_form').form('validate')) {
+                        return false;
+                    }
+                    param.details = JSON.stringify($("#dg_detail").datagrid("getRows"));
+                    param.product_type_name = $("#product_type_no").combobox("getText");
+                    param.clear_type_name = $("#clear_type_no").combobox("getText");
+                    param.clerk_name = $("#clerk_no").combobox("getText");
+                    param.order_type_name = $("#order_type_no").combobox("getText");
+
+                    return true;
+                },
+                success: function (data) {
+                    var result = eval('(' + data + ')');
+                    if (result.suc) {
+                        showTip("@Html.Lang("suc_save")");
+                    } else {
+                        showTip("@Html.Lang("failure_save"):" + result.msg);
+                    }
+                }
+            });
+            $.messager.progress("close");
+        });
+
+
+        //设置一些远程combo的值
+
+        $("#clerk_no").combobox("setValue", "@order.clerk_no");
+        $("#clerk_no").combobox("setText", "@order.clerk_name");
+        $("#order_div").css("visibility", "visible");
+
+    }
+
+    function saveDetail() {
+        if ($("#fm_detail").form("validate")) {
+            var currentRow = {
+                product_no: $("#product_no").combogrid("getValue"),
+                product_name: $("#product_name").textbox("getValue"),
+                product_model: $("#product_model").textbox("getValue"),
+                unit_no: $("#unit_no").combobox("getValue"),
+                unit_name: $("#unit_no").combobox("getText"),
+                qty: $("#qty").numberbox("getValue"),
+                tax_price: $("#tax_price").numberbox("getValue"),
+                total: Math.round($("#qty").numberbox("getValue") * $("#tax_price").numberbox("getValue") * 100) / 100,
+                tax_rate: taxRate,
+                cost:$("#cost").numberbox("getValue"),
+                fetch_date: $("#fetch_date").datebox("getValue"),
+                bl_no: $("#bl_no").textbox("getValue"),
+                bom_no: $("#bom_no").textbox("getValue"),
+                comment: $("#comment").textbox("getValue")
+            }
+            $("#dlg_details").dialog("close");
+            if (editRowIndex > -1) {
+                $("#dg_detail").datagrid("updateRow", { index: editRowIndex, row: currentRow });
+            }
+            else {
+                $("#dg_detail").datagrid("appendRow", currentRow);
+            }
+        }
+    }
+
+</script>
+
+<script type="text/javascript">
+    $(function () {
+        //提交申请按钮
+        $("#submitApply").click(function () {
+            $("#submitApply").linkbutton('disable');
+            $('#saveAllBut').linkbutton('disable');
+            $.post("@Url.Content("~/Saler/BeginApply")", { sysNo: $("#sys_no").textbox("getValue") },
+            function (data) {
+                if (data.suc) {
+                    showTip(data.msg);
+                    setTimeout('window.location.href="@Url.Content("~/Saler/CheckBillList?billType=EO")"', 1000);
+                } else {
+                    showTip(data.msg);
+                    $("#submitApply").linkbutton('enable');
+                    $('#saveAllBut').linkbutton('enable');
+                }
+            });
+        });
+    });
+</script>
+
+
+<div class="easyui-layout" data-options="fit:true" id="order_div" style="visibility:hidden">
+    <div data-options="region:'center'">
+        <form id="order_form" method="post">
+            <div id="order_div" class="easyui-panel" title="@Html.Lang("new_sale_order")" style="width: 840px; padding: 10px; background: #fafafa;">
+                <table border="0" cellpadding="1" cellspacing="3" width="800">
+                    <tr>
+                        <td>
+                            公司：
+                        </td>
+                        <td>
+                            <input class="easyui-textbox" name="account" id="account" style="width:140px" readonly="readonly" value="@order.account" />
+                        </td>                        
+                        <td>
+                            订单类型：
+                        </td>
+                        <td>
+                            <input class="easyui-combobox" name="order_type_no" id="order_type_no" style="width:140px"
+                                   data-options="textField:'name',valueField:'value',panelHeight:'auto', required:true,editable:false,
+                                           data:[
+                                           {value:'04',name:'生产单'},{value:'02',name:'样品单'}
+                                           ]" value="@order.order_type_no" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            系统流水号:
+                        </td>
+                        <td>
+                            <input class="easyui-textbox" name="sys_no" id="sys_no" style="width:140px" readonly="readonly" value="@order.sys_no" />
+                        </td>
+                        <td>
+                            客户编码:
+                        </td>
+                        <td>
+                            <input class="customerbox" name="customer_no" id="customer_no" style="width:140px" value="@order.customer_no" required />
+                        </td>
+                        <td>
+                            客户名称:
+                        </td>
+                        <td>
+                            <input class="easyui-textbox" id="customer_name" name="customer_name" style="width:140px" readonly required value="@order.customer_name" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            产品类别:
+                        </td>
+                        <td>
+                            <input name="product_type_no" id="product_type_no" style="width:140px" />
+                        </td>
+                        <td>
+                            付款条款:
+                        </td>
+                        <td>
+                            <input id="clear_type_no" name="clear_type_no" style="width:140px" />
+                        </td>
+                        <td>
+                            业务员:
+                        </td>
+                        <td>
+                            <input class="remotebox" id="clerk_no" name="clerk_no" style="width: 140px" value="@order.clerk_no" />                            
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>摘要:</td>
+                        <td colspan="5">
+                            <input class="easyui-textbox" name="summary" id="summary" multiline="true" style="width:660px;height:60px;" value="@order.summary" />
+                        </td>
+                    </tr>
+                </table>
+                <br />
+                <div id="detail_div" class="easyui-panel" title="@Html.Lang("sale_order_detail")" style="width: 815px;">
+                    <table id="dg_detail">
+                        @foreach (var det in order.Sale_eo_bill_detail) {
+                            <tr>
+                                <td>@det.product_no</td>
+                                <td>@det.product_name</td>
+                                <td>@det.product_model</td>
+                                <td>@det.unit_no</td>
+                                <td>@det.unit_name</td>
+                                <td>@det.qty</td>
+                                <td>@det.tax_price</td>
+                                <td>@(Math.Round((decimal)(det.qty * det.tax_price), 2))</td>
+                                <td>@det.tax_rate</td>
+                                <td>@det.cost</td>
+                                <td>@(det.fetch_date == null ? "" : ((DateTime)det.fetch_date).ToString("yyyy-MM-dd"))</td>
+                                <td>@det.bl_no</td>
+                                <td>@det.bom_no</td>
+                                <td>@det.comment</td>
+                            </tr>
+                        }
+                    </table>
+                </div>
+                <br />
+                <div align="center">
+                    <a id="saveAllBut" href="#" class="easyui-linkbutton" iconcls='icon-save' style="margin: 10px 20px;">@Html.Lang("save_form")</a>
+                    <a id="submitApply" href="#" class="easyui-linkbutton" iconcls='icon-document' style="margin: 10px 20px;">@Html.Lang("submit_apply")</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@*弹出的编辑框*@
+<div id="dlg_details" class="easyui-dialog" style="width: 520px; padding: 10px 10px" closed="true" buttons="#dlg_details_buttons" modal="true">
+    <form id="fm_detail">
+        <table border="0" cellpadding="2" cellspacing="3" width="450">
+            <tr>
+                <td>
+                    产品编码:
+                </td>
+                <td>
+                    <input id="product_no" name="product_no" required style="width: 135px" />
+                </td>
+                <td>
+                    产品名称:
+                </td>
+                <td>
+                    <input class="easyui-textbox" name="product_name" id="product_name" style="width:135px;" readonly required />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    规格型号:
+                </td>
+                <td>
+                    <input class="easyui-textbox" name="product_model" id="product_model" style="width:135px;" readonly required />
+                </td>
+                <td>
+                    单位:
+                </td>
+                <td>
+                    <input id="unit_no" class="easyui-combobox" name="unit_no" editable="false"
+                           panelheight="auto" valuefield="value" textfield="name" required style="width: 135px" />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    数量:
+                </td>
+                <td>
+                    <input id="qty" class="easyui-numberbox" name="qty" style="width: 135px" required />
+                </td>
+                <td>
+                    含税单价:
+                </td>
+                <td>
+                    <input id="tax_price" class="easyui-numberbox" name="tax_price" required style="width: 135px" precision="2" />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    成本:
+                </td>
+                <td>
+                    <input id="cost" class="easyui-numberbox" name="cost" required style="width: 135px" precision="2" />
+                </td>
+                <td>
+                    备料单号:
+                </td>
+                <td>
+                    <input class="easyui-textbox" name="bl_no" id="bl_no" style="width:135px;" required />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    BOM表码:
+                </td>
+                <td>
+                    <input class="easyui-textbox" name="bom_no" id="bom_no" style="width:135px;" required />
+                </td>
+                <td>
+                    交货日期:
+                </td>
+                <td>
+                    <input id="fetch_date" name="fetch_date" class="easyui-datebox" required style="width: 135px" />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    备注:
+                </td>
+                <td colspan="3">
+                    <input class="easyui-textbox" name="comment" id="comment" style="width:355px" required />
+                </td>
+            </tr>
+        </table>
+    </form>
+    <br />
+</div>
+<div id="dlg_details_buttons">
+    <a href="#" class="easyui-linkbutton" iconcls="icon-ok" onclick="saveDetail()">@Html.Lang("save")</a>
+</div>
+
+<div id="dlg_sel_company" class="easyui-dialog" style="width: 300px; padding: 10px 10px" closed="true" closable="false" modal="true" title="选择要下单到哪个公司">
+    <div style="text-align:center">
+        <a href="#" class="easyui-linkbutton" iconcls="icon-star" style="padding:12px;margin-right:12px;" onclick="companySel('仪器')"><span style="font-size:16px;">仪器</span> </a>
+        <a href="#" class="easyui-linkbutton" iconcls="icon-star" style="padding:12px;margin-right:12px;" onclick="companySel('工业')"><span style="font-size:16px;">工业</span></a>
+    </div>
+</div>

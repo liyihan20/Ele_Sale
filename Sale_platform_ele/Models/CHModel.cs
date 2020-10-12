@@ -63,6 +63,21 @@ namespace Sale_platform_ele.Models
         public string FUserName { get; set; }
         public string FDeliveryNum { get; set; }
     }
-    
 
+    public class ApplierConfirmCHInfo
+    {
+        public string sys_no { get; set; }
+        public string delivery_unit { get; set; }
+        public string delivery_attn { get; set; }
+        public string delivery_phone { get; set; }
+        public string delivery_addr { get; set; }
+        public List<UpdateCHRowInfo> rows { get; set; }
+    }
+
+    public class UpdateCHRowInfo
+    {
+        public int detail_id { get; set; }
+        public int real_qty { get; set; }
+
+    }
 }

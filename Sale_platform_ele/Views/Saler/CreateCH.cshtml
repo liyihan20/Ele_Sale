@@ -2,19 +2,20 @@
 @{
     List<vwChBill> bills = (List<vwChBill>)ViewData["bill"];
     var bill = bills.First();
+    var step = ViewData["step"] == null ? 0 : (int)ViewData["step"];
 }
 <script type="text/javascript" src="@Url.Content("~/Scripts/json2.js")"></script>
 <script type="text/javascript">
     var saleStyle = "";
-    $(function () {
-        $("#dg_detail").datagrid({
-            width: 1200,
-            loadMsg: "@Html.Lang("loading")",
-            rownumbers: true,
-            singleSelect: true,
-            fitColumns: true,
-            //showFooter: true,
-            columns: [[                
+    var columnsArray = [];
+    var toolBarArray = null;
+
+</script>
+
+@if (step == 0) {
+    //营业申请
+    <script>
+        columnsArray = [
                 { field: 'order_no', title: '订单编号', width: 140 },
                 { field: 'item_name', title: '品名', width: 120 },
                 { field: 'item_model', title: '型号', width: 160 },
@@ -31,100 +32,396 @@
                 { field: 'order_id', title: 'order_id', hidden: true },
                 { field: 'item_no', title: 'item_no', hidden: true },
                 { field: 'item_id', title: 'item_id', hidden: true }
-            ]],
-            toolbar: [{
-                text: "@Html.Lang("add_item")",
-                iconCls: 'icon-add',
-                handler: function () {
-                    if ($("#customer_no").combogrid("getValue") == "") {
-                        showTip("请先选择客户后再新增出货明细");
-                        return;
-                    }
-                    if ($("#product_type").combobox("getValue") == "") {
-                        showTip("请先选择产品类别后再新增出货明细");
-                        return;
-                    }
-                    $("#dlg_add").dialog("setTitle", "@Html.Lang("add_item")").dialog("open");
-                    $("#orderList").datagrid("resize", { height: 345 }); //困扰了很久的问题，加上这一句话解决。因为一开始datagrid是隐藏的，而且设置fit=false；所以加载的时候必须再设置一下高度，否则高度都是0
+        ];
+        toolBarArray = [{
+            text: "@Html.Lang("add_item")",
+            iconCls: 'icon-add',
+            handler: function () {
+                if ($("#customer_no").combogrid("getValue") == "") {
+                    showTip("请先选择客户后再新增出货明细");
+                    return;
                 }
-            }, '-', {
-                text: "@Html.Lang("del_item")",
-                iconCls: 'icon-remove',
-                handler: function () {
-                    var row = $('#dg_detail').datagrid('getSelected');
-                    if (row) {
-                        $.messager.confirm('@Html.Lang("confirm")', '@Html.Lang("are_you_sure")?', function (r) {
-                            if (r) {
-                                var index = $('#dg_detail').datagrid('getRowIndex', row);
-                                $('#dg_detail').datagrid('deleteRow', index);
+                if ($("#product_type").combobox("getValue") == "") {
+                    showTip("请先选择产品类别后再新增出货明细");
+                    return;
+                }
+                $("#dlg_add").dialog("setTitle", "@Html.Lang("add_item")").dialog("open");
+                $("#orderList").datagrid("resize", { height: 345 }); //困扰了很久的问题，加上这一句话解决。因为一开始datagrid是隐藏的，而且设置fit=false；所以加载的时候必须再设置一下高度，否则高度都是0
+            }
+        }, '-', {
+            text: "@Html.Lang("del_item")",
+            iconCls: 'icon-remove',
+            handler: function () {
+                var row = $('#dg_detail').datagrid('getSelected');
+                if (row) {
+                    $.messager.confirm('@Html.Lang("confirm")', '@Html.Lang("are_you_sure")?', function (r) {
+                        if (r) {
+                            var index = $('#dg_detail').datagrid('getRowIndex', row);
+                            $('#dg_detail').datagrid('deleteRow', index);
 
-                                if ($("#dg_detail").datagrid("getRows").length == 0) {
-                                    //设置可以再选择
-                                    $("#customer_no").combogrid("enable");
-                                    $("#product_type").combobox("enable");
-                                    saleStyle = "";
-                                }
+                            if ($("#dg_detail").datagrid("getRows").length == 0) {
+                                //设置可以再选择
+                                $("#customer_no").combogrid("enable");
+                                $("#product_type").combobox("enable");
+                                saleStyle = "";
                             }
-                        });
+                        }
+                    });
+                }
+            }
+        }];
+
+        $(function () {
+            $("#customer_no").combogrid({
+                idField: "value",
+                textField: "value",
+                panelWidth: 288,
+                required: 'true',
+                editable: false,
+                url: '@Url.Content("~/Items/GetClerkCHCustomer")',
+                columns: [[
+                            { field: 'value', title: '客户编码', width: 80 },
+                            { field: 'name', title: '客户名称', width: 200 }
+                ]]
+            });
+
+            $("#customer_no").combogrid('grid').datagrid({
+                onClickRow: function (rowIndex, rowData) {
+                    $("#customer_no").combogrid("setText", rowData.value);
+                    $("#customer_no").combogrid("setValue", rowData.value);
+                    $("#customer_name").textbox("setValue", rowData.name);
+                    $("#customer_no").combogrid('hidePanel');
+
+                    //获取地址等信息
+                    $.post("@Url.Content("~/Items/GetDeliveryInfo")", { customerNumber: rowData.value }, function (data) {
+                        $("#delivery_unit").combogrid('grid').datagrid("loadData", data);
+                        $("#delivery_unit").combogrid("setValue", data[0].id);
+                        $("#delivery_unit").combogrid("setText", data[0].deliveryUnit);
+                        $("#delivery_attn").textbox("setValue", data[0].attn);
+                        $("#delivery_addr").textbox("setValue", data[0].addr);
+                        $("#delivery_phone").textbox("setValue", data[0].phone);
+                    });
+
+                    //将查询订单的datagrid清空，否则会出现客户和订单信息对应不上的情况
+                    $("#orderList").datagrid("loadData", []);
+                }
+            });
+
+            $("#product_type").combobox({
+                onChange: function (newValue, oldValue) {
+                    //将查询订单的datagrid清空，否则会出现产品类别和订单信息对应不上的情况
+                    $("#orderList").datagrid("loadData", []);
+                }
+            });
+
+            $("#orderList").datagrid({
+                width: 1280,
+                rownumbers: true,
+                checkOnSelect: true,
+                selectOnCheck: true,
+                fitColumns: true,
+                columns: [[
+                    { field: 'ck', checkbox: true },
+                    { field: 'orderNumber', title: '订单编号', width: 140 },
+                    {
+                        field: 'orderDate', title: '订单日期', width: 80,
+                        formatter: function (value, row, index) {
+                            var date = eval('new ' + eval(value).source);
+                            return date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
+                        }
+                    },
+                    { field: 'orderEntry', title: '订单行号', width: 60 },
+                    { field: 'itemName', title: '品名', width: 120 },
+                    { field: 'itemModel', title: '型号', width: 180 },
+                    { field: 'qty', title: '订单数量', width: 80, align: 'right' },
+                    { field: 'relateQty', title: '关联数量', width: 80, align: 'right' },
+                    {
+                        field: 'canApplyQty', title: '可申请数量', width: 80, align: 'right',
+                        formatter: function (value, row, index) {
+                            return row.qty - row.relateQty;
+                        }
+                    },
+                    { field: 'stockQty', title: '库存数量', width: 80, align: 'right' },
+                    { field: 'unitName', title: '单位', width: 60 },
+                    { field: 'empName', title: '营业员', width: 100 },
+                    { field: 'saleStyle', title: '销售方式', width: 100 },
+                    { field: 'productType', title: '产品类别', width: 100, align: 'center' },
+                    { field: 'unitNumber', hidden: true },
+                    { field: 'orderId', hidden: true },
+                    { field: 'itemNumber', hidden: true }
+                ]]
+            });
+
+            $("#checkBt").on("click", function () {
+                $("#orderList").datagrid("loading");
+                $.post("@Url.Content("~/CHSP/CheckOrderStockInfo")", {
+                    customerNumber: $("#customer_no").combogrid("getValue"),
+                    saleStyle: saleStyle,
+                    productType: $("#product_type").combobox("getValue"),
+                    fromDate: $("#fromDate").datebox("getValue"),
+                    toDate: $("#toDate").datebox("getValue"),
+                    orderNumber: $("#order_no").textbox("getValue"),
+                    productModel: $("#pro_model").textbox("getValue")
+                }, function (data) {
+                    $("#orderList").datagrid("loaded");
+                    if (data.length == 0) {
+                        showTip("查询不到符合条件的单据信息");
+                    } else {
+                        $("#orderList").datagrid("loadData", data);
+                    }
+
+                });
+            });
+
+        });
+        function addCHItem() {
+            var nowRows = $("#dg_detail").datagrid("getRows");
+            var toAddeds = $("#orderList").datagrid("getChecked");
+
+            var isEmpty = nowRows.length == 0;//当前出货信息为空
+            for (var i = 0; i < toAddeds.length; i++) {
+                //判断是否在列表中已存在
+                //for (var j = 0; j < nowRows.length; j++) {
+                //    if (toAddeds[i].orderId == nowRows[j].order_id && toAddeds[i].orderEntry == nowRows[j].order_entry_no) {
+                //        showTip("#" + toAddeds[i].orderNumber + ":" + toAddeds[i].orderEntry + "#已存在，不能重复添加");
+                //        return;
+                //    }
+                //}
+
+                if (isEmpty) {
+                    saleStyle = toAddeds[i].saleStyle;
+                    //设置不能再选择
+                    $("#customer_no").combogrid("disable");
+                    $("#product_type").combobox("disable");
+                } else {
+                    if (toAddeds[i].saleStyle != saleStyle) {
+                        showTip("同一张出货申请的销售方式必须保持一致，列表中的销售方式是:" + saleStyle + ";#" + toAddeds[i].orderNumber + "#的销售方式是:" + toAddeds[i].saleStyle);
+                        return;
                     }
                 }
-            }],
-            onClickRow: onClickRow
+                $("#dg_detail").datagrid("appendRow", {
+                    order_no: toAddeds[i].orderNumber,
+                    item_name: toAddeds[i].itemName,
+                    item_model: toAddeds[i].itemModel,
+                    unit_name: toAddeds[i].unitName,
+                    order_qty: toAddeds[i].qty,
+                    stock_qty: toAddeds[i].stockQty,
+                    can_apply_qty: toAddeds[i].qty - toAddeds[i].relateQty,
+                    order_entry_no: toAddeds[i].orderEntry,
+                    unit_no: toAddeds[i].unitNumber,
+                    order_id: toAddeds[i].orderId,
+                    item_no: toAddeds[i].itemNumber,
+                    item_id: toAddeds[i].itemID
+                });
+            }
+            $("#dlg_add").dialog("close");
+        }
+    </script>
+    <script>
+
+        $(function () {
+            //保存表单
+            $("#saveAllBut").on("click", function () {
+                if (validateBeforeSave()) {
+                    $.messager.progress();
+                    $('#order_form').form('submit', {
+                        url: '@Url.Content("~/Saler/SaveBill")',
+                        onSubmit: function (param) {
+                            console.log($("#dg_detail").datagrid("getRows"));
+                            param.ch_bill_details = JSON.stringify($("#dg_detail").datagrid("getRows"));
+                            param.product_type = $("#product_type").combobox("getValue");
+                            param.delivery_unit = $("#delivery_unit").combobox("getText");
+                            param.customer_no = $("#customer_no").combogrid("getValue");
+                            param.sale_style = saleStyle;
+                            return true;
+                        },
+                        success: function (data) {
+                            var result = eval('(' + data + ')');
+                            if (result.suc) {
+                                showTip("@Html.Lang("suc_save")");
+                            } else {
+                                showTip("@Html.Lang("failure_save"):" + result.msg);
+                            }
+                        }
+                    });
+                    $.messager.progress("close");
+                }
+            });
+
+            $("#submitApply").click(function () {
+                $("#submitApply").linkbutton('disable');
+                $('#saveAllBut').linkbutton('disable');
+                $.post("@Url.Content("~/Saler/BeginApply")", { sysNo: $("#sys_no").textbox("getValue") },
+                function (data) {
+                    if (data.suc) {
+                        showTip(data.msg);
+                        setTimeout('window.location.href="@Url.Content("~/Saler/CheckBillList?billType=CH")"', 1000);
+                    } else {
+                        showTip(data.msg);
+                        $("#submitApply").linkbutton('enable');
+                        $('#saveAllBut').linkbutton('enable');
+                    }
+                });
+            });
+
         });
 
-        $("#customer_no").combogrid({
-            idField: "value",
-            textField: "value",
-            panelWidth: 288,
-            required: 'true',
-            editable: false,
-            url:'@Url.Content("~/Items/GetClerkCHCustomer")',
-            columns: [[
-                        { field: 'value', title: '客户编码', width: 80 },
-        				{ field: 'name', title: '客户名称', width: 200 }
-            ]]
-        });
+        //保存之前先验证
+        function validateBeforeSave() {
+            if (!$('#order_form').form('validate')) {
+                return false;
+            }
+            var rows = $("#dg_detail").datagrid("getRows");
+            if (rows.length == 0) {
+                showTip("保存失败：出货信息明细必须至少有一条数据");
+                return false;
+            }
+            //var modelStockQty = [];
+            var orderCanApplyQty = [];
+            var exceedQty = [];
+            var idx = -1;
+            for (var i = 0; i < rows.length; i++) {
+                if (rows[i].apply_qty == "" || isNaN(rows[i].apply_qty)) {
+                    showTip("保存失败：申请数量不能为空，行号：" + (i + 1));
+                    return false;
+                }
+                if (parseInt(rows[i].apply_qty) > parseInt(rows[i].can_apply_qty)) {
+                    showTip("保存失败：申请数量不能大于可出数量，行号：" + (i + 1));
+                    return false;
+                }
+                //验证库存数量的
+                //idx = modelStockQty.findIndex(function (m) { return m.itemNo == rows[i].item_no; });
+                //if (idx >= 0) {
+                //    modelStockQty[idx].qty = parseInt(modelStockQty[idx].qty) + parseInt(rows[i].apply_qty);
+                //} else {
+                //    modelStockQty.push({ itemNo: rows[i].item_no, qty: parseInt(rows[i].apply_qty), stockQty: parseInt(rows[i].stock_qty) });
+                //}
+                //验证可申请数量的
+                idx = orderCanApplyQty.findIndex(function (m) { return m.orderNo == rows[i].order_no && m.orderEntryNo == rows[i].order_entry_no; });
+                if (idx >= 0) {
+                    orderCanApplyQty[idx].qty = parseInt(orderCanApplyQty[idx].qty) + parseInt(rows[i].apply_qty);
+                } else {
+                    orderCanApplyQty.push({ orderNo: rows[i].order_no, orderEntryNo: rows[i].order_entry_no, qty: parseInt(rows[i].apply_qty), canApplyQty: parseInt(rows[i].can_apply_qty) });
+                }
+            }
+            //exceedQty = modelStockQty.filter(function (v) { return v.qty > v.stockQty; });
+            //if (exceedQty.length > 0) {
+            //    showTip("保存失败，产品代码#" + exceedQty[0].itemNo + "#申请数量(" + exceedQty[0].qty + ")不能大于库存数量(" + exceedQty[0].stockQty + ")");
+            //    return false;
+            //}
+            exceedQty = orderCanApplyQty.filter(function (v) { return v.qty > v.canApplyQty; });
+            if (exceedQty.length > 0) {
+                showTip("保存失败，订单号#" + exceedQty[0].orderNo + "，行号#" + exceedQty[0].orderEntryNo + "#申请数量(" + exceedQty[0].qty + ")不能大于可申请数量(" + exceedQty[0].canApplyQty + ")");
+                return false;
+            }
 
-        $("#customer_no").combogrid('grid').datagrid({
-            onClickRow: function (rowIndex, rowData) {
-                $("#customer_no").combogrid("setText", rowData.value);
-                $("#customer_no").combogrid("setValue", rowData.value);
-                $("#customer_name").textbox("setValue", rowData.name);
-                $("#customer_no").combogrid('hidePanel');
+            return true;
+        }
 
-                //获取地址等信息
-                $.post("@Url.Content("~/Items/GetDeliveryInfo")", { customerNumber: rowData.value }, function (data) {
-                    $("#delivery_unit").combogrid('grid').datagrid("loadData", data);
-                    $("#delivery_unit").combogrid("setValue", data[0].id);
-                    $("#delivery_unit").combogrid("setText", data[0].deliveryUnit);
-                    $("#delivery_attn").textbox("setValue", data[0].attn);
-                    $("#delivery_addr").textbox("setValue", data[0].addr);
-                    $("#delivery_phone").textbox("setValue", data[0].phone);
+    </script>
+}
+else {
+    //营业确认
+    <script>
+        columnsArray = [
+                { field: 'detail_id', title: 'detail_id', hidden: true },
+                { field: 'order_no', title: '订单编号', width: 140 },
+                { field: 'item_name', title: '品名', width: 120 },
+                { field: 'item_model', title: '型号', width: 160 },
+                { field: 'unit_name', title: '单位', width: 60 },
+                { field: 'order_qty', title: '订单数量', width: 80, align: 'right' },
+                { field: 'apply_qty', title: '申请数量', width: 80, align: 'right' },
+                { field: 'real_qty', title: '实出数量', width: 80, align: 'right', editor: { type: 'numberbox' } },
+                { field: 'customer_po', title: '客户P/O', width: 100 },
+                { field: 'customer_pn', title: '客户P/N', width: 100 },
+                { field: 'comment', title: '备注', width: 120 },
+                { field: 'stock_qty', title: '库存数量', width: 80, align: 'right' },
+                { field: 'can_apply_qty', title: '可申请数量', width: 80, align: 'right' },
+                { field: 'order_entry_no', title: '订单行号', width: 80, align: 'center' },
+                { field: 'unit_no', title: 'unit_no', hidden: true },
+                { field: 'order_id', title: 'order_id', hidden: true },
+                { field: 'item_no', title: 'item_no', hidden: true },
+                { field: 'item_id', title: 'item_id', hidden: true }
+        ];
+        $(function () {
+            $("#tb1 input").textbox({ editable: false });
+
+            $("#updateBut").on("click", function () {
+                var updateRows = [];
+                var updateInfo = {};
+                var rows = $("#dg_detail").datagrid("getRows");
+                for (var i = 0; i < rows.length; i++) {
+                    if (rows[i].real_qty == "") {
+                        showTip("第" + (i + 1) + "行的实发数量不能为空");
+                        return;
+                    }
+                    //if (rows[i].real_qty > rows[i].stock_qty) {
+                    //    showTip("第" + (i + 1) + "行的实发数量不能大于库存数量");
+                    //    return;
+                    //}
+                    if (parseInt(rows[i].real_qty) > parseInt(rows[i].can_apply_qty)) {
+                        showTip("第" + (i + 1) + "行的实发数量不能大于可申请数量");
+                        return;
+                    }
+                    if (parseInt(rows[i].real_qty) > parseInt(rows[i].apply_qty)) {
+                        showTip("第" + (i + 1) + "行的实发数量不能大于申请数量");
+                        return;
+                    }
+                    updateRows.push({ detail_id: parseInt(rows[i].detail_id), real_qty: parseInt(rows[i].real_qty) });
+                }
+                if (updateRows.filter(function (u) { return u.real_qty > 0; }).length < 1) {
+                    showTip("不能将所有行的实发数量都设置为0。如果本次不出货，请拒绝此申请");
+                    return;
+                }
+                
+                updateInfo.rows = updateRows;
+                updateInfo.sys_no = "@bill.sys_no";
+                updateInfo.delivery_unit = $("#delivery_unit").combobox("getText");
+                updateInfo.delivery_attn = $("#delivery_attn").val();
+                updateInfo.delivery_phone = $("#delivery_phone").val();
+                updateInfo.delivery_addr = $("#delivery_addr").val();
+
+                console.log(updateInfo);
+
+                $.post("../CHSP/UpdateRealQtyAndAddr", { updateJson: JSON.stringify(updateInfo) }, function (data) {
+                    if (data.suc) {
+                        showTip("保存成功");
+                    } else {
+                        showTip(data.msg);
+                    }
                 });
 
-                //将查询订单的datagrid清空，否则会出现客户和订单信息对应不上的情况
-                $("#orderList").datagrid("loadData", []);
-            }
+            });
+
         });
 
-        $("#product_type").combobox({
-            onChange: function (newValue, oldValue) {
-                //将查询订单的datagrid清空，否则会出现产品类别和订单信息对应不上的情况
-                $("#orderList").datagrid("loadData", []);
-            }
-        });
+    </script>
+}
+<script type="text/javascript">
+    $(function () {
+        $("#dg_detail").datagrid({
+            width: 1200,
+            loadMsg: "@Html.Lang("loading")",
+            rownumbers: true,
+            singleSelect: true,
+            fitColumns: true,
+            //showFooter: true,
+            columns: [columnsArray],
+            toolbar: toolBarArray,
+            onClickRow: onClickRow
+        });        
 
         $("#delivery_unit").combogrid({
-            idField: "id",            
+            idField: "id",
             textField: "deliveryUnit",
             panelWidth: 520,
             required: 'true',
             nowrap: false,
             columns: [[
-                        {field: 'deliveryUnit', title: '收货客户', width: 140 },
-        				{field: 'attn', title: 'attn', width: 60 },
-                        {field: 'phone', title: '电话', width: 100 },
-        				{field: 'addr', title: '收货地址', width: 200 }
+                        { field: 'deliveryUnit', title: '收货客户', width: 140 },
+        				{ field: 'attn', title: 'attn', width: 60 },
+                        { field: 'phone', title: '电话', width: 100 },
+        				{ field: 'addr', title: '收货地址', width: 200 }
             ]]
         });
 
@@ -139,113 +436,11 @@
             }
         });
 
-        $("#orderList").datagrid({
-            width: 1280,            
-            rownumbers: true,            
-            checkOnSelect: true,
-            selectOnCheck: true,
-            fitColumns: true,
-            columns: [[
-                { field: 'ck', checkbox: true },
-                { field: 'orderNumber', title: '订单编号', width: 140 },
-                {
-                    field: 'orderDate', title: '订单日期', width: 80,
-                    formatter: function (value, row, index) {
-                        var date = eval('new ' + eval(value).source);
-                        return date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate();
-                    }
-                },
-                { field: 'orderEntry', title: '订单行号', width: 60 },
-                { field: 'itemName', title: '品名', width: 120 },
-                { field: 'itemModel', title: '型号', width: 180 },
-                { field: 'qty', title: '订单数量', width: 80, align: 'right' },
-                { field: 'relateQty', title: '关联数量', width: 80, align: 'right' },
-                {
-                    field: 'canApplyQty', title: '可申请数量', width: 80, align: 'right',
-                    formatter: function (value, row, index) {
-                        return row.qty - row.relateQty;
-                    }
-                },
-                { field: 'stockQty', title: '库存数量', width: 80, align: 'right' },
-                { field: 'unitName', title: '单位', width: 60 },
-                { field: 'empName', title: '营业员', width: 100 },
-                { field: 'saleStyle', title: '销售方式', width: 100 },
-                { field: 'productType', title: '产品类别', width: 100, align: 'center' },
-                { field: 'unitNumber', hidden: true },
-                { field: 'orderId', hidden: true },
-                { field: 'itemNumber', hidden: true }
-            ]]
-        });
-
-        $("#checkBt").on("click", function () {
-            $("#orderList").datagrid("loading");
-            $.post("@Url.Content("~/CHSP/CheckOrderStockInfo")", {
-                customerNumber: $("#customer_no").combogrid("getValue"),
-                saleStyle: saleStyle,
-                productType: $("#product_type").combobox("getValue"),
-                fromDate: $("#fromDate").datebox("getValue"),
-                toDate: $("#toDate").datebox("getValue"),
-                orderNumber: $("#order_no").textbox("getValue"),
-                productModel: $("#pro_model").textbox("getValue")
-            }, function (data) {
-                $("#orderList").datagrid("loaded");
-                if (data.length == 0) {
-                    showTip("查询不到符合条件的单据信息");
-                } else {
-                    $("#orderList").datagrid("loadData", data);
-                }
-                
-            });
-        });
-
         $("#order_div").click(function () {
             endEditing();
         });
-
     });
 
-    function addCHItem() {
-        var nowRows = $("#dg_detail").datagrid("getRows");
-        var toAddeds=$("#orderList").datagrid("getChecked");
-        
-        var isEmpty = nowRows.length == 0;//当前出货信息为空
-        for (var i = 0; i < toAddeds.length; i++) {
-            //判断是否在列表中已存在
-            //for (var j = 0; j < nowRows.length; j++) {
-            //    if (toAddeds[i].orderId == nowRows[j].order_id && toAddeds[i].orderEntry == nowRows[j].order_entry_no) {
-            //        showTip("#" + toAddeds[i].orderNumber + ":" + toAddeds[i].orderEntry + "#已存在，不能重复添加");
-            //        return;
-            //    }
-            //}
-
-            if (isEmpty) {
-                saleStyle = toAddeds[i].saleStyle;
-                //设置不能再选择
-                $("#customer_no").combogrid("disable");
-                $("#product_type").combobox("disable");
-            } else {
-                if (toAddeds[i].saleStyle != saleStyle) {
-                    showTip("同一张出货申请的销售方式必须保持一致，列表中的销售方式是:" + saleStyle + ";#" + toAddeds[i].orderNumber + "#的销售方式是:" + toAddeds[i].saleStyle);
-                    return;
-                }
-            }
-            $("#dg_detail").datagrid("appendRow", {
-                order_no: toAddeds[i].orderNumber,
-                item_name: toAddeds[i].itemName,
-                item_model: toAddeds[i].itemModel,
-                unit_name: toAddeds[i].unitName,
-                order_qty: toAddeds[i].qty,
-                stock_qty: toAddeds[i].stockQty,
-                can_apply_qty: toAddeds[i].qty - toAddeds[i].relateQty,
-                order_entry_no: toAddeds[i].orderEntry,
-                unit_no: toAddeds[i].unitNumber,
-                order_id: toAddeds[i].orderId,
-                item_no: toAddeds[i].itemNumber,
-                item_id:toAddeds[i].itemID
-            });
-        }
-        $("#dlg_add").dialog("close");
-    }
 
     var editIndex = undefined;
     function endEditing() {
@@ -259,7 +454,7 @@
         }
     }
 
-    function onClickRow(index) {        
+    function onClickRow(index) {
         if (editIndex != index) {
             if (endEditing()) {
                 $('#dg_detail').datagrid('selectRow', index)
@@ -286,112 +481,10 @@
     }
 </script>
 
-<script>
-
-    $(function () {
-        //保存表单
-        $("#saveAllBut").on("click", function () {
-            if (validateBeforeSave()) {
-                $.messager.progress();
-                $('#order_form').form('submit', {
-                    url: '@Url.Content("~/Saler/SaveBill")',
-                    onSubmit: function (param) {
-                        console.log($("#dg_detail").datagrid("getRows"));
-                        param.ch_bill_details = JSON.stringify($("#dg_detail").datagrid("getRows"));
-                        param.product_type = $("#product_type").combobox("getValue");
-                        param.delivery_unit = $("#delivery_unit").combobox("getText");
-                        param.customer_no = $("#customer_no").combogrid("getValue");
-                        param.sale_style = saleStyle;
-                        return true;
-                    },
-                    success: function (data) {
-                        var result = eval('(' + data + ')');
-                        if (result.suc) {
-                            showTip("@Html.Lang("suc_save")");
-                        } else {
-                            showTip("@Html.Lang("failure_save"):" + result.msg);
-                        }
-                    }
-                });
-                $.messager.progress("close");
-            }
-        });
-
-        $("#submitApply").click(function () {
-            $("#submitApply").linkbutton('disable');
-            $('#saveAllBut').linkbutton('disable');
-            $.post("@Url.Content("~/Saler/BeginApply")", { sysNo: $("#sys_no").textbox("getValue") },
-            function (data) {
-                if (data.suc) {
-                    showTip(data.msg);
-                    setTimeout('window.location.href="@Url.Content("~/Saler/CheckBillList?billType=CH")"', 1000);
-                } else {
-                    showTip(data.msg);
-                    $("#submitApply").linkbutton('enable');
-                    $('#saveAllBut').linkbutton('enable');
-                }
-            });
-        });
-
-    });   
-
-    //保存之前先验证
-    function validateBeforeSave() {
-        if (!$('#order_form').form('validate')) {
-            return false;
-        }
-        var rows = $("#dg_detail").datagrid("getRows");
-        if (rows.length == 0) {
-            showTip("保存失败：出货信息明细必须至少有一条数据");
-            return false;
-        }
-        //var modelStockQty = [];
-        var orderCanApplyQty = [];
-        var exceedQty = [];
-        var idx = -1;
-        for (var i = 0;i<rows.length;i++){
-            if (rows[i].apply_qty=="" || isNaN(rows[i].apply_qty)) {
-                showTip("保存失败：申请数量不能为空，行号：" + (i + 1));
-                return false;
-            }
-            if (parseInt(rows[i].apply_qty) > parseInt(rows[i].can_apply_qty)) {
-                showTip("保存失败：申请数量不能大于可出数量，行号：" + (i + 1));
-                return false;
-            }
-            //验证库存数量的
-            //idx = modelStockQty.findIndex(function (m) { return m.itemNo == rows[i].item_no; });
-            //if (idx >= 0) {
-            //    modelStockQty[idx].qty = parseInt(modelStockQty[idx].qty) + parseInt(rows[i].apply_qty);
-            //} else {
-            //    modelStockQty.push({ itemNo: rows[i].item_no, qty: parseInt(rows[i].apply_qty), stockQty: parseInt(rows[i].stock_qty) });
-            //}
-            //验证可申请数量的
-            idx = orderCanApplyQty.findIndex(function (m) { return m.orderNo == rows[i].order_no && m.orderEntryNo == rows[i].order_entry_no; });
-            if (idx >= 0) {
-                orderCanApplyQty[idx].qty = parseInt(orderCanApplyQty[idx].qty) + parseInt(rows[i].apply_qty);
-            } else {
-                orderCanApplyQty.push({ orderNo: rows[i].order_no, orderEntryNo: rows[i].order_entry_no, qty: parseInt(rows[i].apply_qty), canApplyQty: parseInt(rows[i].can_apply_qty) });
-            }
-        }
-        //exceedQty = modelStockQty.filter(function (v) { return v.qty > v.stockQty; });
-        //if (exceedQty.length > 0) {
-        //    showTip("保存失败，产品代码#" + exceedQty[0].itemNo + "#申请数量(" + exceedQty[0].qty + ")不能大于库存数量(" + exceedQty[0].stockQty + ")");
-        //    return false;
-        //}
-        exceedQty = orderCanApplyQty.filter(function (v) { return v.qty > v.canApplyQty; });
-        if (exceedQty.length > 0) {
-            showTip("保存失败，订单号#" + exceedQty[0].orderNo + "，行号#" + exceedQty[0].orderEntryNo + "#申请数量(" + exceedQty[0].qty + ")不能大于可申请数量(" + exceedQty[0].canApplyQty + ")");
-            return false;
-        }
-
-        return true;
-    }
-
-</script>
 
 @if (!string.IsNullOrEmpty(bill.sale_style)) {
     <script type="text/javascript">
-        $(function(){
+        $(function () {
             saleStyle = "@bill.sale_style";
             $("#customer_no").combogrid("disable");
             $("#product_type").combobox("disable");
@@ -401,14 +494,14 @@
                 $("#delivery_unit").combogrid('grid').datagrid("loadData", data);
             });
         });
-        
+
     </script>
 }
 
 <form id="order_form" method="post">
     <div id="order_div" class="easyui-panel" title="新增出货申请" style="width: 840px; padding: 10px; background: #fafafa;">
         <div>
-            <table border="0" cellpadding="1" cellspacing="3" width="800">
+            <table border="0" cellpadding="1" cellspacing="3" width="800" id="tb1">
                 <tr>
                     <td>
                         系统流水号:
@@ -444,7 +537,7 @@
                         营业员:
                     </td>
                     <td>
-                        <input class="easyui-textbox" name="clerk_name" id="clerk_name" style="width: 140px" value="@bill.clerk_name"/>
+                        <input class="easyui-textbox" name="clerk_name" id="clerk_name" style="width: 140px" value="@bill.clerk_name" />
                     </td>
                     <td>
                         营业员电话:
@@ -472,13 +565,19 @@
             <div id="detail_div" class="easyui-panel" title="出货信息明细" style="width: 815px; height: 300px">
                 <table id="dg_detail">
                     @foreach (var l in bills.Where(b => b.item_no != null)) {
-                        <tr>                            
+                        <tr>
+                            @if (step > 0) {
+                                <td>@l.detail_id</td>
+                            }
                             <td>@l.order_no</td>
                             <td>@l.item_name</td>
                             <td>@l.item_model</td>
                             <td>@l.unit_name</td>
                             <td>@l.order_qty</td>
                             <td>@l.apply_qty</td>
+                            @if (step > 0) {
+                                <td>@l.real_qty</td>
+                            }
                             <td>@l.customer_po</td>
                             <td>@l.customer_pn</td>
                             <td>@l.entry_comment</td>
@@ -493,7 +592,7 @@
                     }
                 </table>
             </div>
-            <br/>
+            <br />
             <table border="0" cellpadding="1" cellspacing="3" width="800">
                 <tr>
                     <td>
@@ -526,18 +625,25 @@
             </table>
         </div>
 
+        @if (step == 0) { 
         <div align="center">
-            <a id="saveAllBut" href="#" class="easyui-linkbutton" iconcls='icon-save' style="margin: 10px 20px;">@Html.Lang("save_form")</a>                    
-            <a id="submitApply" href="#" class="easyui-linkbutton" iconcls='icon-document' style="margin: 10px 20px;">@Html.Lang("submit_apply")</a>                    
+            <a id="saveAllBut" href="#" class="easyui-linkbutton" iconcls='icon-save' style="margin: 10px 20px;">@Html.Lang("save_form")</a>
+            <a id="submitApply" href="#" class="easyui-linkbutton" iconcls='icon-document' style="margin: 10px 20px;">@Html.Lang("submit_apply")</a>
         </div>
-
+        }
+        else {
+            <div align="center">
+                <a id="updateBut" href="#" class="easyui-linkbutton" iconcls='icon-save' style="margin: 10px 20px;">确认保存</a>
+            </div>
+        }
     </div>
 </form>
 
+@if (step == 0) { 
 @*弹出的新增对话框*@
 <div id="dlg_add" class="easyui-dialog" style="width: 800px; height:500px;" closed="true" buttons="#dlg_add_buttons" modal="true" title="新增出货条目">
     <div class="easyui-layout" data-options="fit:true">
-        <div data-options="region:'north',collapsed:false,split:true" style="height: 60px; background: #fafafa; padding: 1px;">            
+        <div data-options="region:'north',collapsed:false,split:true" style="height: 60px; background: #fafafa; padding: 1px;">
             <table cellpadding="0" cellspacing="2">
                 <tr>
                     <td>
@@ -558,7 +664,7 @@
                 </tr>
                 <tr>
                     <td>
-                        <input id="fromDate" class="easyui-datebox" name="from_date" style="width: 90px" value="@(DateTime.Now.Year+"-01-01")"/>
+                        <input id="fromDate" class="easyui-datebox" name="from_date" style="width: 90px" value="@(DateTime.Now.Year+"-01-01")" />
                     </td>
                     <td>
                         <input id="toDate" class="easyui-datebox" name="to_date" style="width: 90px" value="@(DateTime.Now.ToString("yyyy-MM-dd"))" />
@@ -573,7 +679,7 @@
                         <a id="checkBt" href="#" class="easyui-linkbutton" data-options="iconCls:'icon-search'">@Html.Lang("search")</a>
                     </td>
                 </tr>
-            </table>            
+            </table>
         </div>
         <div data-options="region:'center'">
             <table id="orderList"></table>
@@ -584,3 +690,4 @@
     <a href="#" class="easyui-linkbutton" iconcls="icon-ok" onclick="addCHItem()">确定</a>
     <a href="#" class="easyui-linkbutton" iconcls="icon-cancel" onclick="javascript: $('#dlg_add').dialog('close')">@Html.Lang("cancel")</a>
 </div>
+}

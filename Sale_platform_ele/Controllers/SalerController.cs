@@ -53,7 +53,7 @@ namespace Sale_platform_ele.Controllers
             string sysNo=fc.Get("sys_no");
             SetBillByType(new BillUtils().GetBillEnType(sysNo));
 
-            string result = bill.SaveBill(fc, currentUser.userId);
+            string result = bill.SaveBill(fc, currentUser);
             Wlog("保存单据，result:" + result, sysNo, string.IsNullOrEmpty(result) ? 0 : -100);
 
             if (!string.IsNullOrEmpty(result)) {
@@ -106,7 +106,7 @@ namespace Sale_platform_ele.Controllers
 
         public JsonResult ApplyHasBegan(string sysNo)
         {
-            return Json(new ResultModel() { suc=new ApplySv().ApplyHasBegan(sysNo) });
+            return Json(new ResultModel() { suc = new ApplySv().ApplyHasBegan(sysNo) });
         }
 
         [SessionTimeOutFilter]
@@ -116,6 +116,7 @@ namespace Sale_platform_ele.Controllers
 
             SetBillBySysNo(sysNo);
             ViewData["bill"] = bill.GetBill(stepVersion);
+            ViewData["step"] = stepVersion;
             if (new ApplySv().ApplyHasBegan(sysNo)) {
                 ViewData["blockInfo"] = new ApplySv(sysNo).GetBlockInfo();
             }
@@ -129,7 +130,7 @@ namespace Sale_platform_ele.Controllers
 
             SetBillBySysNo(sysNo);
             ViewData["bill"] = bill.GetBill(0);
-            var hasSubmited=new ApplySv().ApplyHasBegan(sysNo);
+            var hasSubmited = new ApplySv().ApplyHasBegan(sysNo);
             if (hasSubmited) {
                 ViewData["blockInfo"] = new ApplySv(sysNo).GetBlockInfo();
             }

@@ -2,7 +2,12 @@
 @{
     Sale_eb_bill bill = ViewData["bill"] as Sale_eb_bill;
 }
-
+<style type="text/css">
+    .ck_label{
+        margin-right:8px;
+        cursor:pointer;
+    }
+</style>
 <script>
     $(function () {
 
@@ -26,7 +31,7 @@
                         return;
                     }
                     if (q != "") {
-                        $.post("@Url.Content("~/Items/GetProducts")", { q: q,account:busName },
+                        $.post("@Url.Content("~/Items/GetProducts")", { q: q, account: busName },
                             function (data) {
                                 $("#product_no").combogrid('grid').datagrid('loadData', data);
                                 $("#product_no").combogrid('setText', q);
@@ -143,7 +148,12 @@
             });
         });
 
-        $("#order_div input").textbox({ width: 140 });
+        $(".ck_label").on("click", function () {
+            $("input[name='bl_project'][value='" + $.trim($(this).html()) + "']").trigger("click");
+        });
+
+        $.map("@bill.bl_project".split(","), function (item) { $("input[name='bl_project'][value='" + item + "']").attr("checked", true); });
+        $("#order_div input:not(:checkbox)").textbox({ width: 140 });
         $("#order_div").css("visibility", "visible");
     });
 </script>
@@ -306,6 +316,18 @@
                     </td>
                 </tr>
             </table>
+        </div>
+
+        <div>
+            <fieldset>
+                <legend>备料项目</legend>
+                <div style="padding:8px 0;">
+                    @foreach (var p in new string[] { "全套物料", "单机成品", "包装盒", "外箱", "内箱", "底贴", "说明书", "吸塑", "其他" }) {
+                        <input type="checkbox" name="bl_project" value="@p" /><span class="ck_label">@p</span>
+                    }
+                    <input class="easyui-textbox" name="bl_project_other" value="@bill.bl_project_other" />
+                </div>
+            </fieldset>
         </div>
 
         <div align="center">
