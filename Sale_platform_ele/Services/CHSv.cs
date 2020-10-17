@@ -280,7 +280,7 @@ namespace Sale_platform_ele.Services
                                        where
                                        cd.order_no == d.order_no
                                        && cd.order_entry_no == d.order_entry_no
-                                       && (a.success == null || a.success == true)
+                                       && a.success == true
                                        && c.k3_audit2_date == null
                                        && c.sys_no != bill.sys_no
                                        select c.sys_no);
@@ -345,12 +345,13 @@ namespace Sale_platform_ele.Services
 
         public override void DoWhenFinishAudit(bool isPass)
         {
-            if (isPass && DateTime.Now.Hour > 18 || DateTime.Now.Hour < 8) {
-                //自动生成
-
-                //自动一审
-
+            
+            //自动生成与自动一审
+            var result = db.ExecuteQuery<ResultModel>("exec [192.168.100.213].[AIS20060821075019].[dbo].[sr_GenSR4StockOutBill] @sysNum = {0}", bill.sys_no).FirstOrDefault();
+            if (!result.suc) {
+                throw new Exception(result.msg);
             }
+            
         }
 
         /// <summary>

@@ -742,16 +742,23 @@ namespace Sale_platform_ele.Services
 
             if (!isPass || isLastStep) {
                 ap.success = isPass;
-                ap.finish_date = DateTime.Now;
-          
-                //审批完成之后需要做的事情
-                bill.DoWhenFinishAudit(isPass);
+                ap.finish_date = DateTime.Now;          
             }
             try {
                 db.SubmitChanges();
             }
             catch (Exception ex) {
                 return ex.Message;
+            }
+
+            if (!isPass || isLastStep) {
+                //审批完成之后需要做的事情
+                try {
+                    bill.DoWhenFinishAudit(isPass);
+                }
+                catch (Exception ex) {
+                    return "审批成功；但发生以下错误:" + ex.Message + ";可尝试收回后重试，如果还是出现，请联系管理员处理";
+                }
             }
 
             SendNotificationEmail();

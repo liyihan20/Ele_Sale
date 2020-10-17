@@ -1,6 +1,7 @@
 ﻿@using Sale_platform_ele.Models;
 @{
     Sale_eo_bill order = (Sale_eo_bill)ViewData["bill"];
+    int step = ViewData["step"] == null ? 0 : (int)ViewData["step"];
 }
 
 <script type="text/javascript" src="@Url.Content("~/Scripts/json2.js")"></script>
@@ -285,6 +286,7 @@
 
 </script>
 
+@if (step == 0) { 
 <script type="text/javascript">
     $(function () {
         //提交申请按钮
@@ -305,7 +307,7 @@
         });
     });
 </script>
-
+}
 
 <div class="easyui-layout" data-options="fit:true" id="order_div" style="visibility:hidden">
     <div data-options="region:'center'">
@@ -403,7 +405,9 @@
                 <br />
                 <div align="center">
                     <a id="saveAllBut" href="#" class="easyui-linkbutton" iconcls='icon-save' style="margin: 10px 20px;">@Html.Lang("save_form")</a>
-                    <a id="submitApply" href="#" class="easyui-linkbutton" iconcls='icon-document' style="margin: 10px 20px;">@Html.Lang("submit_apply")</a>
+                    @if (step == 0) { 
+                        <a id="submitApply" href="#" class="easyui-linkbutton" iconcls='icon-document' style="margin: 10px 20px;">@Html.Lang("submit_apply")</a>
+                    }
                 </div>
             </div>
         </form>

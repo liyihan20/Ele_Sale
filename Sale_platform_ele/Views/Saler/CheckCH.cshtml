@@ -1,7 +1,5 @@
 ﻿@using Sale_platform_ele.Models;
 @{
-    //bool hasSubmited = (bool)ViewData["hasSubmited"];
-    //bool hasFinished = (bool)ViewData["hasFinished"];
     List<vwChBill> bills = (List<vwChBill>)ViewData["bill"];
     var bill = bills.First();
 }
@@ -13,7 +11,6 @@
             rownumbers: true,
             singleSelect: true,
             fitColumns: true,
-            //showFooter: true,
             columns: [[
                 { field: 'order_no', title: '订单编号', width: 140 },
                 { field: 'item_name', title: '品名', width: 120 },
@@ -146,6 +143,7 @@
                             <td></td>
                             <td>@bills.Sum(b=>b.order_qty)</td>
                             <td>@bills.Sum(b=>b.apply_qty)</td>
+                            <td>@bills.Sum(b=>b.real_qty??0)</td>
                             <td></td>
                             <td>@bills.Sum(b => b.total_price ?? 0).ToString("###,##0.####")</td>
                             <td></td>

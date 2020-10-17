@@ -83,13 +83,13 @@ namespace Sale_platform_ele.Services
                 return "营业员请输入厂牌或姓名然后按回车键搜索后，在列表中选择";
             }
 
-            bill.applier_id = user.userId;
-            bill.applier_name = user.realName;
-            bill.apply_time = DateTime.Now;
-
             try {
                 var existedBill = db.Sale_eo_bill.Where(s => s.sys_no == bill.sys_no).FirstOrDefault();
                 if (existedBill != null) {
+                    bill.applier_id = existedBill.applier_id;
+                    bill.applier_name = existedBill.applier_name;
+                    bill.apply_time = existedBill.apply_time;
+
                     //备份
                     JsonSerializerSettings js = new JsonSerializerSettings() { ReferenceLoopHandling = ReferenceLoopHandling.Ignore };
                     BackupData bd = new BackupData();
@@ -103,6 +103,11 @@ namespace Sale_platform_ele.Services
                     //删除
                     db.Sale_eo_bill_detail.DeleteAllOnSubmit(existedBill.Sale_eo_bill_detail);
                     db.Sale_eo_bill.DeleteOnSubmit(existedBill);
+                }
+                else {
+                    bill.applier_id = user.userId;
+                    bill.applier_name = user.realName;
+                    bill.apply_time = DateTime.Now;
                 }
 
                 db.Sale_eo_bill.InsertOnSubmit(bill);
