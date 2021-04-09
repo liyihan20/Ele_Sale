@@ -409,7 +409,7 @@ else {
             columns: [columnsArray],
             toolbar: toolBarArray,
             onClickRow: onClickRow
-        });        
+        });
 
         $("#delivery_unit").combogrid({
             idField: "id",
@@ -517,6 +517,7 @@ else {
                                data-options="textField:'value',valueField:'value',panelHeight:'auto',panelWidth:'220', required:true,editable:false,
                                            data:[
                                            {value:'FPC/软硬结合板'},{value:'FPC样品/FPC开模'},{value:'PCB/HDI'},{value:'PCB样品/HDI样品/PCB开模/HDI开模'}
+                                            ,{value:'PCBa/PCBa样品/PCBa开模'}
                                            ]" value="@bill.product_type" />
                     </td>
                     <td>

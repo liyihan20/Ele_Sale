@@ -172,6 +172,14 @@
                     <input class="easyui-textbox" style="width:120px" value="@order.produce_dep_name" />
                 </td>
                 <td>
+                    是否Total Solution:
+                </td>
+                <td>
+                    <input class="easyui-textbox" style="width:120px" value="@order.is_total_solution" />
+                </td>
+            </tr>
+            <tr>
+                <td>
                     @Html.Lang("biller"):
                 </td>
                 <td>
@@ -246,6 +254,26 @@
                 </td>
                 <td>
                     <input class="easyui-textbox" style="width:120px" value="@order.group2" />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    业务员3:
+                </td>
+                <td>
+                    <input class="easyui-textbox" style="width: 120px" value="@order.clerk3_name" />
+                </td>
+                <td>
+                    比例3:
+                </td>
+                <td>
+                    <input class="easyui-textbox" style="width: 120px" value="@(order.percent3==null?0:(int)order.percent3)" />
+                </td>
+                <td>
+                    组别3:
+                </td>
+                <td>
+                    <input class="easyui-textbox" style="width:120px" value="@order.group3" />
                 </td>
             </tr>
             <tr>

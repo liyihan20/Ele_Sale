@@ -134,24 +134,24 @@
             <th style="width:7%;">
                 件数 
             </th>
-            <th style="width:13%;">
+            @*<th style="width:13%;">
                 装箱规格尺寸/MM 
             </th>
             <th style="width:7%;">
                 总毛重/KG 
-            </th>
-            <th style="width:10%;">
+            </th>*@
+            <th style="width:20%;">
                 客户P/O 
             </th>
-            <th style="width:10%;">
+            <th style="width:20%;">
                 客户P/N 
             </th>
-            <th style="width:10%;">
+            <th style="width:14%;">
                 备注 
             </th>
         </tr>
         <tr>
-            <td colspan="10">
+            <td colspan="8">
                 <hr style="margin-top:-4px;" />
             </td>
         </tr>  
@@ -187,16 +187,16 @@
                     <td style="text-align:center;">
                         @(list[i].packs == null ? "" : ((int)list[i].packs).ToString("N0"))
                     </td>
-                    <td>
+                    @*<td>
                         @list[i].box_size
                     </td>
                     <td style="text-align:center;">
                         @((list[i].total_gross_weight??0)==0?"":list[i].total_gross_weight.ToString())
-                    </td>
-                    <td>
+                    </td>*@
+                    <td style="text-align:center">
                         @list[i].customer_po
                     </td>
-                    <td>
+                    <td style="text-align:center">
                         @list[i].customer_pn
                     </td>
                     <td>
@@ -206,14 +206,14 @@
         }
             else {
                 <tr>
-                    <td colspan="10">
+                    <td colspan="8">
                         &nbsp;
                     </td>
                 </tr>
             }
         }
         <tr>
-            <td colspan="10">
+            <td colspan="8">
                 <hr style="margin-bottom:-4px;" />
             </td>
         </tr>  
@@ -221,7 +221,7 @@
             <td style="text-align:right;">
                 TOTAL:
             </td>
-            <td style="text-align:center;">
+            <td colspan="2" style="text-align:center;">
                 @totalQtyInPage.ToString("N0")
             </td>
             <td></td>

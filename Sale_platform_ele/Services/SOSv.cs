@@ -162,7 +162,10 @@ namespace Sale_platform_ele.Services
                 order.clerk2_no = "";
                 order.clerk2_name = "";
             }
-
+            if (string.IsNullOrEmpty(order.clerk3_name) || string.IsNullOrEmpty(order.clerk3_no)) {
+                order.clerk3_no = "";
+                order.clerk3_name = "";
+            }
             try {
                 var existed = db.Order.Where(o => o.sys_no == order.sys_no);
                 order.update_user_id = user.userId;
@@ -228,6 +231,9 @@ namespace Sale_platform_ele.Services
             if (string.IsNullOrEmpty(order.clerk2_no) && !string.IsNullOrEmpty(order.clerk2_name)) {
                 return "业务员2请输入厂牌或姓名后按回车后在列表中选择";
             }
+            if (string.IsNullOrEmpty(order.clerk3_no) && !string.IsNullOrEmpty(order.clerk3_name)) {
+                return "业务员3请输入厂牌或姓名后按回车后在列表中选择";
+            }
 
             bool isForeignOrder = !order.currency_no.Equals("RMB");
             if (isForeignOrder) {
@@ -264,8 +270,8 @@ namespace Sale_platform_ele.Services
                 }
             }
 
-            if (Math.Abs((order.percent1 ?? 0m) + (order.percent2 ?? 0m) - 100m) > 0.000001m) {
-                return "比例1和比例2之和必须等于100！";
+            if (Math.Abs((order.percent1 ?? 0m) + (order.percent2 ?? 0m) + (order.percent3 ?? 0m) - 100m) > 0.000001m) {
+                return "业务员比例之和必须等于100！";
             }
             var taxRateNum = 17;
             if (DateTime.Now > DateTime.Parse("2019-04-01")) {

@@ -37,6 +37,23 @@
                         </ul>
                     </li>
                 }
+                if (Array.IndexOf(powers, "total_solution") != -1) {
+                    <li>
+                        <span>Total Solution</span>
+                        <ul>
+                            @{
+                                string optoUrl = Uri.EscapeDataString("Saler/CreateSaleOrder?account=光电总部");
+                                string optorsUrl = Uri.EscapeDataString("Saler/CreateSaleOrder?account=光电仁寿");
+                                string semiUrl = Uri.EscapeDataString("Saler/CreateSaleOrder");
+                            }
+                            @*<li id="~/Account/JumpToOtherCrm?company=op&url=@optoUrl"><span>光电销售订单</span> </li>
+                            <li id="~/Account/JumpToOtherCrm?company=op&url=@optorsUrl"><span>光电仁寿订单</span> </li>*@
+                            <li id="~/Account/JumpToOtherCrm?company=semi&url=@semiUrl"><span>半导体订单</span></li>
+                            <li id="~/Saler/CreateBill?billType=SO"><span>电子销售订单</span> </li>
+                            <li id="~/Saler/CreateBill?billType=EO"><span>仪器/工业销售订单</span></li>
+                        </ul>
+                    </li>
+                }
             }
             @if (copName.Contains("仪器")) {
 

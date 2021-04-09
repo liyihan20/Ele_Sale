@@ -793,10 +793,9 @@ namespace Sale_platform_ele.Services
 
             if (ap.success != null) {
                 ap.success = null;
-                ap.finish_date = null;                
+                ap.finish_date = null;
             }
             
-
             db.SubmitChanges();
 
         }

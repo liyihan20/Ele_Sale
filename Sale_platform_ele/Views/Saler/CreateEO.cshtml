@@ -249,10 +249,14 @@
 
 
         //设置一些远程combo的值
-
         $("#clerk_no").combobox("setValue", "@order.clerk_no");
         $("#clerk_no").combobox("setText", "@order.clerk_name");
         $("#order_div").css("visibility", "visible");
+
+        if ("工业" == account) {
+            $("#is_total_solution").combobox("setValue", "否");
+            $("#is_total_solution").combobox("readonly");
+        }
 
     }
 
@@ -330,6 +334,16 @@
                                            data:[
                                            {value:'04',name:'生产单'},{value:'02',name:'样品单'}
                                            ]" value="@order.order_type_no" />
+                        </td>
+                        <td>
+                            是否Total Solution:
+                        </td>
+                        <td>
+                            <input class="easyui-combobox" name="is_total_solution" id="is_total_solution" style="width:140px"
+                                   data-options="textField:'name',valueField:'name',panelHeight:'auto', required:true,editable:false,
+                                           data:[
+                                           {name:'是'},{name:'否'}
+                                           ]" value="@order.is_total_solution" />
                         </td>
                     </tr>
                     <tr>

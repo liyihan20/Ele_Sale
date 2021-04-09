@@ -50,7 +50,7 @@ namespace Sale_platform_ele.Controllers
 
         public JsonResult SaveBill(FormCollection fc)
         {
-            string sysNo=fc.Get("sys_no");
+            string sysNo = fc.Get("sys_no");
             SetBillByType(new BillUtils().GetBillEnType(sysNo));
 
             string result = bill.SaveBill(fc, currentUser);

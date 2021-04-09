@@ -106,7 +106,7 @@ namespace Sale_platform_ele.Services
                         op_date = DateTime.Now,
                         op_name = user.realName
                     };
-                    db.CustomerDeliveryInfo.InsertOnSubmit(info);                    
+                    db.CustomerDeliveryInfo.InsertOnSubmit(info);
                 }
 
                 var existsed = db.ChBill.Where(c => c.sys_no == bill.sys_no).ToList();
@@ -119,8 +119,7 @@ namespace Sale_platform_ele.Services
                     bd.main_data = SomeUtils.ModelToString<ChBill>(existsed.First());
                     bd.secondary_data = SomeUtils.ModelsToString<ChBillDetail>(existsed.First().ChBillDetail.ToList());
                     db.BackupData.InsertOnSubmit(bd);
-
-
+                    
                     //删掉旧单
                     db.ChBillDetail.DeleteAllOnSubmit(existsed.First().ChBillDetail);
                     db.ChBill.DeleteAllOnSubmit(existsed);
@@ -155,15 +154,7 @@ namespace Sale_platform_ele.Services
             td = td.AddDays(1);
 
             //先检查出货组权限
-            List<string> ptypes = new List<string>();
-            if (new UA(userId).HasGotPower("CH_FPC_Team")) {
-                ptypes.Add("FPC/软硬结合板");
-                ptypes.Add("FPC样品/FPC开模");
-            }
-            if (new UA(userId).HasGotPower("CH_PCB_Team")) {
-                ptypes.Add("PCB/HDI");
-                ptypes.Add("PCB样品/HDI样品/PCB开模/HDI开模");
-            }
+            List<string> ptypes = GetCHTypes(userId);
 
             var result = (from o in db.ChBill
                           from d in o.ChBillDetail
@@ -298,14 +289,15 @@ namespace Sale_platform_ele.Services
                                       d.order_no,
                                       d.order_entry_no
                                   }
-                                      into g
-                                      select new
-                                      {
-                                          g.Key,
-                                          applyQtySum = g.Sum(s => s.real_qty)
-                                      }).ToList();
+                                  into g
+                                  select new
+                                  {
+                                      g.Key,
+                                      applyQtySum = g.Sum(s => s.real_qty)
+                                  }).ToList();
+
             foreach (var h in hasApplyQtySum) {
-                var qtyEnough = (from v in db.vwK3OrderInfo                                 
+                var qtyEnough = (from v in db.vwK3OrderInfo
                                  where v.orderId == h.Key.order_id
                                  && v.orderEntry == h.Key.order_entry_no
                                  && (v.qty - v.relateQty) < h.applyQtySum
@@ -345,11 +337,12 @@ namespace Sale_platform_ele.Services
 
         public override void DoWhenFinishAudit(bool isPass)
         {
-            
-            //自动生成与自动一审
-            var result = db.ExecuteQuery<ResultModel>("exec [192.168.100.213].[AIS20060821075019].[dbo].[sr_GenSR4StockOutBill] @sysNum = {0}", bill.sys_no).FirstOrDefault();
-            if (!result.suc) {
-                throw new Exception(result.msg);
+            if (isPass) {
+                //自动生成与自动一审
+                var result = db.ExecuteQuery<ResultModel>("exec [192.168.100.213].[AIS20060821075019].[dbo].[sr_GenSR4StockOutBill] @sysNum = {0}", bill.sys_no).FirstOrDefault();
+                if (!result.suc) {
+                    throw new Exception(result.msg);
+                }
             }
             
         }
@@ -380,7 +373,7 @@ namespace Sale_platform_ele.Services
             string[] colName = new string[] { "审核结果","流水号","下单日期","制单人","产品类别","客户编码","客户名称","营业员","营业员电话",
                                             "备注","收货单位","ATTN","收货电话","收货地址","产品代码","产品名称","规格型号","单位","订单数量",
                                             "申请数量","实出数量","客户P/O","客户P/N","行备注","订单号","订单行号","出库单号","出库日期",
-                                            "快递单号","叉板数","件数","周期"};
+                                            "快递单号","叉板数","件数","周期" };
 
             //設置excel文件名和sheet名
             XlsDocument xls = new XlsDocument();
@@ -479,15 +472,7 @@ namespace Sale_platform_ele.Services
             td = td.AddDays(1);
 
             //先检查出货组权限
-            List<string> ptypes = new List<string>();
-            if (new UA(userId).HasGotPower("CH_FPC_Team")) {
-                ptypes.Add("FPC/软硬结合板");
-                ptypes.Add("FPC样品/FPC开模");
-            }
-            if (new UA(userId).HasGotPower("CH_PCB_Team")) {
-                ptypes.Add("PCB/HDI");
-                ptypes.Add("PCB样品/HDI样品/PCB开模/HDI开模");
-            }
+            List<string> ptypes = GetCHTypes(userId);
 
             var result = (from o in db.ChBill
                           from d in o.ChBillDetail
@@ -583,27 +568,7 @@ namespace Sale_platform_ele.Services
                           orderby v.agency, v.clerkId
                           select v).ToList();
 
-            return result;
-
-            //return (from c in db.ClerkAndCustomer
-            //        from d in db.Department
-            //        where c.User.department_no == d.dep_no
-            //        && (
-            //        c.customer_name.Contains(searchValue)
-            //        || c.customer_number.Contains(searchValue)
-            //        || c.User.real_name.Contains(searchValue)
-            //        || c.User.username.Contains(searchValue)
-            //        || d.name.Contains(searchValue))
-            //        select new ClerkAndCustomerModel()
-            //        {
-            //            id = c.id,
-            //            agency = d.name,
-            //            clerkId = c.clerk_id,
-            //            clerkName = c.User.real_name,
-            //            clerkNumber = c.User.username,
-            //            customerName = c.customer_name,
-            //            customerNumber = c.customer_number
-            //        }).ToList();
+            return result;            
         }
 
         public string SaveClerkAndCustomer(int clerkId, string customerName, string customerNumber)
@@ -713,6 +678,23 @@ namespace Sale_platform_ele.Services
             return result.OrderBy(r => r.orderDate).ToList();
         }
 
+        //软硬板出货组对应的产品类型
+        public List<string> GetCHTypes(int userId)
+        {
+            //先检查出货组权限
+            List<string> ptypes = new List<string>();
+            if (new UA(userId).HasGotPower("CH_FPC_Team")) {
+                ptypes.Add("FPC/软硬结合板");
+                ptypes.Add("FPC样品/FPC开模");
+                ptypes.Add("PCBa/PCBa样品/PCBa开模");
+            }
+            if (new UA(userId).HasGotPower("CH_PCB_Team")) {
+                ptypes.Add("PCB/HDI");
+                ptypes.Add("PCB样品/HDI样品/PCB开模/HDI开模");
+            }
+            return ptypes;
+        }
+
         public List<vwK3StockInfo> GetK3StockInfo(int orderId, int orderEntryId)
         {
             return db.vwK3StockInfo.Where(v => v.orderID == orderId && v.orderEntryId == orderEntryId).OrderBy(v => v.stockDate).ToList();
@@ -721,16 +703,7 @@ namespace Sale_platform_ele.Services
         public List<StockTeamReport> GetStockTeamReport(string sysNo, string stockNo, string orderNo,string customer,string model, DateTime fromDate, DateTime toDate,int userId)
         {
             //先检查出货组权限
-            List<string> ptypes = new List<string>();
-            if (new UA(userId).HasGotPower("CH_FPC_Team")) {
-                ptypes.Add("FPC/软硬结合板");
-                ptypes.Add("FPC样品/FPC开模");
-            }
-            if (new UA(userId).HasGotPower("CH_PCB_Team")) {
-                ptypes.Add("PCB/HDI");
-                ptypes.Add("PCB样品/HDI样品/PCB开模/HDI开模");
-            }
-            string[] ptypeArr=ptypes.ToArray();
+            List<string> ptypes = GetCHTypes(userId);
 
             var result = (from c in db.ChBill
                           from d in c.ChBillDetail
@@ -742,7 +715,7 @@ namespace Sale_platform_ele.Services
                           && c.k3_audit1_date > fromDate
                           && c.k3_audit1_date < toDate
                           && (c.customer_name.Contains(customer) || c.customer_no.Contains(customer))
-                          && ptypeArr.Contains(c.product_type)
+                          && ptypes.Contains(c.product_type)
                           && d.item_model.Contains(model)
                           orderby c.id
                           select new StockTeamReport()
@@ -875,7 +848,7 @@ namespace Sale_platform_ele.Services
         //打印送货单
         public List<VwChPrintReport> GetChReportData(string sysNo)
         {
-            return db.VwChPrintReport.Where(v => v.sys_no == sysNo).ToList();
+            return db.VwChPrintReport.Where(v => v.sys_no == sysNo && v.apply_qty > 0).ToList();
         }
 
         //插入打印日志

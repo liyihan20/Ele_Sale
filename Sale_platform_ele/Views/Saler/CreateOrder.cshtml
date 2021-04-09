@@ -48,13 +48,13 @@
                 $.post("@Url.Content("~/Items/GetProductPriceInfo")", { itemNo: rowData.number }, function (data) {
                     if (data.suc) {
                         var e = data.extra;
-                        $("#fm_detail #unit_price").textbox("setValue",e.unitPrice);
+                        $("#fm_detail #unit_price").textbox("setValue", e.unitPrice);
                         $("#fm_detail #deal_price").textbox("setValue", e.dealPrice);
                         $("#fm_detail #cost").textbox("setValue", e.cost);
                         $("#fm_detail #fee_rate").textbox("setValue", e.feeRate);
                     }
                 });
-                
+
                 $("#item_no").combogrid('hidePanel');
             }
         });
@@ -141,7 +141,7 @@
                 }
             }, '-', {
                 text: "@Html.Lang("del_item")",
-                iconCls: 'icon-remove', 
+                iconCls: 'icon-remove',
                 handler: function () {
                     var row = $('#dg_detail').datagrid('getSelected');
                     if (row) {
@@ -280,6 +280,7 @@
                     param.currency_name = $("#currency_no").combobox("getText");
                     param.clerk1_name = $("#clerk1_no").combobox("getText");
                     param.clerk2_name = $("#clerk2_no").combobox("getText");
+                    param.clerk3_name = $("#clerk3_no").combobox("getText");
                     param.backpaper_confirm_name = $("#backpaper_confirm_no").combobox("getText");
                     param.produce_way_name = $("#produce_way_no").combobox("getText");
                     param.clear_way_name = $("#clear_way_no").combogrid("getText");
@@ -307,6 +308,8 @@
         $("#clerk1_no").combobox("setText", "@order.clerk1_name");
         $("#clerk2_no").combobox("setValue", "@order.clerk2_no");
         $("#clerk2_no").combobox("setText", "@order.clerk2_name");
+        $("#clerk3_no").combobox("setValue", "@order.clerk3_no");
+        $("#clerk3_no").combobox("setText", "@order.clerk3_name");
         $("#order_div").css("visibility", "visible");
         setTaxRat("@order.currency_no");
     });
@@ -317,7 +320,7 @@
             //if (new Date() > new Date("2018-05-01 00:00:00")) { //这种方式只能兼容google chrome，IE不兼容
             if (new Date() > new Date(2019, 3, 1)) {
                 taxRate = 13;
-            }else if (new Date() > new Date(2018,4,1)) {
+            } else if (new Date() > new Date(2018, 4, 1)) {
                 taxRate = 16;
             } else {
                 taxRate = 17;
@@ -606,9 +609,19 @@
                                 <input class="easyui-combobox" name="produce_dep_name" id="produce_dep_name" style="width:120px"
                                data-options="textField:'value',valueField:'value',panelHeight:'auto',required:true,editable:false,
                                            data:[
-                                           {value:'PCB'},{value:'PCBa'},{value:'PCB钻孔'}
+                                           {value:'硬板'},{value:'软板'},{value:'PCBa'}
                                            ]" value="@order.produce_dep_name" />
                             </td>
+                            <td>是否Total Solution:</td>
+                            <td>
+                                <input class="easyui-combobox" name="is_total_solution" id="is_total_solution" style="width:120px"
+                                       data-options="textField:'name',valueField:'name',panelHeight:'auto', required:true,editable:false,
+                                               data:[
+                                               {name:'是'},{name:'否'}
+                                               ]" value="@order.is_total_solution" />
+                            </td>
+                        </tr>
+                        <tr>  
                             <td>
                                 @Html.Lang("biller"):
                             </td>
@@ -684,6 +697,26 @@
                             </td>
                             <td>
                                 <input class="easyui-textbox" name="group2" id="group2" style="width:120px" value="@order.group2" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                业务员3:
+                            </td>
+                            <td>
+                                <input id="clerk3_no" class="remotebox" name="clerk3_no" style="width: 120px" />
+                            </td>
+                            <td>
+                                比例3:
+                            </td>
+                            <td>
+                                <input class="easyui-numberbox" id="percent3" name="percent3" style="width: 120px" value="@order.percent3" />
+                            </td>
+                            <td>
+                                组别3:
+                            </td>
+                            <td>
+                                <input class="easyui-textbox" name="group3" id="group3" style="width:120px" value="@order.group3" />
                             </td>
                         </tr>
                         <tr>

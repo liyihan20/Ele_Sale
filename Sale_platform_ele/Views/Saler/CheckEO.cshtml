@@ -103,6 +103,16 @@
                             <input value="@order.clerk_name" />
                         </td>
                     </tr>
+                    @if ("仪器".Equals(order.account)) { 
+                        <tr>
+                            <td>
+                                是否Total Solution:
+                            </td>
+                            <td>
+                                <input style="width:140px" value="@order.is_total_solution" />
+                            </td>
+                        </tr>
+                    }
                     <tr>
                         <td>摘要:</td>
                         <td colspan="5">
