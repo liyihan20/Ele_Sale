@@ -1,0 +1,202 @@
+﻿@using Sale_platform_ele.Models;
+@{
+    Sale_BL bill = ViewData["bill"] as Sale_BL;
+}
+<style type="text/css">
+    .ck_label{
+        margin-right:8px;
+        cursor:pointer;
+    }
+</style>
+<script>
+    $(function () {
+
+        $.map("@bill.bl_project".split(","), function (item) { $("input[name='bl_project'][value='" + item + "']").attr("checked", true); });
+        $("#order_div input[type='checkbox']").not(":checked").attr("disabled", "disabled");
+        $("#order_div input[type='checkbox']:checked").click(function () { event.preventDefault(); });
+        $("#order_div input:not(:checkbox):not(#comment)").textbox({ width: 140, editable: false });
+        $("#order_div").css("visibility", "visible");
+
+        $("#printBt").on("click", function () {
+            window.open("../File/PrintBLReport?sysNo=@bill.sys_no");
+        });
+
+    });
+</script>
+
+
+    <div id="order_div" class="easyui-panel" title="查看备料单" style="width: 840px; padding: 10px; background: #fafafa;visibility:hidden">
+        <div>
+            <table border="0" cellpadding="1" cellspacing="3" width="800">
+                <tr>
+                    <td>
+                        备料单:
+                    </td>
+                    <td>
+                        <a id="printBt" href="#" class="easyui-linkbutton" iconcls='icon-print' style="padding:2px 10px;"> 打印 </a>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        系统流水号:
+                    </td>
+                    <td>
+                        <input value="@bill.sys_no" />
+                    </td>
+                    <td>
+                        备料日期:
+                    </td>
+                    <td>
+                        <input value="@(bill.bill_date == DateTime.MinValue ? "" : bill.bill_date.ToString("yyyy-MM-dd"))" />
+                    </td>
+                    <td>
+                        版本:
+                    </td>
+                    <td>
+                        <input value="@bill.version_no"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        产品类别:
+                    </td>
+                    <td>
+                        <input value="@bill.product_type" />
+                    </td>
+                    <td>
+                        客户型号:
+                    </td>
+                    <td>
+                        <input value="@bill.customer_pn" />
+                    </td>
+                    <td>
+                        客户编码:
+                    </td>
+                    <td>
+                        <input value="@bill.customer_no" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        客户名称:
+                    </td>
+                    <td>
+                        <input value="@bill.customer_name" />
+                    </td>
+                    <td>
+                        终端客户编码:
+                    </td>
+                    <td>
+                        <input value="@bill.zz_customer_no" />
+                    </td>
+                    <td>
+                        终端客户名称:
+                    </td>
+                    <td>
+                        <input value="@bill.zz_customer_name" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        产品代码:
+                    </td>
+                    <td>
+                        <input value="@bill.product_no" />
+                    </td>
+                    <td>
+                        产品名称:
+                    </td>
+                    <td>
+                        <input value="@bill.product_name" />
+                    </td>
+                    <td>
+                        产品型号:
+                    </td>
+                    <td>
+                        <input value="@bill.product_model" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        备料数量(粒):
+                    </td>
+                    <td>
+                        <input value="@(bill.bl_qty > 0 ? bill.bl_qty.ToString() : "")" />
+                    </td>
+                    <td>
+                        排版粒数(粒):
+                    </td>
+                    <td>
+                        <input value="@(bill.layout_qty > 0 ? bill.layout_qty.ToString() : "")" />
+                    </td>
+                    <td>
+                        订单数量(粒):
+                    </td>
+                    <td>
+                        <input value="@(bill.order_qty > 0 ? bill.order_qty.ToString() : "")" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        营业员:
+                    </td>
+                    <td>
+                        <input value="@bill.clerk_name" />
+                    </td>
+                    <td>
+                        首样时间:
+                    </td>
+                    <td>
+                        <input value="@(bill.first_date == DateTime.MinValue ? "" : bill.first_date.ToString("yyyy-MM-dd"))" />
+                    </td>
+                    <td>
+                        量产时间:
+                    </td>
+                    <td>
+                        <input value="@(bill.batch_date == DateTime.MinValue ? "" : bill.batch_date.ToString("yyyy-MM-dd"))" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        产品用途:
+                    </td>
+                    <td>
+                        <input value="@bill.usage" />
+                    </td>
+                    <td>
+                        FCST周期:
+                    </td>
+                    <td>
+                        <input value="@bill.fcst" />
+                    </td>
+                    <td>
+                        制单人:
+                    </td>
+                    <td>
+                        <input value="@bill.applier_name" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        备注:
+                    </td>
+                    <td colspan="5">
+                        <input class="easyui-textbox" id="comment" multiline="true" style="width:660px;height:40px;" value="@bill.comment" editable="false" />
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <div>
+            <fieldset>
+                <legend>备料项目</legend>
+                <div style="padding:8px 0;">
+                    @foreach (var p in new string[] { "全套物料", "覆铜板", "P片", "铜箔", "干膜", "油墨" }) {
+                        <input type="checkbox" name="bl_project" value="@p" /><span class="ck_label">@p</span>
+                    }
+                </div>
+            </fieldset>
+        </div>
+
+    </div>
+

@@ -175,6 +175,7 @@
     <Compile Include="Services\ApplySv.cs" />
     <Compile Include="Services\BaseSv.cs" />
     <Compile Include="Services\BillSv.cs" />
+    <Compile Include="Services\BLSv.cs" />
     <Compile Include="Services\EOSv.cs" />
     <Compile Include="Services\CHSv.cs" />
     <Compile Include="Services\CommissionSv.cs" />
@@ -652,6 +653,10 @@
     <Content Include="Views\Saler\CreateEO.cshtml" />
     <Content Include="Views\Saler\CheckEOList.cshtml" />
     <Content Include="Views\Saler\CheckEO.cshtml" />
+    <Content Include="Views\Saler\CreateBL.cshtml" />
+    <Content Include="Views\Saler\CheckbLList.cshtml" />
+    <Content Include="Views\Saler\CheckBL.cshtml" />
+    <Content Include="Views\File\PrintBLReport.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

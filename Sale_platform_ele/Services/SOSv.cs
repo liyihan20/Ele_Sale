@@ -355,6 +355,16 @@ namespace Sale_platform_ele.Services
         /// <returns></returns>
         public override string GetProcessNo()
         {
+            //2021-09-01起，电子要求开模和样品单需增加成控、研发和事业部审批，按照软板和硬板进行区分
+            if (DateTime.Now >= DateTime.Parse("2021-09-01")) {
+                if (new string[] { "FPC样品", "FPC开模", "软硬结合板" }.Contains(order.product_type_name)) {
+                    return BILL_TYPE + "_SOFT"; //走软板流程
+                }
+
+                if (new string[] { "PCB样品", "PCB开模", "HDI样品", "HDI开模" }.Contains(order.product_type_name)) {
+                    return BILL_TYPE + "_HARD"; //走硬板流程
+                }
+            }
             return BILL_TYPE;
         }
 

@@ -65,6 +65,15 @@ namespace Sale_platform_ele.Services
             return db.Apply.Where(a => a.sys_no == sysNo && a.success != null).Count() > 0;
         }
 
+        /// <summary>
+        /// (无参构造）申请是否已完成
+        /// </summary>
+        /// <param name="sysNo"></param>
+        /// <returns></returns>
+        public bool ApplyHasSucceed(string sysNo)
+        {
+            return db.Apply.Where(a => a.sys_no == sysNo && a.success == true).Count() > 0;
+        }
 
         /// <summary>
         /// (无参构造)提交申请
@@ -800,7 +809,15 @@ namespace Sale_platform_ele.Services
 
         }
 
-
+        /// <summary>
+        /// 总裁办批量处理申请单
+        /// </summary>
+        /// <param name="applyDetailIds"></param>
+        /// <param name="userId"></param>
+        /// <param name="isPass"></param>
+        /// <param name="comment"></param>
+        /// <param name="ipAdd"></param>
+        /// <returns></returns>
         public string CeoBatchAudit(int[] applyDetailIds, int userId, bool isPass, string comment,string ipAdd){
             int record = 0;
             foreach (int detailId in applyDetailIds) {
@@ -865,5 +882,21 @@ namespace Sale_platform_ele.Services
             }
             return "已批量处理" + record.ToString() + "行记录";
         }
+
+        public List<StepNameAndAuditorModel> GetStepAndAuditor(string sysNo)
+        {
+            return (from ad in db.ApplyDetails
+                    join a in db.Apply on ad.apply_id equals a.id
+                    join u in db.User on ad.user_id equals u.id
+                    where a.sys_no == sysNo && ad.pass == true
+                    orderby ad.step
+                    select new StepNameAndAuditorModel()
+                    {
+                        stepName = ad.step_name,
+                        auditorName = u.real_name,
+                        auditTime = (DateTime)ad.finish_date
+                    }).ToList();
+        }
+
     }
 }

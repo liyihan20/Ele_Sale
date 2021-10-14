@@ -1,0 +1,134 @@
+﻿@using Sale_platform_ele.Models;
+@{
+    var bl = ViewData["bl"] as Sale_BL;
+    var alist = ViewData["result"] as List<StepNameAndAuditorModel>;
+}
+
+<style type="text/css">
+        #reportTb{
+            border-left:1px solid;
+            border-bottom:1px solid;
+        }
+        #reportTb tr td {
+            text-align: center;
+            border-right:1px solid;
+            border-top:1px solid;
+            padding: 4px 12px;
+        }
+
+        #reportTb tr td:nth-child(2n+1) {
+            background-color: #F3F3F3;
+        }
+    </style>
+
+
+
+<div style="padding:4px;font-size:9pt;width:640px;margin:0 auto;">    
+    <div><img src="@Url.Content("~/Content/Images/Truly.gif")" /></div>
+
+    <div style="text-align:center;">        
+        <div style="font-size:14pt;font-weight:bold;margin:8px 0;">
+            <span>信利电子有限公司 备料单</span> <br/>
+        </div>
+    </div>    
+    
+    <table style="width:100%;" id="reportTb" cellspacing="0">
+        <tr>
+            <td style="width:20%;">申请流水号:</td>
+            <td style="width:30%;">@bl.sys_no</td>
+            <td style="width:20%;">打印时间:</td>
+            <td style="width:30%;">@(DateTime.Now.ToString("yyyy-MM-dd HH:mm"))</td>
+        </tr>
+        <tr>
+            <td>申请人:</td>
+            <td>@bl.applier_name</td>
+            <td>部门:</td>
+            <td>@ViewData["depName"]</td>
+        </tr>        
+        <tr>
+            <td colspan="4">申请内容</td>
+        </tr>
+        <tr>
+            <td>备料日期:</td>
+            <td>@(((DateTime)bl.bill_date).ToString("yyyy-MM-dd"))</td>
+            <td>版本:</td>
+            <td>@bl.version_no</td>
+        </tr>
+        <tr>
+            <td>产品类别:</td>
+            <td>@bl.product_type</td>
+            <td>客户型号:</td>
+            <td>@bl.customer_pn</td>
+        </tr>
+        <tr>
+            <td>客户名称:</td>
+            <td>@bl.customer_name (@bl.customer_no)</td>
+            <td>终端客户名称</td>
+            <td>@bl.zz_customer_name (@bl.zz_customer_no)</td>
+        </tr>
+        <tr>
+            <td>产品代码:</td>
+            <td>@bl.product_no</td>
+            <td>产品名称:</td>
+            <td>@bl.product_name</td>
+        </tr>
+        <tr>
+            <td>产品型号:</td>
+            <td>@bl.product_model</td>
+            <td>备料数量(粒):</td>
+            <td>@bl.bl_qty</td>
+        </tr>
+        <tr>
+            <td>排版粒数(粒):</td>
+            <td>@bl.layout_qty</td>
+            <td>订单数量(粒):</td>
+            <td>@bl.order_qty</td>
+        </tr>
+        <tr>
+            <td>营业员:</td>
+            <td>@bl.clerk_name</td>
+            <td>产品用途:</td>
+            <td>@bl.usage</td>
+        </tr>
+        <tr>
+            <td>首样时间:</td>
+            <td>@(((DateTime)bl.first_date).ToString("yyyy-MM-dd"))</td>
+            <td>量产时间:</td>
+            <td>@(((DateTime)bl.batch_date).ToString("yyyy-MM-dd"))</td>
+        </tr>
+        <tr>
+            <td>FCST周期:</td>
+            <td>@bl.fcst</td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>备料项目:</td>
+            <td colspan="3">@bl.bl_project</td>
+        </tr>
+        <tr>
+            <td>备注:</td>
+            <td colspan="3">@bl.comment</td>
+        </tr>       
+        <tr>
+            <td colspan="4">审批流程</td>
+        </tr>
+        @for (var i = 0; i < alist.Count(); i=i+2) {
+
+            <tr>
+                <td>@alist[i].stepName :</td>
+                <td>@alist[i].auditorName @(((DateTime)alist[i].auditTime).ToString("MM/dd HH:mm"))</td>
+                @if (i >= alist.Count()-1) {
+                    <td></td><td></td>
+                }
+                else {
+                    <td>@alist[i+1].stepName :</td>
+                    <td>@alist[i+1].auditorName @(((DateTime)alist[i+1].auditTime).ToString("MM/dd HH:mm"))</td>
+                }
+            </tr>
+            
+        }
+    </table>
+
+</div>
+

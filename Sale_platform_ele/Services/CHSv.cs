@@ -687,10 +687,12 @@ namespace Sale_platform_ele.Services
                 ptypes.Add("FPC/软硬结合板");
                 ptypes.Add("FPC样品/FPC开模");
                 ptypes.Add("PCBa/PCBa样品/PCBa开模");
+                ptypes.Add("H-PCBa/F-PCBa");
             }
             if (new UA(userId).HasGotPower("CH_PCB_Team")) {
                 ptypes.Add("PCB/HDI");
                 ptypes.Add("PCB样品/HDI样品/PCB开模/HDI开模");
+                ptypes.Add("HPCB");
             }
             return ptypes;
         }
@@ -872,7 +874,7 @@ namespace Sale_platform_ele.Services
         {
             if (!isPass) return null;
 
-            return "linhh.sale@truly.com.cn";
+            return "linhh.sale@truly.cn";
         }
 
         public override void BeforeRollBack(int step)

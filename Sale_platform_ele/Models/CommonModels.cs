@@ -71,5 +71,10 @@ namespace Sale_platform_ele.Models
 
     }
 
-
+    public class StepNameAndAuditorModel
+    {
+        public string stepName { get; set; }
+        public string auditorName { get; set; }
+        public DateTime auditTime { get; set; }
+    }
 }

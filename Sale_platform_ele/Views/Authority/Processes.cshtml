@@ -149,10 +149,10 @@
     function editProc(){
         var row = $('#tbPro').datagrid('getSelected');
         if(!row){return;}
-        $("#proc_type").val(row.orderType);
+        $("#proc_type").textbox("setValue",row.orderType);
         $("#begin_time").datebox("setValue", row.beginTime);
         $("#end_time").datebox("setValue", row.endTime);
-        $("#info").val(row.info);
+        $("#info").textbox("setValue", row.info);
         $("#tbDet").datagrid({url:"@Url.Content("~/Authority/GetProDets")",queryParams:{id:row.id} });
         $("#pro_dlg").dialog("setTitle","编辑流程").dialog("open");
         pro_id=row.id;

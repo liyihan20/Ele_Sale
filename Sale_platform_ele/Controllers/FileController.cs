@@ -219,5 +219,21 @@ namespace Sale_platform_ele.Controllers
             return View();
         }
 
+        [SessionTimeOutFilter]
+        public ActionResult PrintBLReport(string sysNo)
+        {
+            var sv = new ApplySv();
+            if (!sv.ApplyHasSucceed(sysNo)) {
+                ViewBag.tip = "此备料单还未审批完结，不能打印";
+                return View("Error");
+            }
+
+            ViewData["result"] = sv.GetStepAndAuditor(sysNo);
+            ViewData["printer"] = currentUser.realName;
+            ViewData["bl"] = new BLSv(sysNo).GetBill(0);
+            ViewData["depName"] = new UA(currentUser.userId).GetUserDepartmentName();
+
+            return View();
+        }
     }
 }

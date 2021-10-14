@@ -1,0 +1,375 @@
+﻿@using Sale_platform_ele.Models;
+@{
+    Sale_BL bill = ViewData["bill"] as Sale_BL;
+}
+<style type="text/css">
+    .ck_label{
+        margin-right:8px;
+        cursor:pointer;
+    }
+</style>
+<script>
+    $(function () {
+
+        $("#product_no").combogrid({
+            idField: "number",
+            textField: "number",
+            panelWidth: 500,
+            required: true,
+            columns: [[
+                    { field: 'number', title: '@Html.Lang("pro_num")', width: 120 },
+                    { field: 'name', title: '@Html.Lang("pro_name")', width: 140 },
+                    { field: 'model', title: '@Html.Lang("pro_model")', width: 220 }
+            ]],
+            keyHandler: {
+                query: function () { },
+                enter: function () {
+                    var q = $("#product_no").combogrid('getText');
+                    if (q != "") {
+                        $.post("@Url.Content("~/Items/GetProducts")", { q: q },
+                            function (data) {
+                                $("#product_no").combogrid('grid').datagrid('loadData', data);
+                                $("#product_no").combogrid('setText', q);
+                            },
+                            "json"
+                            );
+                    }
+                }
+            },
+            onClickRow: function (rowIndex, rowData) {
+                $("#product_no").combogrid('setValue', rowData.number);
+                $("#product_no").combogrid('setText', rowData.number);
+                $("#product_name").textbox("setValue", rowData.name);
+                $("#product_model").textbox("setValue", rowData.model);
+
+                $("#product_no").combogrid('hidePanel');
+            }
+        });
+
+        $(".remotebox").combobox({
+            valueField: "value",
+            textField: "name",
+            required: true,
+            keyHandler: {
+                query: function () { },
+                enter: function () {
+                    var box_id = $(this).attr("id");
+                    var _this = "#" + box_id;
+                    var url = "@Url.Content("~/Items/GetClerks")";
+                    var q = $(_this).combobox('getText');
+                    if (q != "") {
+                        $.post(url, { q: q },
+                        function (data) {
+                            $(_this).combobox('loadData', data);
+                            $(_this).combobox('setText', q);
+                        },
+                        "json"
+                        );
+                    }
+                }
+            }
+        });
+
+        $("#customer_no").combogrid({
+            loadMsg: "Please wait...",
+            idField: "value",
+            textField: "value",
+            panelWidth: 400,
+            columns: [[
+                    { field: 'value', title: '@Html.Lang("customer_num")', width: 150 },
+                    { field: 'name', title: '@Html.Lang("customer_name")', width: 220 }
+            ]],
+            keyHandler: {
+                query: function () { },
+                enter: function () {
+                    var box_id = $(this).attr("id");
+                    var _this = "#" + box_id;
+                    var q = $(_this).combogrid('getText');
+                    if (q != "") {
+                        $.post("@Url.Content("~/Items/GetCustomers")", { q: q },
+                            function (data) {
+                                $(_this).combogrid('grid').datagrid('loadData', data);
+                                $(_this).combogrid('setText', q);
+                            },
+                            "json"
+                            );
+                    }
+                }
+            },
+            onClickRow: function (rowIndex, rowData) {
+                $("#customer_no").combogrid('setValue', rowData.value);
+                $("#customer_no").combogrid('setText', rowData.value);
+                $("#customer_name").textbox("setValue", rowData.name);
+
+                $("#customer_no").combogrid('hidePanel');
+            }
+        });
+        $("#zz_customer_no").combogrid({
+            loadMsg: "Please wait...",
+            idField: "value",
+            textField: "value",
+            panelWidth: 400,
+            columns: [[
+                    { field: 'value', title: '@Html.Lang("customer_num")', width: 150 },
+                    { field: 'name', title: '@Html.Lang("customer_name")', width: 220 }
+            ]],
+            keyHandler: {
+                query: function () { },
+                enter: function () {
+                    var box_id = $(this).attr("id");
+                    var _this = "#" + box_id;
+                    var q = $(_this).combogrid('getText');
+                    if (q != "") {
+                        $.post("@Url.Content("~/Items/GetCustomers")", { q: q },
+                            function (data) {
+                                $(_this).combogrid('grid').datagrid('loadData', data);
+                                $(_this).combogrid('setText', q);
+                            },
+                            "json"
+                            );
+                    }
+                }
+            },
+            onClickRow: function (rowIndex, rowData) {
+                $("#zz_customer_no").combogrid('setValue', rowData.value);
+                $("#zz_customer_no").combogrid('setText', rowData.value);
+                $("#zz_customer_name").textbox("setValue", rowData.name);
+
+                $("#zz_customer_no").combogrid('hidePanel');
+            }
+        });
+
+        //保存订单
+        $('#saveAllBut').bind('click', function () {
+            $.messager.progress();
+            $('#order_form').form('submit', {
+                url: '@Url.Content("~/Saler/SaveBill")',
+                onSubmit: function (param) {
+                    if (!$('#order_form').form('validate')) {
+                        return false;
+                    }
+                    param.clerk_name = $("#clerk_no").combobox("getText");
+                    return true;
+                },
+                success: function (data) {
+                    var result = eval('(' + data + ')');
+                    if (result.suc) {
+                        showTip("@Html.Lang("suc_save")");
+                    } else {
+                        showTip("@Html.Lang("failure_save"):" + result.msg);
+                    }
+                }
+            });
+            $.messager.progress("close");
+        });
+
+        $("#submitApply").click(function () {
+            $("#submitApply").linkbutton('disable');
+            $('#saveAllBut').linkbutton('disable');
+            $.post("@Url.Content("~/Saler/BeginApply")", { sysNo: "@bill.sys_no" },
+            function (data) {
+                if (data.suc) {
+                    showTip(data.msg);
+                    setTimeout('window.location.href="@Url.Content("~/Saler/CheckBillList?billType=BL")"', 1000);
+                } else {
+                    showTip(data.msg);
+                    $("#submitApply").linkbutton('enable');
+                    $('#saveAllBut').linkbutton('enable');
+                }
+            });
+        });
+
+        //设置一些远程combo的值
+        $("#clerk_no").combobox("setValue", "@bill.clerk_no");
+        $("#clerk_no").combobox("setText", "@bill.clerk_name");
+
+        $(".ck_label").on("click", function () {
+            $("input[name='bl_project'][value='" + $.trim($(this).html()) + "']").trigger("click");
+        });
+
+        $.map("@bill.bl_project".split(","), function (item) { $("input[name='bl_project'][value='" + item + "']").attr("checked", true); });
+        $("#order_div input:not(:checkbox):not(#comment)").textbox({ width: 140 });
+        $("#order_div").css("visibility", "visible");
+    });
+</script>
+
+<form id="order_form" method="post">
+    <div id="order_div" class="easyui-panel" title="新建备料单" style="width: 840px; padding: 10px; background: #fafafa;visibility:hidden">
+        <div>
+            <table border="0" cellpadding="1" cellspacing="3" width="800">
+
+                <tr>
+                    <td>
+                        系统流水号:
+                    </td>
+                    <td>
+                        <input class="easyui-textbox" name="sys_no" id="sys_no" value="@bill.sys_no" readonly />
+                    </td>
+                    <td>
+                        备料日期:
+                    </td>
+                    <td>
+                        <input class="easyui-datebox" name="bill_date" id="bill_date" value="@(bill.bill_date == DateTime.MinValue ? "" : bill.bill_date.ToString("yyyy-MM-dd"))" />
+                    </td>
+                    <td>
+                        版本:
+                    </td>
+                    <td>
+                        <input class="easyui-textbox" id="version_no" name="version_no" value="@bill.version_no" required/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        产品类别:
+                    </td>
+                    <td>
+                        <input class="easyui-combobox" name="product_type" id="product_type"
+                               data-options="textField:'value',valueField:'value',panelHeight:'auto', required:true,editable:false,
+                                           data:[
+                                           {value:'硬板'}
+                                           ]" value="@bill.product_type" />
+                    </td>
+                    <td>
+                        客户型号:
+                    </td>
+                    <td>
+                        <input class="easyui-textbox" id="customer_pn" name="customer_pn" value="@bill.customer_pn" required />
+                    </td>
+                    <td>
+                        客户编码:
+                    </td>
+                    <td>
+                        <input name="customer_no" id="customer_no" value="@bill.customer_no" required />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        客户名称:
+                    </td>
+                    <td>
+                        <input class="easyui-textbox" id="customer_name" name="customer_name" editable="false" value="@bill.customer_name" />
+                    </td>
+                    <td>
+                        终端客户编码:
+                    </td>
+                    <td>
+                        <input name="zz_customer_no" id="zz_customer_no" value="@bill.zz_customer_no" required />
+                    </td>
+                    <td>
+                        终端客户名称:
+                    </td>
+                    <td>
+                        <input class="easyui-textbox" id="zz_customer_name" name="zz_customer_name" editable="false" value="@bill.zz_customer_name" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        产品代码:
+                    </td>
+                    <td>
+                        <input class="easyui-combogrid" id="product_no" name="product_no" value="@bill.product_no" required/>
+                    </td>
+                    <td>
+                        产品名称:
+                    </td>
+                    <td>
+                        <input class="easyui-textbox" id="product_name" name="product_name" value="@bill.product_name" readonly />
+                    </td>
+                    <td>
+                        产品型号:
+                    </td>
+                    <td>
+                        <input class="easyui-textbox" id="product_model" name="product_model" value="@bill.product_model" readonly />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        备料数量(粒):
+                    </td>
+                    <td>
+                        <input class="easyui-numberbox" id="bl_qty" name="bl_qty" value="@(bill.bl_qty > 0 ? bill.bl_qty.ToString() : "")" required />
+                    </td>
+                    <td>
+                        排版粒数(粒):
+                    </td>
+                    <td>
+                        <input class="easyui-numberbox" id="layout_qty" name="layout_qty" value="@(bill.layout_qty > 0 ? bill.layout_qty.ToString() : "")" required />
+                    </td>
+                    <td>
+                        订单数量(粒):
+                    </td>
+                    <td>
+                        <input class="easyui-numberbox" id="order_qty" name="order_qty" value="@(bill.order_qty > 0 ? bill.order_qty.ToString() : "")" required />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        营业员:
+                    </td>
+                    <td>
+                        <input class="remotebox" name="clerk_no" id="clerk_no" value="@bill.clerk_name" required />
+                    </td>
+                    <td>
+                        首样时间:
+                    </td>
+                    <td>
+                        <input class="easyui-datebox" name="first_date" id="first_date" required value="@(bill.first_date == DateTime.MinValue ? "" : bill.first_date.ToString("yyyy-MM-dd"))" />
+                    </td>
+                    <td>
+                        量产时间:
+                    </td>
+                    <td>
+                        <input class="easyui-datebox" name="batch_date" id="batch_date" required value="@(bill.batch_date == DateTime.MinValue ? "" : bill.batch_date.ToString("yyyy-MM-dd"))" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        产品用途:
+                    </td>
+                    <td>
+                        <input class="easyui-textbox" id="usage" name="usage" value="@bill.usage" required />
+                    </td>
+                    <td>
+                        FCST周期:
+                    </td>
+                    <td>
+                        <input class="easyui-textbox" id="fcst" name="fcst" value="@bill.fcst" required />
+                    </td>
+                    <td>
+                        制单人:
+                    </td>
+                    <td>
+                        <input class="easyui-textbox" name="applier_name" value="@bill.applier_name" readonly />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        备注:
+                    </td>
+                    <td colspan="5">
+                        <input class="easyui-textbox" name="comment" id="comment" multiline="true" style="width:660px;height:40px;" value="@bill.comment" />
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <div>
+            <fieldset>
+                <legend>备料项目</legend>
+                <div style="padding:8px 0;">
+                    @foreach (var p in new string[] { "全套物料", "覆铜板", "P片", "铜箔", "干膜", "油墨" }) {
+                        <input type="checkbox" name="bl_project" value="@p" /><span class="ck_label">@p</span>
+                    }
+                </div>
+            </fieldset>
+        </div>
+
+
+
+        <div align="center">
+            <a id="saveAllBut" href="#" class="easyui-linkbutton" iconcls='icon-save' style="margin: 10px 20px;">@Html.Lang("save_form")</a>
+            <a id="submitApply" href="#" class="easyui-linkbutton" iconcls='icon-document' style="margin: 10px 20px;">@Html.Lang("submit_apply")</a>
+        </div>
+
+    </div>
+</form>

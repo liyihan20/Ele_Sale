@@ -74,4 +74,18 @@ namespace Sale_platform_ele.Models
         public string auditStatus { get; set; }
     }
 
+    public class BLListModel
+    {
+        public int billId { get; set; }
+        public string billDate { get; set; }
+        public string sysNo { get; set; }
+        public string customerName { get; set; }
+        public string productName { get; set; }
+        public string productModel { get; set; }
+        public int qty { get; set; }
+        public string auditStatus { get; set; }
+    }
+
+
+
 }
