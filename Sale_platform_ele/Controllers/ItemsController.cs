@@ -119,5 +119,10 @@ namespace Sale_platform_ele.Controllers
             return Json(new OtherSv().GetProductType(account));
         }
 
+        public JsonResult GetK3OrderForMX(string billNO)
+        {
+            return Json(new MXSv().GetK3OrderForMX(billNO));
+        }
+
     }
 }

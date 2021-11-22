@@ -320,6 +320,14 @@
                 <table border="0" cellpadding="1" cellspacing="3" width="800">
                     <tr>
                         <td>
+                            下单日期：
+                        </td>
+                        <td>
+                            <input class="easyui-datebox" name="bill_date" id="bill_date" style="width:140px" value="@(((DateTime)order.bill_date).ToString("yyyy-MM-dd"))" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
                             公司：
                         </td>
                         <td>
@@ -472,7 +480,7 @@
                     含税单价:
                 </td>
                 <td>
-                    <input id="tax_price" class="easyui-numberbox" name="tax_price" required style="width: 135px" precision="2" />
+                    <input id="tax_price" class="easyui-numberbox" name="tax_price" required style="width: 135px" precision="4" />
                 </td>
             </tr>
             <tr>

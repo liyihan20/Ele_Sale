@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
-using Newtonsoft.Json;
 using Sale_platform_ele.Models;
 using Sale_platform_ele.Utils;
 using Newtonsoft.Json;
@@ -10,112 +9,139 @@ using org.in2bits.MyXls;
 
 namespace Sale_platform_ele.Services
 {
-    public class BLSv:BillSv
+    public class MXSv:BillSv
     {
-        private Sale_BL bill;
+        private Sale_MX bill;
 
-        public BLSv() { }
-        public BLSv(string sysNo)
+        public MXSv() {  }
+
+        public MXSv(string sysNo)
         {
-            try {
-                bill = db.Sale_BL.Single(b => b.sys_no == sysNo);
-            }
-            catch {
-                throw new Exception("流水号不存在");
-            }
+            bill = db.Sale_MX.Single(m => m.sys_no == sysNo);
         }
 
         public override string BillType
         {
-            get { return "BL"; }
+            get { return "MX"; }
         }
 
         public override string BillTypeName
         {
-            get { return "备料单"; }
+            get { return "修改/取消单"; }
         }
 
         public override string CreateViewName
         {
-            get { return "CreateBL"; }
+            get { return "CreateMX"; }
         }
 
         public override string CheckViewName
         {
-            get { return "CheckBL"; }
+            get { return "CheckMX"; }
         }
 
         public override string CheckListViewName
         {
-            get { return "CheckBLList"; }
+            get { return "CheckMXList"; }
         }
 
         public override object GetNewBill(UserInfo currentUser)
         {
-            var bl = new Sale_BL();
-            bl.applier_name = currentUser.realName;
-            bl.sys_no = GetNextSysNo(BillType);
-            bl.bill_date = DateTime.Now;
-            bl.step_version = 0;
-
-            return bl;
+            var m = new MXCheckModel();
+            m.bill = new Sale_MX()
+            {
+                sys_no = GetNextSysNo(BillType),
+                applier_name = currentUser.realName,
+                bill_date = DateTime.Now
+            };
+            return m;
         }
 
         public override object GetBill(int stepVersion)
         {
-            bill.step_version = stepVersion;
-            return bill;
+            var m = new MXCheckModel();
+            m.bill = bill;
+            m.detailsBefore = db.Sale_MX_detail.Where(d => d.sys_no==bill.sys_no && d.detail_type == "before").ToList();
+            m.detailsAfter = db.Sale_MX_detail.Where(d => d.sys_no == bill.sys_no && d.detail_type == "after").ToList();
+
+            return m;
         }
 
         public override string SaveBill(System.Web.Mvc.FormCollection fc, UserInfo user)
         {
-            bill = new Sale_BL();
+            bill = new Sale_MX();
             SomeUtils.SetFieldValueToModel(fc, bill);
+            List<Sale_MX_detail> beforeList = JsonConvert.DeserializeObject<List<Sale_MX_detail>>(fc.Get("before_details"));
+            List<Sale_MX_detail> afterList = JsonConvert.DeserializeObject<List<Sale_MX_detail>>(fc.Get("after_details"));
 
-            if (string.IsNullOrWhiteSpace(bill.customer_name)) {
-                return "客户名称必须填写，请在代码处输入后按回车搜索";
-            }
-            if (string.IsNullOrWhiteSpace(bill.product_model)) {
-                return "产品必须填写，请在代码处输入后按回车搜索";
-            }
-            if (string.IsNullOrEmpty(bill.clerk_no)) {
-                return "营业员必须输入姓名或厂牌后按回车，在列表中选择";
+            if (beforeList.Count() > 0) {
+                if (fc.Get("before_details").Equals(fc.Get("after_details"))) {
+                    return "原单明细表格内容和变更后表格内容不能完全一致";
+                }
             }
 
-            if (string.IsNullOrEmpty(bill.bl_project)) {
-                return "备料明细必须至少勾选一个";
+            if ("取消".Equals(bill.tran_type) && "生产单".Equals(bill.bill_type)) {
+                if (afterList.Where(a => decimal.Parse(a.relate_qty) > 0).Count() > 0) {
+                    return "此单据存在K3关联数量（出货数量）不为0的记录，不能整单取消；如需修改数量，业务类型请选择【修改】";
+                }
             }
 
-            var existedBill = db.Sale_BL.Where(e => e.sys_no == bill.sys_no).FirstOrDefault();
-            if (existedBill == null) {
-                bill.applier_id = user.userId;
-                bill.applier_name = user.realName;
-                bill.apply_time = DateTime.Now;
-
-                db.Sale_BL.InsertOnSubmit(bill);
+            string[] p1 = new string[] { "型号", "数量", "含税单价", "成交价", "成本价" };
+            string[] p2 = new string[] { "交货日期", "包装信息", "客户名称", "贸易类型", "其它" };
+            if (string.IsNullOrEmpty(bill.change_project)) {
+                return "变更项目至少需选择一项才能保存";
             }
-            else {
-                bill.applier_id = existedBill.applier_id;
-                bill.applier_name = existedBill.applier_name;
-                bill.apply_time = existedBill.apply_time;
-                db.BackupData.InsertOnSubmit(new BackupData()
-                {
-                    op_date = DateTime.Now,
-                    sys_no = bill.sys_no,
-                    user_id = user.userId,
-                    main_data = JsonConvert.SerializeObject(existedBill)
-                });
 
-                SomeUtils.CopyPropertyValue(bill, existedBill);
+            //变更项目包含一项以上的P1项时，表格必须要有数据
+            if (p1.Any(p => bill.change_project.Contains(p))) {
+                if (beforeList.Count() < 1 || afterList.Count()<1) {
+                    return "你选择的变更项目要求在表格中处理，当前表格没有数据";
+                }
             }
+            if (p2.Any(p => bill.change_project.Contains(p))) {
+                if (string.IsNullOrEmpty(bill.comment)) {
+                    return "你选择的变更项目要求在附注中说明，当前附注没有内容";
+                }
+            }
+
+            bill.applier_name = user.realName;
+            bill.applier_id = user.userId;
+            bill.apply_time = DateTime.Now;
+
+            beforeList.ForEach(b => { b.detail_type = "before"; b.sys_no = bill.sys_no; });
+            afterList.ForEach(a => { a.detail_type = "after"; a.sys_no = bill.sys_no; });
+            var details = new List<Sale_MX_detail>();
+            details.AddRange(beforeList);
+            details.AddRange(afterList);
+
             try {
+                var existBill = db.Sale_MX.Where(s => s.sys_no == bill.sys_no).FirstOrDefault();
+                if (existBill != null) {
+                    var existDetails = db.Sale_MX_detail.Where(s => s.sys_no == bill.sys_no).ToList();
+
+                    //备份旧订单
+                    BackupData bd = new BackupData();
+                    bd.main_data = JsonConvert.SerializeObject(existBill);
+                    bd.secondary_data = JsonConvert.SerializeObject(existDetails);
+                    bd.op_date = DateTime.Now;
+                    bd.sys_no = bill.sys_no;
+                    bd.user_id = user.userId;
+                    db.BackupData.InsertOnSubmit(bd);
+
+                    //删除旧单
+                    db.Sale_MX.DeleteOnSubmit(existBill);
+                    db.Sale_MX_detail.DeleteAllOnSubmit(existDetails);
+                }
+
+                db.Sale_MX.InsertOnSubmit(bill);
+                db.Sale_MX_detail.InsertAllOnSubmit(details);
+
                 db.SubmitChanges();
             }
             catch (Exception ex) {
-                return ex.Message;
+                return "保存失败：" + ex.Message;
             }
             return "";
-
         }
 
         public override List<object> GetBillList(SalerSearchParamModel pm, int userId)
@@ -131,31 +157,27 @@ namespace Sale_platform_ele.Services
             }
             td = td.AddDays(1);
 
-            var result = from e in db.Sale_BL
+            var result = from e in db.Sale_MX
                          join a in db.Apply on e.sys_no equals a.sys_no into X
                          from Y in X.DefaultIfEmpty()
                          where (canCheckAll || e.applier_id == userId)
                          && e.bill_date >= fd
                          && e.bill_date < td
                          && (pm.auditResult == 10 || (pm.auditResult == 0 && (Y == null || (Y != null && Y.success == null))) || (pm.auditResult == 1 && Y != null && Y.success == true) || pm.auditResult == -1 && Y != null && Y.success == false)
-                         select new BLListModel()
+                         select new MXListModel()
                          {
                              billId = e.id,
                              auditStatus = (Y == null ? "未开始申请" : Y.success == true ? "申请成功" : Y.success == false ? "申请失败" : "审批之中"),
                              billDate = e.bill_date.ToShortDateString(),
                              customerName = e.customer_name,
-                             productModel = e.product_model,
-                             qty = e.bl_qty,
-                             productName = e.product_name,
-                             sysNo = e.sys_no
+                             sysNo = e.sys_no,
+                             billNo = e.bill_no,
+                             billType = e.bill_type,
+                             tranType = e.tran_type
                          };
 
             if (!string.IsNullOrWhiteSpace(pm.searchValue)) {
-                result = result.Where(r => r.sysNo.Contains(pm.searchValue));
-            }
-
-            if (!string.IsNullOrWhiteSpace(pm.itemModel)) {
-                result = result.Where(r => r.productModel.Contains(pm.itemModel));
+                result = result.Where(r => r.billNo.Contains(pm.searchValue));
             }
 
             if (!string.IsNullOrWhiteSpace(pm.customerName)) {
@@ -167,10 +189,16 @@ namespace Sale_platform_ele.Services
 
         public override object GetNewBillFromOld()
         {
-            bill.sys_no = GetNextSysNo(BillType);
             bill.bill_date = DateTime.Now;
 
-            return bill;
+            var m = new MXCheckModel();
+            m.bill = bill;
+            m.detailsBefore = db.Sale_MX_detail.Where(d => d.sys_no == bill.sys_no && d.detail_type == "before").ToList();
+            m.detailsAfter = db.Sale_MX_detail.Where(d => d.sys_no == bill.sys_no && d.detail_type == "after").ToList();
+
+            m.bill.sys_no = GetNextSysNo(BillType);
+            return m;
+
         }
 
         public override string GetProcessNo()
@@ -188,7 +216,7 @@ namespace Sale_platform_ele.Services
 
         public override string GetProductModel()
         {
-            return bill.product_model;
+            return db.Sale_MX_detail.Where(d => d.sys_no == bill.sys_no).Select(d => d.item_model).FirstOrDefault();
         }
 
         public override string GetCustomerName()
@@ -198,12 +226,12 @@ namespace Sale_platform_ele.Services
 
         public override bool HasOrderSaved(string sysNo)
         {
-            return db.Sale_BL.Where(b => b.sys_no == sysNo).Count() > 0;
+            return db.Sale_MX.Where(m => m.sys_no == sysNo).Count() > 0;
         }
 
         public override string GetSpecificBillTypeName()
         {
-            return BillTypeName;
+            return bill.tran_type + bill.bill_type;
         }
 
         public override void DoWhenBeforeApply()
@@ -213,11 +241,7 @@ namespace Sale_platform_ele.Services
 
         public override void DoWhenBeforeAudit(int step, string stepName, bool isPass, int userId)
         {
-            if (stepName.Contains("计划经理") && isPass) {
-                if (string.IsNullOrEmpty(bill.good_percent)) {
-                    throw new Exception("必须填写订料良率并保存后，才能同意");
-                }
-            }
+            
         }
 
         public override void DoWhenFinishAudit(bool isPass)
@@ -227,7 +251,8 @@ namespace Sale_platform_ele.Services
 
         private class ExcelData
         {
-            public Sale_BL h { get; set; }
+            public Sale_MX h { get; set; }
+            public Sale_MX_detail e { get; set; }
             public string auditStatus { get; set; }
         }
 
@@ -238,14 +263,14 @@ namespace Sale_platform_ele.Services
         private void ExportExcel(List<ExcelData> myData)
         {
             //列名：
-            string[] colName = new string[] { "审核结果","流水号","备料日期","客户型号","版本号","产品类别","客户编码","客户名称","终端客户编码","终端客户名称",
-                                            "产品代码","产品名称","产品型号","备料数量(粒)","营业员","产品用途","订料良率","产品类型","表面处理","是否半孔板",
-                                            "是否出样","制单人","备料项目","备注","消耗计划" };
+            string[] colName = new string[] { "审核结果","流水号","下单日期","业务类型","单据类型","单据编号","客户名称","办事处","营业员",
+                                            "制单人","变更项目","附注","明细类型","单据行号","物料名称","规格型号","数量","成交价","含税单价",
+                                            "成本价","成交金额","交货日期","币别","K3关联数量" };
 
             //設置excel文件名和sheet名
             XlsDocument xls = new XlsDocument();
-            xls.FileName = string.Format("电子备料单_{0}.xls", DateTime.Now.ToString("yyyyMMdd"));
-            Worksheet sheet = xls.Workbook.Worksheets.Add("备料信息列表");
+            xls.FileName = string.Format("电子修改取消单单_{0}.xls", DateTime.Now.ToString("yyyyMMdd"));
+            Worksheet sheet = xls.Workbook.Worksheets.Add("单据列表");
 
             //设置各种样式
 
@@ -277,37 +302,36 @@ namespace Sale_platform_ele.Services
             foreach (var d in myData) {
                 colIndex = 1;
 
-                // "审核结果","流水号","备料日期","客户型号","版本号","产品类别","客户编码","客户名称","终端客户编码","终端客户名称",
-                //"产品代码","产品名称","产品型号","备料数量(粒)","营业员","产品用途","订料良率","产品类型","表面处理","是否半孔板",
-                //"是否出样","制单人","备料项目","备注"
+                //"审核结果","流水号","下单日期","业务类型","单据类型","单据编号","客户名称","办事处","营业员",
+                //"制单人","变更项目","附注","明细类型","单据行号","物料名称","规格型号","数量","成交价","含税单价",
+                //"成本价","成交金额","交货日期","币别","K3关联数量"
 
                 cells.Add(++rowIndex, colIndex, d.auditStatus);
                 cells.Add(rowIndex, ++colIndex, d.h.sys_no);
                 cells.Add(rowIndex, ++colIndex, d.h.bill_date.ToString("yyyy-MM-dd"));
-                cells.Add(rowIndex, ++colIndex, d.h.customer_pn);
-                cells.Add(rowIndex, ++colIndex, d.h.version_no);
-                cells.Add(rowIndex, ++colIndex, d.h.product_type);
-                cells.Add(rowIndex, ++colIndex, d.h.customer_no);
+                cells.Add(rowIndex, ++colIndex, d.h.tran_type);
+                cells.Add(rowIndex, ++colIndex, d.h.bill_type);
+                cells.Add(rowIndex, ++colIndex, d.h.bill_no);
                 cells.Add(rowIndex, ++colIndex, d.h.customer_name);
-                cells.Add(rowIndex, ++colIndex, d.h.zz_customer_no);
-                cells.Add(rowIndex, ++colIndex, d.h.zz_customer_name);
-
-                cells.Add(rowIndex, ++colIndex, d.h.product_no);
-                cells.Add(rowIndex, ++colIndex, d.h.product_name);
-                cells.Add(rowIndex, ++colIndex, d.h.product_model);
-                cells.Add(rowIndex, ++colIndex, d.h.bl_qty);
+                cells.Add(rowIndex, ++colIndex, d.h.agency_name);
                 cells.Add(rowIndex, ++colIndex, d.h.clerk_name);
-                cells.Add(rowIndex, ++colIndex, d.h.usage);
-                cells.Add(rowIndex, ++colIndex, d.h.good_percent);
-                cells.Add(rowIndex, ++colIndex, d.h.product_classification);
-                cells.Add(rowIndex, ++colIndex, d.h.surface_type);
-                cells.Add(rowIndex, ++colIndex, d.h.is_half_hole);
 
-                cells.Add(rowIndex, ++colIndex, d.h.is_make_sample);
                 cells.Add(rowIndex, ++colIndex, d.h.applier_name);
-                cells.Add(rowIndex, ++colIndex, d.h.bl_project);
+                cells.Add(rowIndex, ++colIndex, d.h.change_project);
                 cells.Add(rowIndex, ++colIndex, d.h.comment);
-                cells.Add(rowIndex, ++colIndex, d.h.bl_plan);
+                cells.Add(rowIndex, ++colIndex, d.e.detail_type == "before" ? "原单" : "改单");
+                cells.Add(rowIndex, ++colIndex, d.e.entry_no);
+                cells.Add(rowIndex, ++colIndex, d.e.item_name);
+                cells.Add(rowIndex, ++colIndex, d.e.item_model);
+                cells.Add(rowIndex, ++colIndex, d.e.qty);
+                cells.Add(rowIndex, ++colIndex, d.e.deal_price);
+                cells.Add(rowIndex, ++colIndex, d.e.tax_price);
+
+                cells.Add(rowIndex, ++colIndex, d.e.cost);
+                cells.Add(rowIndex, ++colIndex, d.e.deal_sum);
+                cells.Add(rowIndex, ++colIndex, d.e.fetch_date);
+                cells.Add(rowIndex, ++colIndex, d.e.currency_name);
+                cells.Add(rowIndex, ++colIndex, d.e.relate_qty);
             }
 
             xls.Send();
@@ -319,32 +343,31 @@ namespace Sale_platform_ele.Services
 
             DateTime fd, td;
             if (!DateTime.TryParse(pm.fromDate, out fd)) {
-                fd = DateTime.Parse("2017-01-01");
+                fd = DateTime.Parse("2021-01-01");
             }
             if (!DateTime.TryParse(pm.toDate, out td)) {
                 td = DateTime.Parse("2049-09-09");
             }
             td = td.AddDays(1);
 
-            var result = from e in db.Sale_BL
-                         join a in db.Apply on e.sys_no equals a.sys_no into X
+            var result = from h in db.Sale_MX
+                         join a in db.Apply on h.sys_no equals a.sys_no into X
                          from Y in X.DefaultIfEmpty()
-                         where (canCheckAll || e.applier_id == userId)
-                         && e.bill_date >= fd
-                         && e.bill_date < td
+                         join e in db.Sale_MX_detail on h.sys_no equals e.sys_no into et
+                         from ef in et.DefaultIfEmpty()
+                         where (canCheckAll || h.applier_id == userId)
+                         && h.bill_date >= fd
+                         && h.bill_date < td
                          && (pm.auditResult == 10 || (pm.auditResult == 0 && (Y == null || (Y != null && Y.success == null))) || (pm.auditResult == 1 && Y != null && Y.success == true) || pm.auditResult == -1 && Y != null && Y.success == false)
                          select new ExcelData()
                          {
-                             h = e,
-                             auditStatus = (Y == null ? "未开始申请" : Y.success == true ? "申请成功" : Y.success == false ? "申请失败" : "审批之中")
+                             h = h,
+                             e = ef,
+                             auditStatus = (Y == null ? "未开始申请" : Y.success == true ? "申请成功" : Y.success == false ? "申请失败" : "审批之中"),
                          };
 
             if (!string.IsNullOrWhiteSpace(pm.searchValue)) {
-                result = result.Where(r => r.h.sys_no.Contains(pm.searchValue));
-            }
-
-            if (!string.IsNullOrWhiteSpace(pm.itemModel)) {
-                result = result.Where(r => r.h.product_model.Contains(pm.itemModel));
+                result = result.Where(r => r.h.bill_no.Contains(pm.searchValue));
             }
 
             if (!string.IsNullOrWhiteSpace(pm.customerName)) {
@@ -371,7 +394,9 @@ namespace Sale_platform_ele.Services
 
             var result = from a in db.Apply
                          from ad in a.ApplyDetails
-                         join e in db.Sale_BL on a.sys_no equals e.sys_no
+                         join h in db.Sale_MX on a.sys_no equals h.sys_no
+                         join e in db.Sale_MX_detail on h.sys_no equals e.sys_no into et
+                         from ef in et.DefaultIfEmpty()
                          where ad.user_id == userId
                          && a.order_type == BillType
                          && a.sys_no.Contains(pm.sysNo)
@@ -396,7 +421,8 @@ namespace Sale_platform_ele.Services
                          orderby a.start_date descending
                          select new ExcelData()
                          {
-                             h = e,
+                             h = h,
+                             e = ef,
                              auditStatus = a.success == true ? "PASS" : a.success == false ? "NG" : "----"
                          };
 
@@ -409,7 +435,7 @@ namespace Sale_platform_ele.Services
             }
 
             if (!string.IsNullOrWhiteSpace(pm.proModel)) {
-                result = result.Where(r => r.h.product_model.Contains(pm.proModel));
+                result = result.Where(r => r.e.item_model.Contains(pm.proModel));
             }
 
             ExportExcel(result.OrderByDescending(r => r.h.id).Take(200).ToList());
@@ -418,6 +444,11 @@ namespace Sale_platform_ele.Services
         public override void BeforeRollBack(int step)
         {
             
+        }
+
+        public object GetK3OrderForMX(string billNo)
+        {
+            return db.getK3OrderForMx(billNo).ToList();
         }
 
     }

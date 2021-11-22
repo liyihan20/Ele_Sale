@@ -42,4 +42,5 @@ namespace Sale_platform_ele.Models
         public string comment { get; set; }
     }
 
+
 }

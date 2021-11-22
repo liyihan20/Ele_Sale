@@ -196,17 +196,20 @@
         $("#order_type_no").combobox({
             onChange: function (newValue, oldValue) {
                 if (newValue != oldValue && newValue != "") {
+                    $(".mod").hide();
                     var result = pTypes;
                     if (newValue == "01") {
                         //开模单
                         result = $.grep(pTypes, function (item, index) {
                             return item.name.indexOf("开模") >= 0;
                         });
+                        $(".mod").show();
                     } else if (newValue == "02") {
                         //样品单
                         result = $.grep(pTypes, function (item, index) {
                             return item.name.indexOf("样品") >= 0;
                         });
+                        $(".mod").show();
                     } else if (newValue == "04") {
                         //生产单
                         result = $.grep(pTypes, function (item, index) {
@@ -260,13 +263,13 @@
 
         //保存订单
         $('#saveAllBut').bind('click', function () {
+            if (!$('#order_form').form('validate')) {
+                return false;
+            }
             $.messager.progress();
             $('#order_form').form('submit', {
                 url: '@Url.Content("~/Saler/SaveBill")',
-                onSubmit: function (param) {
-                    if (!$('#order_form').form('validate')) {
-                        return false;
-                    }
+                onSubmit: function (param) {                    
                     param.Sale_order_details = JSON.stringify($("#dg_detail").datagrid("getRows"));
                     param.step_version = "@order.step_version";
                     param.product_type_name = $("#product_type_no").combobox("getText");
@@ -276,17 +279,20 @@
                     param.sale_way_name = $("#sale_way_no").combobox("getText");
                     param.delivery_place_name = $("#delivery_place_no").combobox("getText");
                     param.receive_place_name = $("#receive_place_no").combobox("getText");
-                    //param.agency_name = $("#agency_no").combobox("getText");
                     param.currency_name = $("#currency_no").combobox("getText");
                     param.clerk1_name = $("#clerk1_no").combobox("getText");
                     param.clerk2_name = $("#clerk2_no").combobox("getText");
                     param.clerk3_name = $("#clerk3_no").combobox("getText");
+                    param.agency1_name = $("#agency1_no").combobox("getText");
+                    param.agency2_name = $("#agency2_no").combobox("getText");
+                    param.agency3_name = $("#agency3_no").combobox("getText");
                     param.backpaper_confirm_name = $("#backpaper_confirm_no").combobox("getText");
                     param.produce_way_name = $("#produce_way_no").combobox("getText");
                     param.clear_way_name = $("#clear_way_no").combogrid("getText");
                     return true;
                 },
                 success: function (data) {
+                    $.messager.progress("close");
                     var result = eval('(' + data + ')');
                     if (result.suc) {
                         showTip("@Html.Lang("suc_save")");
@@ -295,7 +301,7 @@
                     }
                 }
             });
-            $.messager.progress("close");
+            
         });
 
 
@@ -312,6 +318,12 @@
         $("#clerk3_no").combobox("setText", "@order.clerk3_name");
         $("#order_div").css("visibility", "visible");
         setTaxRat("@order.currency_no");
+
+        //2021-11-22 样品和模单增加量产时间等3个输入框
+        if ("@order.order_type_name" != "开模单" && "@order.order_type_name" != "样品单") {
+            $(".mod").hide();
+        }
+
     });
 
     function setTaxRat(currencyNo) {
@@ -581,27 +593,18 @@
                                 @Html.Lang("clear_way"):
                             </td>
                             <td>
-                                 <select class="easyui-combogrid" style="width:120px" name="clear_way_no" id="clear_way_no" data-options="
-                                    value:'@order.clear_way_no',
+                                 <input class="easyui-combogrid" style="width:120px" name="clear_way_no" id="clear_way_no" data-options="
                                     panelWidth: 360,
                                     idField: 'value',
                                     textField: 'name',
-                                    url: '@Url.Content("~/Items/GetItems?what=clear_way")',                                    
+                                    url: '../Items/GetItems?what=clear_way',                                    
                                     columns: [[
                                         {field:'value',title:'结算代码',width:100},
                                         {field:'name',title:'结算名称',width:300},
                                     ]],
                                     fitColumns: true,
-                                ">
-                                </select>
+                                " value="@order.clear_way_no" />
                             </td>
-                            @*<td>
-                                    @Html.Lang("agency"):
-                                </td>
-                                <td>
-                                    <input class="easyui-combobox" id="agency_no" name="agency_no" style="width: 120px" panelwidth="120" valuefield="value" textfield="name" url="@Url.Content("~/Items/getItems?what=agency")" required="true" value="@order.agency_no" />
-                                </td>*@
-                            
                             <td>
                                 生产部门:
                             </td>
@@ -621,7 +624,25 @@
                                                ]" value="@order.is_total_solution" />
                             </td>
                         </tr>
-                        <tr>  
+                        <tr>
+                            <td class="mod">
+                                量产时间:
+                            </td>
+                            <td class="mod">
+                                <input class="easyui-datebox" name="batch_time" id="batch_time" style="width: 120px" editable="false" value="@(order.batch_time==null?"":((DateTime)order.batch_time).ToString("yyyy-MM-dd"))" />
+                            </td>
+                            <td class="mod">
+                                订单总量:
+                            </td>
+                            <td class="mod">
+                                <input class="easyui-textbox" name="total_quantity" id="total_quantity" style="width:120px" value="@order.total_quantity" />
+                            </td>
+                            <td class="mod">
+                                月订单量:
+                            </td>
+                            <td class="mod">
+                                <input class="easyui-textbox" name="monthly_quantity" id="monthly_quantity" style="width:120px" value="@order.monthly_quantity" />
+                            </td>
                             <td>
                                 @Html.Lang("biller"):
                             </td>
@@ -673,10 +694,11 @@
                                 <input class="easyui-numberbox" id="percent1" name="percent1" style="width: 120px" required="true" value="@order.percent1" />
                             </td>
                             <td>
-                                @Html.Lang("group1"):
+                                办事处1:
                             </td>
                             <td>
-                                <input class="easyui-textbox" name="group1" id="group1" style="width:120px" value="@order.group1" />
+                                <input class="easyui-combobox" id="agency1_no" name="agency1_no" style="width: 120px" editable="false"
+                                       panelheight="auto" valuefield="value" textfield="name" url="@Url.Content("~/Items/getItems?what=dept")" required value="@order.agency1_no" />
                             </td>
                         </tr>
                         <tr>
@@ -693,10 +715,11 @@
                                 <input class="easyui-numberbox" id="percent2" name="percent2" style="width: 120px" value="@order.percent2" />
                             </td>
                             <td>
-                                @Html.Lang("group2"):
+                                办事处2:
                             </td>
                             <td>
-                                <input class="easyui-textbox" name="group2" id="group2" style="width:120px" value="@order.group2" />
+                                <input class="easyui-combobox" id="agency2_no" name="agency2_no" style="width: 120px" editable="false"
+                                       panelheight="auto" valuefield="value" textfield="name" url="@Url.Content("~/Items/getItems?what=dept")" value="@order.agency2_no" />
                             </td>
                         </tr>
                         <tr>
@@ -713,10 +736,11 @@
                                 <input class="easyui-numberbox" id="percent3" name="percent3" style="width: 120px" value="@order.percent3" />
                             </td>
                             <td>
-                                组别3:
+                                办事处3:
                             </td>
                             <td>
-                                <input class="easyui-textbox" name="group3" id="group3" style="width:120px" value="@order.group3" />
+                                <input class="easyui-combobox" id="agency3_no" name="agency3_no" style="width: 120px" editable="false"
+                                       panelheight="auto" valuefield="value" textfield="name" url="@Url.Content("~/Items/getItems?what=dept")" value="@order.agency3_no" />
                             </td>
                         </tr>
                         <tr>

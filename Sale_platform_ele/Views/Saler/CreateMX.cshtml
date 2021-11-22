@@ -1,0 +1,610 @@
+﻿@using Sale_platform_ele.Models;
+@using Newtonsoft.Json;
+@{
+    MXCheckModel m = ViewData["bill"] as MXCheckModel;
+    var bill = m.bill;
+    string beforeJson = "[]", afterJson = "[]";
+    if (m.detailsBefore != null) {
+        beforeJson = JsonConvert.SerializeObject(m.detailsBefore);
+    }
+    if (m.detailsAfter != null) {
+        afterJson = JsonConvert.SerializeObject(m.detailsAfter);
+    }
+}
+
+<style type="text/css">
+    .ck_label {
+        margin-right: 8px;
+        cursor: pointer;
+    }
+</style>
+
+<script type="text/javascript" src="@Url.Content("~/Scripts/json2.js")"></script>
+<script>
+    var beforeData=@Html.Raw(beforeJson);
+    var afterData=@Html.Raw(afterJson);
+    var canChangeColumn=["item_name","item_model","qty","deal_price","tax_price","cost","fetch_date"];
+</script>
+<script>
+    $(function () {
+
+        $("#bill_type").combobox({
+            onChange: function (newValue, oldValue) {
+                if (newValue == "生产单") {
+                    $("#getK3InfoBtn").linkbutton("enable");
+                    $("#tb1AddBtn").linkbutton("disable");
+                    $("#tb2AddBtn").linkbutton("disable");
+                } else if (newValue == "备料单") {
+                    $("#getK3InfoBtn").linkbutton("disable");
+                    $("#tb1AddBtn").linkbutton("enable");
+                    $("#tb2AddBtn").linkbutton("enable");
+                }
+            }
+        });
+
+
+
+        $("#tran_type").combobox({
+            onChange: function (newValue, oldValue) {
+                if (newValue == "修改") {
+                    $('#tb1DelBtn').linkbutton('enable');
+                    $('#tb2DelBtn').linkbutton('enable');
+                    $('#tb2ModifyBtn').linkbutton('enable');
+                    $('#tb2CopyBtn').linkbutton('enable');
+                } else if (newValue == "取消") {
+                    $('#tb1DelBtn').linkbutton('disable');
+                    $('#tb2DelBtn').linkbutton('disable');
+                    $('#tb2ModifyBtn').linkbutton('disable');
+                    $('#tb2CopyBtn').linkbutton('disable');
+                }
+            }
+        });
+
+        $("#getK3InfoBtn").on("click",function(){
+            var billNo = $.trim($("#bill_no").val());
+            if(billNo==""){
+                showTip("请先录入K3单据编号");
+                return;
+            }
+
+            if(beforeData.length>0){
+                $.messager.confirm('操作确认', '检测到表格中存在数据，确定要重新加载数据吗？当前的表格数据将会被覆盖。', function (r) {
+                    fetchK3Data(billNo);
+                });
+            }else{
+                fetchK3Data(billNo);
+            }
+        });
+
+        //保存订单
+        $('#saveAllBut').bind('click', function () {
+            if (!$('#order_form').form('validate')) {
+                return false;
+            }
+            $.messager.progress();
+            $('#order_form').form('submit', {
+                url: '@Url.Content("~/Saler/SaveBill")',
+                onSubmit: function (param) {
+                    param.before_details = JSON.stringify(beforeData);
+                    param.after_details=JSON.stringify(afterData);
+                    return true;
+                },
+                success: function (data) {
+                    $.messager.progress("close");
+                    var result = eval('(' + data + ')');
+                    if (result.suc) {
+                        showTip("@Html.Lang("suc_save")");
+                    } else {
+                        showTip("@Html.Lang("failure_save"):" + result.msg);
+                    }
+                }
+            });
+
+        });
+
+        $("#submitApply").on("click",function() {
+            $("#submitApply").linkbutton('disable');
+            $('#saveAllBut').linkbutton('disable');
+            $.post("@Url.Content("~/Saler/BeginApply")", { sysNo: $("#sys_no").textbox("getValue") },
+            function (data) {
+                if (data.suc) {
+                    showTip(data.msg);
+                    setTimeout('window.location.href="@Url.Content("~/Saler/CheckBillList?billType=MX")"', 1000);
+                } else {
+                    showTip(data.msg);
+                    $("#submitApply").linkbutton('enable');
+                    $('#saveAllBut').linkbutton('enable');
+                }
+            });
+        });
+
+        setTimeout(function(){
+            $("#bill_type").combobox("setValue","@bill.bill_type");
+            $("#tran_type").combobox("setValue","@bill.tran_type");
+        },500);
+
+        $(".ck_label").on("click", function () {
+            $("input[name='change_project'][value='" + $.trim($(this).html()) + "']").trigger("click");
+        });
+        $("#order_div input:not(:checkbox):not(#comment)").textbox({ width: 140 });
+        $.map("@bill.change_project".split(","), function (item) { $("input[name='change_project'][value='" + item + "']").attr("checked", true); });
+        $("#order_div").css("visibility", "visible");
+        $("#getK3InfoBtn").linkbutton("disable");
+    });
+
+    function fetchK3Data(billNo){
+        $.messager.progress();
+        $.post("../Items/GetK3OrderForMX",{billNO:billNo},function(data){
+            $.messager.progress("close");
+            if(data.length<1){
+                showTip("查不到此生产单的信息，请确认后再录入");
+                return;
+            }
+
+            if($("#tran_type").combobox("getValue")=="取消"){
+                if(data.filter(function(d){return d.relate_qty>0}).length>0){
+                    showTip("此单据已做过出库单，不能取消，只能修改");
+                    return;
+                }
+            }
+
+            var h=data[0];
+            $("#customer_name").textbox("setValue",h.customer_name);
+            $("#agency_name").textbox("setValue",h.agency_name);
+            $("#clerk_name").textbox("setValue",h.clerk_name);
+
+            beforeData=data;
+            afterData=JSON.parse(JSON.stringify(data)); //复制一份数据
+
+            if($("#tran_type").combobox("getValue")=="取消"){
+                afterData.forEach(function(a){a.qty=0;a.deal_sum=0;});
+            }
+
+            $("#detail_before").datagrid("loadData",beforeData);
+            $("#detail_after").datagrid("loadData",afterData);
+        });
+    }
+
+</script>
+
+<script>
+    var editRowIndex=undefined;
+    $(function () {
+        var columnsArray=[
+                { field: 'entry_no', title: '单据行号', width: 60, align: 'center' },
+                { field: 'item_name', title: '物料名称', width: 120 },
+                { field: 'item_model', title: '规格型号', width: 150 },
+                { field: 'qty', title: '数量', width: 80, align: 'right' },
+                { field: 'deal_price', title: '成交价', width: 80, align: 'right' },
+                { field: 'tax_price', title: '含税单价', width: 80, align: 'right' },
+                { field: 'cost', title: '成本价', width: 60, align: 'right' },
+                { field: 'deal_sum', title: '成交金额', width: 100, align: 'right' },
+                { field: 'fetch_date', title: '交货日期', width: 100 },
+                { field: 'currency_name', title: '币别', width: 80 },
+                { field: 'bill_no', title: '单据编号', width: 140 },
+                { field: 'relate_qty', title: 'K3关联数量', width: 80, align: 'right' }
+        ];
+
+        //更改表格的列属性，在原表格的基础上增加可变列的styler属性，如果值与原表格不一样，则变为红色
+        var columnsArrayAfter=JSON.parse(JSON.stringify(columnsArray));
+        for(var i=0;i<canChangeColumn.length;i++){
+            var colName=canChangeColumn[i];
+            
+            //必须构建一个闭包函数，否则里面函数的colName永远都是for循环的最后一个
+            (function(colName){
+                columnsArrayAfter.filter(function(c){return c.field==colName;})[0].styler=function(value,row,index){
+                    var beforeValue=beforeData.filter(function(b){return b.entry_no == row.entry_no;}).map(function(b){return b[colName];})[0];
+                    if(beforeValue != value){
+                        return "color:red";
+                    }else{
+                        return "color:black";
+                    }
+                };
+            })(colName);
+        }
+        $("#detail_before").datagrid({
+            width: 1100,
+            height:200,
+            data: beforeData,
+            singleSelect: true,
+            fitColumns: true,
+            columns: [columnsArray],
+            toolbar: [{
+                text: "删除行",
+                id:"tb1DelBtn",
+                disabled:true,
+                iconCls: 'icon-remove',
+                handler: delItem
+            },{
+                text: "新增备料行",
+                id:"tb1AddBtn",
+                disabled:true,
+                iconCls: 'icon-add',
+                handler: addItem
+            }]
+        });
+
+        $("#detail_after").datagrid({
+            width: 1100,
+            height:200,
+            data: afterData,
+            singleSelect: true,
+            fitColumns: true,
+            columns: [columnsArrayAfter],
+            toolbar: [{
+                text: "修改行",
+                id:"tb2ModifyBtn",
+                disabled:true,
+                iconCls: 'icon-edit',
+                handler: editItem
+            },{
+                text: "删除行",
+                id:"tb2DelBtn",
+                disabled:true,
+                iconCls: 'icon-remove',
+                handler: delItem2
+            },{
+                text: "复制行",
+                id:"tb2CopyBtn",
+                disabled:true,
+                iconCls: 'icon-redo',
+                handler: copyItem
+            }]
+        });
+    })
+
+    function delItem(){
+        var row = $('#detail_before').datagrid('getSelected');
+        if (row) {
+            removeArrItem(beforeData,"entry_no",row.entry_no);
+            removeArrItem(afterData,"entry_no",row.entry_no);
+            $("#detail_before").datagrid("loadData",beforeData);
+            $("#detail_after").datagrid("loadData",afterData);
+        }
+    }
+
+    function delItem2(){
+        var row = $('#detail_after').datagrid('getSelected');
+        if (row) {
+            if(afterData.filter(function(a){return a.entry_no = row.entry_no}).length<2){
+                showTip("当前对应的订单行只有一行，如需删除，请在原单表格删除对应的订单行，然后此行也会一并自动删除");
+                return;
+            }
+            var deleteRowIndex=$('#detail_after').datagrid('getRowIndex',row);
+            afterData.splice(deleteRowIndex,1);
+            $('#detail_after').datagrid('loadData', afterData);
+        }
+    }
+
+    function editItem(){
+        var row = $('#detail_after').datagrid('getSelected');
+        if (row) {
+            editRowIndex=$('#detail_after').datagrid('getRowIndex',row);
+            $("#dlg_details").dialog("setTitle","修改单据明细").dialog("open");            
+            $("#detail_bill_no").textbox("readonly",true);
+            $("#entry_no").textbox("readonly",true);
+
+            $("#fm_detail").form("load",row);
+            $("#detail_bill_no").textbox("setValue",row.bill_no);
+
+        }
+    }
+
+    function addItem(){
+        editRowIndex=undefined;
+        $("#fm_detail").form("reset");
+        $("#dlg_details").dialog("setTitle","新增备料明细").dialog("open");
+        $("#detail_bill_no").textbox("readonly",false);
+        $("#entry_no").textbox("readonly",false);
+        $("#detail_bill_no").textbox("setValue",$("#bill_no").textbox("getValue"));
+    }
+
+    function copyItem(){
+        var row = $('#detail_after').datagrid('getSelected');
+        if (row) {
+            var rowIndex=$('#detail_after').datagrid('getRowIndex',row);
+            afterData.splice(rowIndex,0,JSON.parse(JSON.stringify(row)));            
+            $("#detail_after").datagrid("loadData",afterData);
+        }
+    }
+
+    //删除所有符合条件的行
+    function removeArrItem(arr,field_name,field_value){        
+        var idx=[];
+        for(var i=0;i<arr.length;i++){
+            if(arr[i][field_name]==field_value){
+                idx.push(i);
+            }
+        }
+
+        //从后面的索引开始删除
+        for(var i=idx.length-1;i>=0;i--){
+            arr.splice(idx[i],1);
+        }
+    }
+
+    //保存明细
+    function saveDetail(){
+        //只有第二个表格可以修改
+
+        if (!$("#fm_detail").form("validate")) {
+            return;
+        }
+
+        if(editRowIndex!=undefined){
+            var d = afterData[editRowIndex];
+
+            if(!isNaN(d.relate_qty)){
+                if($("#qty").textbox("getValue")<d.relate_qty){
+                    showTip("修改后的数量不能少于K3关联数量（已出库数量）");
+                    return;
+                }
+            }
+
+            d.item_name = $("#item_name").textbox("getValue");
+            d.item_model = $("#item_model").textbox("getValue");
+            d.qty = $("#qty").textbox("getValue");
+            d.deal_price = $("#deal_price").textbox("getValue");
+            d.tax_price = $("#tax_price").textbox("getValue");
+            d.cost = $("#cost").textbox("getValue");
+            d.fetch_date = $("#fetch_date").datebox("getValue");
+
+            if(!isNaN(d.qty) && !isNaN(d.deal_price)){
+                d.deal_sum = d.qty * d.deal_price;
+            }else{
+                d.deal_sum = 0;
+            }
+
+            $("#detail_after").datagrid("updateRow", { index: editRowIndex, row: d });
+            $("#detail_after").datagrid("refreshRow",editRowIndex);
+
+            $("#dlg_details").dialog("close");
+        }else{
+            //只有第一个表格可以增加
+            var entry_no = $("#entry_no").textbox("getValue");            
+
+            if(beforeData.filter(function(b){return b.entry_no == entry_no}).length>0){
+                showTip("单据行号已存在，不能重复");
+                return;
+            }
+            var detail = {
+                bill_no:$("#detail_bill_no").textbox("getValue"),
+                entry_no:entry_no,
+                item_name:$("#item_name").textbox("getValue"),
+                item_model:$("#item_model").textbox("getValue"),
+                qty:$("#qty").textbox("getValue"),
+                deal_price:$("#deal_price").textbox("getValue"),
+                cost:$("#cost").textbox("getValue"),
+                fetch_date:$("#fetch_date").datebox("getValue")
+            }
+
+            if(!isNaN(detail.qty) && !isNaN(detail.deal_price)){
+                detail.deal_sum = detail.qty * detail.deal_price;
+            }else{
+                detail.deal_sum = 0;
+            }
+
+            var detail2 = JSON.parse(JSON.stringify(detail));
+            if($("#tran_type").combobox("getValue") == "取消"){
+                detail2.qty = 0;
+                detail2.deal_sum = 0;
+            }
+
+            beforeData.push(detail);
+            afterData.push(detail2);
+
+            $("#detail_before").datagrid("loadData",beforeData);
+            $("#detail_after").datagrid("loadData",afterData);
+            
+            $("#dlg_details").dialog("close");
+        }
+
+    }
+
+</script>
+
+    <div id="order_div" class="easyui-panel" title="新建修改/取消单" style="width: 840px; padding: 10px; background: #fafafa;visibility:hidden">
+        <form id="order_form" method="post">
+            <table border="0" cellpadding="1" cellspacing="3" width="800">
+                <tr>
+                    <td>
+                        系统流水号:
+                    </td>
+                    <td>
+                        <input class="easyui-textbox" name="sys_no" id="sys_no" value="@bill.sys_no" readonly />
+                    </td>
+                    <td>
+                        下单日期:
+                    </td>
+                    <td>
+                        <input class="easyui-datebox" name="bill_date" id="bill_date" editable="false" value="@(bill.bill_date == DateTime.MinValue ? "" : bill.bill_date.ToString("yyyy-MM-dd"))" />
+                    </td>
+                    <td>
+                        业务类型:
+                    </td>
+                    <td>
+                        <input class="easyui-combobox" name="tran_type" id="tran_type"
+                               data-options="textField:'value',valueField:'value',panelHeight:'auto', required:true,editable:false,
+                                           data:[
+                                           {value:'修改'},{value:'取消'}
+                                           ]" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        单据类型:
+                    </td>
+                    <td>
+                        <input class="easyui-combobox" name="bill_type" id="bill_type"
+                               data-options="textField:'value',valueField:'value',panelHeight:'auto', required:true,editable:false,
+                                           data:[
+                                           {value:'生产单'},{value:'备料单'}
+                                           ]" />
+                    </td>
+                    <td>
+                        单据编号:
+                    </td>
+                    <td colspan="3">
+                        <input class="easyui-textbox" id="bill_no" name="bill_no" value="@bill.bill_no" required />
+                        <a id="getK3InfoBtn" href="#" class="easyui-linkbutton" iconcls='icon-search' style="margin-left:8px;">读取生产单详情</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        客户名称:
+                    </td>
+                    <td>
+                        <input class="easyui-textbox" id="customer_name" name="customer_name" value="@bill.customer_name" required />
+                    </td>
+                    <td>
+                        办事处:
+                    </td>
+                    <td>
+                        <input class="easyui-textbox" id="agency_name" name="agency_name" value="@bill.agency_name" required />
+                    </td>
+                    <td>
+                        营业员:
+                    </td>
+                    <td>
+                        <input class="easyui-textbox" id="clerk_name" name="clerk_name" value="@bill.clerk_name" required />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        制单人:
+                    </td>
+                    <td>
+                        <input class="easyui-textbox" name="applier_name" value="@bill.applier_name" readonly />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        变更项目:
+                    </td>
+                    <td colspan="5">
+                        <div style="margin:8px 0;">
+                            <fieldset>
+                                <legend>修改以下项目的在表格中处理</legend>
+                                <div style="padding:6px 0;">
+                                    @foreach (var p in new string[] { "型号", "数量", "含税单价", "成本价", "成交价" }) {
+                                        <input type="checkbox" name="change_project" value="@p" /><span class="ck_label">@p</span>                                    
+                                    }
+                                </div>
+                            </fieldset>
+                            <fieldset>
+                                <legend>修改以下项目的在附注中说明</legend>
+                                <div style="padding:6px 0;">
+                                    @foreach (var p in new string[] { "交货日期","包装信息","客户名称","贸易类型","其它" }) {
+                                        <input type="checkbox" name="change_project" value="@p" /><span class="ck_label">@p</span>                                    
+                                    }
+                                </div>
+                            </fieldset>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        附注:
+                    </td>
+                    <td colspan="5">
+                        <input class="easyui-textbox" name="comment" id="comment" multiline="true" style="width:720px;height:80px;" value="@bill.comment" prompt="变更项目是包装信息、客户名称、贸易类型或其它时，请在此处说明" />
+                    </td>
+                </tr>
+            </table>
+
+            <div style="margin-top:16px;">
+                <div class="easyui-panel" title="原单明细信息" style="width: 815px;">
+                    <table id="detail_before"></table>
+                </div>
+            </div>
+            <div style="margin-top:16px;">
+                <div class="easyui-panel" title="变更后明细信息" style="width: 815px;">
+                    <table id="detail_after"></table>
+                </div>
+            </div>
+        </form>
+
+
+        <div align="center">
+            <a id="saveAllBut" class="easyui-linkbutton" iconcls='icon-save' style="margin: 10px 20px;">@Html.Lang("save_form")</a>
+            <a id="submitApply" class="easyui-linkbutton" iconcls='icon-document' style="margin: 10px 20px;">@Html.Lang("submit_apply")</a>
+        </div>
+
+    </div>
+
+@*弹出的编辑框*@
+<div id="dlg_details" class="easyui-dialog" style="width: 520px; padding: 10px 10px" closed="true" buttons="#dlg_details_buttons" modal="true">
+    <form id="fm_detail">
+        <table border="0" cellpadding="2" cellspacing="3" width="450">
+            <tr>
+                <td>
+                    单据编码:
+                </td>
+                <td>
+                    <input class="easyui-textbox" name="detail_bill_no" id="detail_bill_no" style="width: 135px" required />
+                </td>
+                <td>
+                    单据行号:
+                </td>
+                <td>
+                    <input class="easyui-textbox" name="entry_no" id="entry_no" style="width:135px;" required />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    物料名称:
+                </td>
+                <td>
+                    <input class="easyui-textbox" name="item_name" id="item_name" style="width:135px;" required />
+                </td>
+                <td>
+                    规格型号:
+                </td>
+                <td>
+                    <input class="easyui-textbox" name="item_model" id="item_model" style="width:135px;" required />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    数量:
+                </td>
+                <td>
+                    <input class="easyui-textbox" id="qty" name="qty" style="width: 135px" required />
+                </td>
+                <td>
+                    成交价:
+                </td>
+                <td>
+                    <input class="easyui-textbox" id="deal_price" name="deal_price" style="width: 135px" />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    含税单价:
+                </td>
+                <td>
+                    <input class="easyui-textbox" id="tax_price" name="tax_price" style="width: 135px" />
+                </td>
+                <td>
+                    成本价:
+                </td>
+                <td>
+                    <input class="easyui-textbox" id="cost" name="cost" style="width: 135px" />
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    交货日期:
+                </td>
+                <td>
+                    <input id="fetch_date" name="fetch_date" class="easyui-datebox" style="width: 135px" />
+                </td>
+            </tr>
+        </table>
+    </form>
+    <br />
+</div>
+<div id="dlg_details_buttons">
+    <a class="easyui-linkbutton" iconcls="icon-ok" onclick="saveDetail()">@Html.Lang("save")</a>
+    <a class="easyui-linkbutton" iconcls="icon-cancel" onclick="javascript:$('#dlg_details').dialog('close')">@Html.Lang("cancel")</a>
+</div>

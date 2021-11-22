@@ -45,6 +45,20 @@
                 <table border="0" cellpadding="1" cellspacing="3" width="800">
                     <tr>
                         <td>
+                            下单日期：
+                        </td>
+                        <td>
+                            <input value="@(order.bill_date==null?"":((DateTime)order.bill_date).ToString("yyyy-MM-dd"))" />
+                        </td>
+                        <td>
+                            单据编号：
+                        </td>
+                        <td>
+                            <input value="@order.bill_no" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
                             公司：
                         </td>
                         <td>

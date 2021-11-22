@@ -183,6 +183,7 @@
     <Compile Include="Services\EBSv.cs" />
     <Compile Include="Services\EqmSv.cs" />
     <Compile Include="Services\GroupSv.cs" />
+    <Compile Include="Services\MXSv.cs" />
     <Compile Include="Services\OtherSv.cs" />
     <Compile Include="Services\ProcessSv.cs" />
     <Compile Include="Services\SOSv.cs" />
@@ -654,9 +655,13 @@
     <Content Include="Views\Saler\CheckEOList.cshtml" />
     <Content Include="Views\Saler\CheckEO.cshtml" />
     <Content Include="Views\Saler\CreateBL.cshtml" />
-    <Content Include="Views\Saler\CheckbLList.cshtml" />
+    <Content Include="Views\Saler\CheckBLList.cshtml" />
     <Content Include="Views\Saler\CheckBL.cshtml" />
     <Content Include="Views\File\PrintBLReport.cshtml" />
+    <Content Include="Views\Saler\CreateMX.cshtml" />
+    <Content Include="Views\Saler\CheckMXList.cshtml" />
+    <Content Include="Views\Saler\CheckMX.cshtml" />
+    <Content Include="Views\File\PrintMXReport.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -36,6 +36,16 @@
                         <a id="printBt" href="#" class="easyui-linkbutton" iconcls='icon-print' style="padding:2px 10px;"> 打印 </a>
                     </td>
                 </tr>
+                @if (!string.IsNullOrEmpty(bill.good_percent)) { 
+                    <tr>
+                        <td>
+                            订料良率:
+                        </td>
+                        <td>
+                            <input value="@bill.good_percent" />
+                        </td>
+                    </tr>
+                }
                 <tr>
                     <td>
                         系统流水号:
@@ -124,50 +134,44 @@
                         <input value="@(bill.bl_qty > 0 ? bill.bl_qty.ToString() : "")" />
                     </td>
                     <td>
-                        排版粒数(粒):
-                    </td>
-                    <td>
-                        <input value="@(bill.layout_qty > 0 ? bill.layout_qty.ToString() : "")" />
-                    </td>
-                    <td>
-                        订单数量(粒):
-                    </td>
-                    <td>
-                        <input value="@(bill.order_qty > 0 ? bill.order_qty.ToString() : "")" />
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        营业员:
-                    </td>
-                    <td>
-                        <input value="@bill.clerk_name" />
-                    </td>
-                    <td>
-                        首样时间:
-                    </td>
-                    <td>
-                        <input value="@(bill.first_date == DateTime.MinValue ? "" : bill.first_date.ToString("yyyy-MM-dd"))" />
-                    </td>
-                    <td>
-                        量产时间:
-                    </td>
-                    <td>
-                        <input value="@(bill.batch_date == DateTime.MinValue ? "" : bill.batch_date.ToString("yyyy-MM-dd"))" />
-                    </td>
-                </tr>
-                <tr>
-                    <td>
                         产品用途:
                     </td>
                     <td>
                         <input value="@bill.usage" />
                     </td>
                     <td>
-                        FCST周期:
+                        营业员:
                     </td>
                     <td>
-                        <input value="@bill.fcst" />
+                        <input value="@bill.clerk_name" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        产品类型:
+                    </td>
+                    <td>
+                        <input value="@bill.product_classification" />
+                    </td>
+                    <td>
+                        表面处理:
+                    </td>
+                    <td>
+                        <input value="@bill.surface_type" />
+                    </td>
+                    <td>
+                        是否半孔板:
+                    </td>
+                    <td>
+                        <input value="@bill.is_half_hole" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        是否出样:
+                    </td>
+                    <td>
+                        <input value="@bill.is_make_sample" />
                     </td>
                     <td>
                         制单人:
@@ -181,7 +185,7 @@
                         备注:
                     </td>
                     <td colspan="5">
-                        <input class="easyui-textbox" id="comment" multiline="true" style="width:660px;height:40px;" value="@bill.comment" editable="false" />
+                        <input class="easyui-textbox" id="comment" multiline="true" style="width:660px;height:60px;" value="@bill.comment" editable="false" />
                     </td>
                 </tr>
             </table>
@@ -197,6 +201,24 @@
                 </div>
             </fieldset>
         </div>
+        @if (!string.IsNullOrEmpty(bill.bl_plan)) { 
+            <div>
+                <fieldset>
+                    <legend>消耗计划</legend>
+                    <div style="padding:8px 0;">
 
+                        @foreach (var plan in bill.bl_plan.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries)) {                        
+                            var d = plan.Split(new char[] { ':' }, StringSplitOptions.RemoveEmptyEntries)[0];
+                            var q = plan.Split(new char[] { ':' }, StringSplitOptions.RemoveEmptyEntries)[1];
+                        
+                            <div style="margin-bottom:6px;">
+                                日期：<input value="@d" /> <span style="padding:0 12px;"></span> 数量：<input value="@q" />
+                            </div>
+                        }
+                    
+                    </div>
+                </fieldset>
+            </div>
+        }
     </div>
 

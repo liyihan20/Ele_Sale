@@ -179,6 +179,26 @@
                 </td>
             </tr>
             <tr>
+                @if (order.order_type_name == "开模单" || order.order_type_name == "样品单") {
+                    <td>
+                        量产时间:
+                    </td>
+                    <td>
+                        <input class="easyui-textbox" style="width:120px" value="@(order.batch_time==null?"":((DateTime)order.batch_time).ToString("yyyy-MM-dd"))" />
+                    </td>
+                    <td>
+                        订单总量:
+                    </td>
+                    <td>
+                        <input class="easyui-textbox" style="width:120px" value="@order.total_quantity" />
+                    </td>
+                    <td>
+                        月订单量:
+                    </td>
+                    <td>
+                        <input class="easyui-textbox" style="width:120px" value="@order.monthly_quantity" />
+                    </td>
+                }
                 <td>
                     @Html.Lang("biller"):
                 </td>
@@ -230,10 +250,10 @@
                     <input class="easyui-textbox" style="width: 120px"  value="@((int)order.percent1)" />
                 </td>
                 <td>
-                    @Html.Lang("group1"):
+                    办事处1:
                 </td>
                 <td>
-                    <input class="easyui-textbox" style="width:120px" value="@order.group1" />
+                    <input class="easyui-textbox" style="width:120px" value="@order.agency1_name" />
                 </td>
             </tr>
             <tr>
@@ -250,10 +270,10 @@
                     <input class="easyui-textbox" style="width: 120px" value="@(order.percent2==null?0:(int)order.percent2)" />
                 </td>
                 <td>
-                    @Html.Lang("group2"):
+                    办事处2:
                 </td>
                 <td>
-                    <input class="easyui-textbox" style="width:120px" value="@order.group2" />
+                    <input class="easyui-textbox" style="width:120px" value="@order.agency2_name" />
                 </td>
             </tr>
             <tr>
@@ -270,10 +290,10 @@
                     <input class="easyui-textbox" style="width: 120px" value="@(order.percent3==null?0:(int)order.percent3)" />
                 </td>
                 <td>
-                    组别3:
+                    办事处3:
                 </td>
                 <td>
-                    <input class="easyui-textbox" style="width:120px" value="@order.group3" />
+                    <input class="easyui-textbox" style="width:120px" value="@order.agency3_name" />
                 </td>
             </tr>
             <tr>

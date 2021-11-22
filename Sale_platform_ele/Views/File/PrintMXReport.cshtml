@@ -1,0 +1,261 @@
+﻿@using Sale_platform_ele.Models;
+@{
+    var mx = ViewData["mx"] as MXCheckModel;
+    var h = mx.bill;
+    var alist = ViewData["result"] as List<StepNameAndAuditorModel>;
+}
+
+<style type="text/css">
+    #reportTb {
+        border-left: 1px solid;
+        border-bottom: 1px solid;
+    }
+
+    
+        
+
+        #reportTb tr td {
+            text-align: center;
+            border-right: 1px solid;
+            border-top: 1px solid;
+            padding: 4px 12px;
+        }
+        #detailBeforeTb tr td,#detailAfterTb tr td {
+            text-align: center;
+            border:0;
+            padding:2px;
+            word-break:break-all;
+            border-top:1px dashed;
+        }
+
+
+
+    /*#reportTb tr td:nth-child(2n+1) {
+            background-color: #F3F3F3;
+        }*/
+</style>
+
+
+
+<div style="padding:4px;font-size:9pt;width:640px;margin:0 auto;">
+    <div><img src="@Url.Content("~/Content/Images/Truly.gif")" /></div>
+
+    <div style="text-align:center;">
+        <div style="font-size:14pt;font-weight:bold;margin:8px 0;">
+            <span>信利电子有限公司 修改/取消单</span> <br />
+        </div>
+    </div>
+
+    <table style="width:100%;" id="reportTb" cellspacing="0">
+        <tr>
+            <td style="width:20%;">申请流水号:</td>
+            <td style="width:30%;">@h.sys_no</td>
+            <td style="width:20%;">打印时间:</td>
+            <td style="width:30%;">@(DateTime.Now.ToString("yyyy-MM-dd HH:mm"))</td>
+        </tr>
+        <tr>
+            <td>申请人:</td>
+            <td>@h.applier_name</td>
+            <td>部门:</td>
+            <td>@ViewData["depName"]</td>
+        </tr>
+        <tr>
+            <td colspan="4">申请内容</td>
+        </tr>
+        <tr>
+            <td>下单日期:</td>
+            <td>@(((DateTime)h.bill_date).ToString("yyyy-MM-dd"))</td>
+            <td>业务类型:</td>
+            <td>@h.tran_type</td>
+        </tr>
+        <tr>
+            <td>单据类型:</td>
+            <td>@h.bill_type</td>
+            <td>单据编号:</td>
+            <td>@h.bill_no</td>
+        </tr>
+        <tr>
+            <td>客户名称:</td>
+            <td>@h.customer_name</td>
+            <td>办事处:</td>
+            <td>@h.agency_name</td>
+        </tr>
+        <tr>
+            <td>业务员:</td>
+            <td>@h.clerk_name</td>
+            <td>变更项目:</td>
+            <td>@h.change_project</td>
+        </tr>
+        <tr>
+            <td>附注:</td>
+            <td colspan="3">@h.comment</td>
+        </tr>
+        
+        @if (mx.detailsBefore.Count() > 0) {
+            <tr>
+                <td colspan="4">原单明细</td>
+            </tr>
+            <tr>
+                <td colspan="4">
+                    <table cellspacing="0" id="detailBeforeTb" style="margin:8px 0;">
+                        <tr>
+                            <th style="width:8%">
+                                行号
+                            </th>
+                            <th style="width:14%">
+                                物料名称
+                            </th>
+                            <th style="width:20%">
+                                规格型号
+                            </th>
+                            <th style="width:8%">
+                                数量
+                            </th>
+                            <th style="width:10%">
+                                成交价
+                            </th>
+                            <th style="width:10%">
+                                含税单价
+                            </th>
+                            <th style="width:10%">
+                                成本价
+                            </th>
+                            <th style="width:10%">
+                                成交金额
+                            </th>
+                            <th style="width:10%">
+                                交货日期
+                            </th>
+                        </tr>
+                        <tbody>
+                        @foreach (var b in mx.detailsBefore) {
+                            <tr>
+                                <td>
+                                    @b.entry_no
+                                </td>
+                                <td>
+                                    @b.item_name
+                                </td>
+                                <td>
+                                    @b.item_model
+                                </td>
+                                <td>
+                                    @b.qty
+                                </td>
+                                <td>
+                                    @b.deal_price
+                                </td>
+                                <td>
+                                    @b.tax_price
+                                </td>
+                                <td>
+                                    @b.cost
+                                </td>
+                                <td>
+                                    @b.deal_sum
+                                </td>
+                                <td>
+                                    @b.fetch_date
+                                </td>
+                            </tr>
+                        }
+                            </tbody>
+                    </table>
+                </td>
+            </tr>
+        }
+
+        @if (mx.detailsAfter.Count() > 0) {
+            <tr>
+                <td colspan="4">改单明细</td>
+            </tr>
+            <tr>
+                <td colspan="4">
+                    <table cellspacing="0" id="detailAfterTb" style="margin:8px 0;">
+                        <tr>
+                            <th style="width:8%">
+                                行号
+                            </th>
+                            <th style="width:14%">
+                                物料名称
+                            </th>
+                            <th style="width:20%">
+                                规格型号
+                            </th>
+                            <th style="width:8%">
+                                数量
+                            </th>
+                            <th style="width:10%">
+                                成交价
+                            </th>
+                            <th style="width:10%">
+                                含税单价
+                            </th>
+                            <th style="width:10%">
+                                成本价
+                            </th>
+                            <th style="width:10%">
+                                成交金额
+                            </th>
+                            <th style="width:10%">
+                                交货日期
+                            </th>
+                        </tr>
+                        @foreach (var b in mx.detailsAfter) {
+                            <tr>
+                                <td>
+                                    @b.entry_no
+                                </td>
+                                <td>
+                                    @b.item_name
+                                </td>
+                                <td>
+                                    @b.item_model
+                                </td>
+                                <td>
+                                    @b.qty
+                                </td>
+                                <td>
+                                    @b.deal_price
+                                </td>
+                                <td>
+                                    @b.tax_price
+                                </td>
+                                <td>
+                                    @b.cost
+                                </td>
+                                <td>
+                                    @b.deal_sum
+                                </td>
+                                <td>
+                                    @b.fetch_date
+                                </td>
+                            </tr>
+                        }
+                    </table>
+                </td>
+            </tr>
+        }
+
+        <tr>
+            <td colspan="4">审批流程</td>
+        </tr>
+        @for (var i = 0; i < alist.Count(); i = i + 2) {
+
+            <tr>
+                <td>@alist[i].stepName :</td>
+                <td>@alist[i].auditorName @(((DateTime)alist[i].auditTime).ToString("MM/dd HH:mm"))</td>
+                @if (i >= alist.Count() - 1) {
+                    <td></td>
+                    <td></td>
+                }
+                else {
+                    <td>@alist[i + 1].stepName :</td>
+                    <td>@alist[i + 1].auditorName @(((DateTime)alist[i + 1].auditTime).ToString("MM/dd HH:mm"))</td>
+                }
+            </tr>
+
+        }
+    </table>
+
+</div>

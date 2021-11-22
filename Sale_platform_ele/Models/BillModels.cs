@@ -87,5 +87,23 @@ namespace Sale_platform_ele.Models
     }
 
 
+    public class MXCheckModel
+    {
+        public Sale_MX bill { get; set; }
+        public List<Sale_MX_detail> detailsBefore { get; set; }
+        public List<Sale_MX_detail> detailsAfter { get; set; }
+    }
+
+    public class MXListModel
+    {
+        public int billId { get; set; }
+        public string billDate { get; set; }
+        public string sysNo { get; set; }
+        public string billType { get; set; }
+        public string tranType { get; set; }
+        public string customerName { get; set; }
+        public string billNo { get; set; }
+        public string auditStatus { get; set; }
+    }
 
 }

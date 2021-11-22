@@ -1,0 +1,218 @@
+﻿@using Sale_platform_ele.Models;
+@using Newtonsoft.Json;
+@{
+    MXCheckModel m = ViewData["bill"] as MXCheckModel;
+    var bill = m.bill;
+    string beforeJson = "[]", afterJson = "[]";
+    if (m.detailsBefore != null) {
+        beforeJson = JsonConvert.SerializeObject(m.detailsBefore);
+    }
+    if (m.detailsAfter != null) {
+        afterJson = JsonConvert.SerializeObject(m.detailsAfter);
+    }
+}
+
+<style type="text/css">
+    .ck_label {
+        margin-right: 8px;
+        cursor: pointer;
+    }
+</style>
+
+<script type="text/javascript" src="@Url.Content("~/Scripts/json2.js")"></script>
+<script>
+    var beforeData=@Html.Raw(beforeJson);
+    var afterData=@Html.Raw(afterJson);
+    var canChangeColumn=["item_name","item_model","qty","deal_price","tax_price","cost","fetch_date"];
+</script>
+<script>
+    $(function () {
+        $.map("@bill.change_project".split(","), function (item) { $("input[name='change_project'][value='" + item + "']").attr("checked", true); });
+        $("#order_div input[type='checkbox']").not(":checked").attr("disabled", "disabled");
+        $("#order_div input[type='checkbox']:checked").click(function () { event.preventDefault(); });
+        $("#order_div input:not(:checkbox):not(#comment)").textbox({ width: 140, editable: false });
+        $("#order_div").css("visibility", "visible");
+
+        $("#printBt").on("click", function () {
+            window.open("../File/PrintMXReport?sysNo=@bill.sys_no");
+        });
+
+    });
+
+</script>
+
+<script>
+    $(function () {
+        var columnsArray=[
+                { field: 'entry_no', title: '单据行号', width: 60, align: 'center' },
+                { field: 'item_name', title: '物料名称', width: 120 },
+                { field: 'item_model', title: '规格型号', width: 150 },
+                { field: 'qty', title: '数量', width: 80, align: 'right' },
+                { field: 'deal_price', title: '成交价', width: 80, align: 'right' },
+                { field: 'tax_price', title: '含税单价', width: 80, align: 'right' },
+                { field: 'cost', title: '成本价', width: 60, align: 'right' },
+                { field: 'deal_sum', title: '成交金额', width: 100, align: 'right' },
+                { field: 'fetch_date', title: '交货日期', width: 100 },
+                { field: 'currency_name', title: '币别', width: 80 },
+                { field: 'bill_no', title: '单据编号', width: 140 },
+                { field: 'relate_qty', title: 'K3关联数量', width: 80, align: 'right' }
+        ];
+
+        //更改表格的列属性，在原表格的基础上增加可变列的styler属性，如果值与原表格不一样，则变为红色
+        var columnsArrayAfter=JSON.parse(JSON.stringify(columnsArray));
+        for(var i=0;i<canChangeColumn.length;i++){
+            var colName=canChangeColumn[i];
+            
+            //必须构建一个闭包函数，否则里面函数的colName永远都是for循环的最后一个
+            (function(colName){
+                columnsArrayAfter.filter(function(c){return c.field==colName;})[0].styler=function(value,row,index){
+                    var beforeValue=beforeData.filter(function(b){return b.entry_no == row.entry_no;}).map(function(b){return b[colName];})[0];
+                    if(beforeValue != value){
+                        return "color:red";
+                    }else{
+                        return "color:black";
+                    }
+                };
+            })(colName);
+        }
+        $("#detail_before").datagrid({
+            width: 1100,
+            height:180,
+            data: beforeData,
+            singleSelect: true,
+            fitColumns: true,
+            columns: [columnsArray]
+        });
+
+        $("#detail_after").datagrid({
+            width: 1100,
+            height:180,
+            data: afterData,
+            singleSelect: true,
+            fitColumns: true,
+            columns: [columnsArrayAfter]
+        });
+    });
+    
+
+</script>
+
+    <div id="order_div" class="easyui-panel" title="查看单据" style="width: 840px; padding: 10px; background: #fafafa;visibility:hidden">
+            <table border="0" cellpadding="1" cellspacing="3" width="800">
+                <tr>
+                    <td>
+                        功能按钮:
+                    </td>
+                    <td>
+                        <a id="printBt" href="#" class="easyui-linkbutton" iconcls='icon-print' style="padding:2px 10px;"> 打印 </a>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        系统流水号:
+                    </td>
+                    <td>
+                        <input value="@bill.sys_no" />
+                    </td>
+                    <td>
+                        下单日期:
+                    </td>
+                    <td>
+                        <input value="@(bill.bill_date == DateTime.MinValue ? "" : bill.bill_date.ToString("yyyy-MM-dd"))" />
+                    </td>
+                    <td>
+                        业务类型:
+                    </td>
+                    <td>
+                        <input value="@bill.tran_type" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        单据类型:
+                    </td>
+                    <td>
+                        <input value="@bill.bill_type" />
+                    </td>
+                    <td>
+                        单据编号:
+                    </td>
+                    <td colspan="3">
+                        <input value="@bill.bill_no" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        客户名称:
+                    </td>
+                    <td>
+                        <input value="@bill.customer_name" />
+                    </td>
+                    <td>
+                        办事处:
+                    </td>
+                    <td>
+                        <input value="@bill.agency_name" />
+                    </td>
+                    <td>
+                        营业员:
+                    </td>
+                    <td>
+                        <input value="@bill.clerk_name" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        制单人:
+                    </td>
+                    <td>
+                        <input value="@bill.applier_name" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        变更项目:
+                    </td>
+                    <td colspan="5">
+                        <div style="margin:8px 0;">
+                            <fieldset>
+                                <legend>修改以下项目的在表格中处理</legend>
+                                <div style="padding:6px 0;">
+                                    @foreach (var p in new string[] { "型号", "数量", "含税单价", "成本价", "成交价" }) {
+                                        <input type="checkbox" name="change_project" value="@p" /><span class="ck_label">@p</span>                                    
+                                    }
+                                </div>
+                            </fieldset>
+                            <fieldset>
+                                <legend>修改以下项目的在附注中说明</legend>
+                                <div style="padding:6px 0;">
+                                    @foreach (var p in new string[] { "交货日期","包装信息","客户名称","贸易类型","其它" }) {
+                                        <input type="checkbox" name="change_project" value="@p" /><span class="ck_label">@p</span>                                    
+                                    }
+                                </div>
+                            </fieldset>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        附注:
+                    </td>
+                    <td colspan="5">
+                        <input class="easyui-textbox" name="comment" id="comment" multiline="true" style="width:720px;height:80px;" value="@bill.comment" editable="false" />
+                    </td>
+                </tr>
+            </table>
+
+            <div style="margin-top:16px;">
+                <div class="easyui-panel" title="原单明细信息" style="width: 815px;">
+                    <table id="detail_before"></table>
+                </div>
+            </div>
+            <div style="margin-top:16px;">
+                <div class="easyui-panel" title="变更后明细信息" style="width: 815px;">
+                    <table id="detail_after"></table>
+                </div>
+            </div>
+
+    </div>

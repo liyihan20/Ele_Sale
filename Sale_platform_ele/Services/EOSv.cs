@@ -63,13 +63,24 @@ namespace Sale_platform_ele.Services
             bill = new Sale_eo_bill();
             bill.sys_no = GetNextSysNo(BILL_TYPE);
             bill.applier_name = currentUser.realName;
+            bill.bill_date = DateTime.Now;
             bill.account = "";
 
             return bill;
         }
 
         public override object GetBill(int stepVersion)
-        {            
+        {
+            if (string.IsNullOrEmpty(bill.bill_no)) {
+                if (db.Apply.Where(a => a.sys_no == bill.sys_no && a.success == true).Count() > 0) {
+                    //如果订单号为空，并且已申请结束OK的，去K3把订单号带过来。
+                    var k3Orders = db.getK3OrderNo(bill.sys_no).ToList();
+                    if (k3Orders.Count() > 0) {
+                        bill.bill_no = k3Orders.First().FBillNo;
+                    }
+                    db.SubmitChanges();
+                }
+            }
             return bill;
         }
 
@@ -174,6 +185,7 @@ namespace Sale_platform_ele.Services
         {
             var eo = db.Sale_eo_bill.Where(e => e.sys_no == bill.sys_no).FirstOrDefault();
             eo.sys_no = GetNextSysNo(BillType);
+            eo.bill_date = DateTime.Now;
             return eo;
         }
 

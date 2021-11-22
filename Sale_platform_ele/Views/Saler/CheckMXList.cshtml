@@ -1,0 +1,185 @@
+﻿@using Sale_platform_ele.Models;
+@{
+    SalerSearchParamModel pm = (SalerSearchParamModel)ViewData["queryParams"];
+}
+
+<script type="text/javascript">
+    document.onkeydown = function (event) {
+        var e = event || window.event || arguments.callee.caller.arguments[0];
+        if (e && e.keyCode == 13) { // enter 键
+            $("#checkBt").click();
+        }
+    };
+    $(function () {
+        $("#orderList").datagrid({
+            fit: true,
+            fitColumns: true,
+            rownumbers: true,
+            singleSelect: true,
+            columns: [[
+                        { field: 'billDate', title: '下单日期', width: 80 },
+                        { field: 'sysNo', title: '申请流水号', width: 100 },
+    					{ field: 'tranType', title: '业务类型', width: 60 },
+                        { field: 'billType', title: '单据类型', width: 60 },
+    					{ field: 'billNo', title: '单据编号', width: 100 },
+    					{ field: 'customerName', title: '客户名称', width: 120 },
+                        {
+                            field: 'auditStatus', title: '@Html.Lang("apply_status")', width: 60, align: 'center',
+                            styler: function (value, row, index) {
+                                if (value == '申请失败') {
+                                    return 'color:red;';
+                                } else if (value == '申请成功') {
+                                    return 'color:green;';
+                                }
+                            }
+                        }
+            ]],
+            toolbar: [{
+                text: "@Html.Lang("check_detail")",
+                iconCls: 'icon-search',
+                handler: CheckDetail
+            }, '-',
+            {
+                text: "@Html.Lang("edit_bill")",
+                iconCls: 'icon-edit',
+                handler: EditOrder
+            }, '-',
+            {
+                text: "@Html.Lang("newFromOld")",
+                iconCls: 'icon-add',
+                handler: AddNewFromOld
+            }, '-', {
+                text: "@Html.Lang("check_status")",
+                iconCls: 'icon-help',
+                handler: ApplierCheckStatus
+            }, '-',
+            {
+                text: "@Html.Lang("export_excel")",
+                iconCls: 'icon-xls',
+                handler: function () {
+                    showTip("正在导出符合查询条件的数据，请稍等...");
+                    $("#fm").form("submit", {
+                        url: "@Url.Content("~/File/ExportSalerExcel")",
+                        success: function (data) {
+                        }
+                    });
+                }
+            }],
+            onDblClickRow: CheckDetail
+        });
+
+        $("#checkBt").click(function () {
+            $("#orderList").datagrid("loading");
+            $("#fm").form("submit", {
+                url: "../Saler/GetBillList",
+                success: function (data) {
+                    var result = eval("(" + data + ")");
+                    $("#orderList").datagrid("loadData", result);
+                    $("#orderList").datagrid("loaded");
+                }
+            });
+
+        });
+        
+
+    });
+
+    function ApplierCheckStatus() {
+        var row = $("#orderList").datagrid("getSelected");
+        if (row) {
+            CheckStatus(row.sysNo);
+        }
+    }
+
+    function CheckDetail() {
+        var row = $("#orderList").datagrid("getSelected");
+        if (row) {
+            window.location.href = "@Url.Content("~/Saler/CheckBill")" + "?sysNo=" + row.sysNo;
+        }
+    }
+
+    function EditOrder() {
+        var row = $("#orderList").datagrid("getSelected");
+        if (row) {
+            //编辑之前检测是否已开始申请
+            $.post("@Url.Content("~/Saler/ApplyHasBegan")", { sysNo: row.sysNo },
+            function (data) {
+                if (!data.suc) {
+                    window.location.href = "@Url.Content("~/Saler/ModifyBill?sysNo=")" + row.sysNo + "&stepVersion=0";
+                } else {
+                    showTip("@Html.Lang("order_cannot_edit")");
+                }
+            }, "json");
+        }
+    }
+
+    function AddNewFromOld() {
+        var row = $("#orderList").datagrid("getSelected");
+        if (row) {
+            window.location.href = "@Url.Content("~/Saler/CreateNewBillFromOld?sysNo=")" + row.sysNo;
+        }
+    }
+
+</script>
+<div class="easyui-layout" data-options="fit:true">
+    <div data-options="region:'north',collapsed:false,split:true,height:'auto'" style="background: #fafafa; padding: 1px;">
+        <form id="fm" method="post" style="padding:2px 5px;">
+            <div>
+                <input type="hidden" name="billType" value="@pm.billType" />
+                <table>
+                    <tr>
+                        <td>
+                            下单日期：
+                        </td>
+                        <td>
+                            <input id="fromDate" class="easyui-datebox" name="fromDate" style="width: 100px" value="@pm.fromDate" />
+                        </td>
+                        <td style="text-align:right;">
+                            到：
+                        </td>
+                        <td>
+                            <input id="toDate" class="easyui-datebox" name="toDate" style="width: 100px" value="@pm.toDate" />
+                        </td>
+                        <td>
+                            审批结果:
+                        </td>
+                        <td>
+                            <input id="auditResult" name="auditResult" style="width: 100px" class="easyui-combobox" value="@pm.auditResult"
+                               data-options="valueField: 'value' ,textField: 'label' ,panelHeight: 'auto',editable:false,
+                            data: [
+                               {label: '所有' ,value: '10'},{label: '未完成' ,value: '0'},{label: '成功' ,value: '1'},{label: '失败' ,value: '-1'}
+                               ]" />
+                        </td>
+                        <td>
+
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            单据编号：
+                        </td>
+                        <td>
+                            <input class="easyui-textbox" id="searchValue" name="searchValue" style="width: 100px" value="@pm.searchValue" />
+                        </td>
+                        <td>
+                            客户名称：
+                        </td>
+                        <td>
+                            <input class="easyui-textbox" id="customerName" name="customerName" style="width: 100px" value="@pm.customerName" />
+                        </td>
+                        <td>
+                            <a id="checkBt" href="#" class="easyui-linkbutton" data-options="iconCls:'icon-search'" style="padding-left:12px;padding-right:12px;">
+                                @Html.Lang("search")
+                            </a>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </form>
+    </div>
+    <div data-options="region:'center'">
+        <table id="orderList"></table>
+    </div>
+</div>
+
+@Html.Partial("_CheckAuditStatus")

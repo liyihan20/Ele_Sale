@@ -96,12 +96,6 @@ namespace Sale_platform_ele.Services
             order.step_version = 0;
             order.User = new UA(currentUser.userId).GetUser();
 
-            var agencys = new OtherSv().GetItems("agency").Where(a => a.name == currentUser.departmentName);
-            if (agencys.Count() > 0) {
-                order.agency_no = agencys.First().value;
-                order.agency_name = agencys.First().name;
-            }
-
             return order;
         }
 
@@ -273,6 +267,19 @@ namespace Sale_platform_ele.Services
             if (Math.Abs((order.percent1 ?? 0m) + (order.percent2 ?? 0m) + (order.percent3 ?? 0m) - 100m) > 0.000001m) {
                 return "业务员比例之和必须等于100！";
             }
+
+            if ((order.percent2 ?? 0m) > 0) {
+                if (string.IsNullOrEmpty(order.agency2_no)) {
+                    return "比例2大于0时，办事处2不能为空";
+                }
+            }
+
+            if ((order.percent3 ?? 0m) > 0) {
+                if (string.IsNullOrEmpty(order.agency3_no)) {
+                    return "比例3大于0时，办事处3不能为空";
+                }
+            }
+
             var taxRateNum = 17;
             if (DateTime.Now > DateTime.Parse("2019-04-01")) {
                 taxRateNum = 13;
@@ -531,7 +538,7 @@ namespace Sale_platform_ele.Services
                 cells.Add(rowIndex, ++colIndex, d.h.sys_no);
                 cells.Add(rowIndex, ++colIndex, d.h.order_no);
                 cells.Add(rowIndex, ++colIndex, ((DateTime)d.h.order_date).ToString("yyyy-MM-dd"));
-                cells.Add(rowIndex, ++colIndex, d.h.agency_name);
+                cells.Add(rowIndex, ++colIndex, d.h.agency1_name);
                 cells.Add(rowIndex, ++colIndex, d.h.order_type_name);
                 cells.Add(rowIndex, ++colIndex, d.h.customer_name);
                 cells.Add(rowIndex, ++colIndex, d.h.oversea_customer_name);
