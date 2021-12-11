@@ -75,7 +75,7 @@
       <Association Name="User_ClerkAndCustomer" Member="ClerkAndCustomer" ThisKey="id" OtherKey="clerk_id" Type="ClerkAndCustomer" />
       <Association Name="User_ChBill" Member="ChBill" ThisKey="id" OtherKey="user_id" Type="ChBill" />
       <Association Name="User_Apply" Member="Apply" ThisKey="id" OtherKey="user_id" Type="Apply" />
-      <Association Name="User_Sale_order" Member="Order" ThisKey="id" OtherKey="original_id" Type="Order" />
+      <Association Name="User_Order" Member="Order" ThisKey="id" OtherKey="original_id" Type="Order" />
     </Type>
   </Table>
   <Table Name="dbo.Sale_auditorsRelation" Member="AuditorsRelation">
@@ -195,7 +195,7 @@
       <Column Name="MU" Type="System.Decimal" DbType="Decimal(18,4)" CanBeNull="true" />
       <Column Name="fetch_date" Type="System.DateTime" DbType="SmallDateTime" CanBeNull="true" />
       <Column Name="comment" Type="System.String" DbType="VarChar(500)" CanBeNull="true" />
-      <Association Name="Sale_order_OrderDetail" Member="Order" ThisKey="order_id" OtherKey="id" Type="Order" IsForeignKey="true" />
+      <Association Name="Order_OrderDetail" Member="Order" ThisKey="order_id" OtherKey="id" Type="Order" IsForeignKey="true" />
     </Type>
   </Table>
   <Table Name="dbo.Sale_system_no" Member="SystemNo">
@@ -610,24 +610,6 @@
       <Column Name="bl_plan" Type="System.String" DbType="NVarChar(2000)" CanBeNull="true" />
     </Type>
   </Table>
-  <Table Name="dbo.Sale_MX" Member="Sale_MX">
-    <Type Name="Sale_MX">
-      <Column Name="id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
-      <Column Name="sys_no" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
-      <Column Name="applier_id" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="applier_name" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
-      <Column Name="apply_time" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
-      <Column Name="bill_date" Type="System.DateTime" DbType="SmallDateTime NOT NULL" CanBeNull="false" />
-      <Column Name="bill_type" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
-      <Column Name="tran_type" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
-      <Column Name="bill_no" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
-      <Column Name="customer_name" Type="System.String" DbType="NVarChar(200)" CanBeNull="true" />
-      <Column Name="clerk_name" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
-      <Column Name="agency_name" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
-      <Column Name="change_project" Type="System.String" DbType="NVarChar(100)" CanBeNull="true" />
-      <Column Name="comment" Type="System.String" DbType="NVarChar(1000)" CanBeNull="true" />
-    </Type>
-  </Table>
   <Table Name="dbo.Sale_MX_detail" Member="Sale_MX_detail">
     <Type Name="Sale_MX_detail">
       <Column Name="id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
@@ -732,8 +714,27 @@
       <Column Name="batch_time" Type="System.DateTime" DbType="SmallDateTime" CanBeNull="true" />
       <Column Name="total_quantity" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
       <Column Name="monthly_quantity" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
-      <Association Name="Sale_order_OrderDetail" Member="OrderDetail" ThisKey="id" OtherKey="order_id" Type="OrderDetail" />
-      <Association Name="User_Sale_order" Member="User" ThisKey="original_id" OtherKey="id" Type="User" IsForeignKey="true" />
+      <Association Name="Order_OrderDetail" Member="OrderDetail" ThisKey="id" OtherKey="order_id" Type="OrderDetail" />
+      <Association Name="User_Order" Member="User" ThisKey="original_id" OtherKey="id" Type="User" IsForeignKey="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Sale_MX" Member="Sale_MX">
+    <Type Name="Sale_MX">
+      <Column Name="id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="sys_no" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="applier_id" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="applier_name" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="apply_time" Type="System.DateTime" DbType="DateTime" CanBeNull="true" />
+      <Column Name="bill_date" Type="System.DateTime" DbType="SmallDateTime NOT NULL" CanBeNull="false" />
+      <Column Name="bill_type" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="tran_type" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="bill_no" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="customer_name" Type="System.String" DbType="NVarChar(200)" CanBeNull="true" />
+      <Column Name="clerk_name" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="agency_name" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="change_project" Type="System.String" DbType="NVarChar(100)" CanBeNull="true" />
+      <Column Name="comment" Type="System.String" DbType="NVarChar(1000)" CanBeNull="true" />
+      <Column Name="code_num" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
     </Type>
   </Table>
   <Function Name="dbo.getExchangeRate" Method="getExchangeRate">

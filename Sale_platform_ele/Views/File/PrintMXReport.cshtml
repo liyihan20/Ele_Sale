@@ -3,6 +3,7 @@
     var mx = ViewData["mx"] as MXCheckModel;
     var h = mx.bill;
     var alist = ViewData["result"] as List<StepNameAndAuditorModel>;
+    alist.Add(new StepNameAndAuditorModel() { stepName = "总裁办", auditorName = "", auditTime = null }); //加上总裁办 2021-12-07
 }
 
 <style type="text/css">
@@ -10,9 +11,6 @@
         border-left: 1px solid;
         border-bottom: 1px solid;
     }
-
-    
-        
 
         #reportTb tr td {
             text-align: center;
@@ -52,6 +50,20 @@
             <td style="width:30%;">@h.sys_no</td>
             <td style="width:20%;">打印时间:</td>
             <td style="width:30%;">@(DateTime.Now.ToString("yyyy-MM-dd HH:mm"))</td>
+        </tr>
+        <tr>
+            <td>
+                编码:
+            </td>
+            <td>
+                @h.code_num
+            </td>
+            <td>
+                打印人:
+            </td>
+            <td>
+                @ViewData["printer"]
+            </td>
         </tr>
         <tr>
             <td>申请人:</td>
@@ -244,14 +256,14 @@
 
             <tr>
                 <td>@alist[i].stepName :</td>
-                <td>@alist[i].auditorName @(((DateTime)alist[i].auditTime).ToString("MM/dd HH:mm"))</td>
+                <td>@alist[i].auditorName @(alist[i + 1].auditTime == null ? "" : ((DateTime)alist[i].auditTime).ToString("MM/dd HH:mm"))</td>
                 @if (i >= alist.Count() - 1) {
                     <td></td>
                     <td></td>
                 }
                 else {
                     <td>@alist[i + 1].stepName :</td>
-                    <td>@alist[i + 1].auditorName @(((DateTime)alist[i + 1].auditTime).ToString("MM/dd HH:mm"))</td>
+                    <td>@alist[i + 1].auditorName @(alist[i + 1].auditTime==null?"":((DateTime)alist[i + 1].auditTime).ToString("MM/dd HH:mm"))</td>
                 }
             </tr>
 

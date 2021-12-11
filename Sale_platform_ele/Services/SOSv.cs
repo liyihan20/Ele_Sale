@@ -280,6 +280,12 @@ namespace Sale_platform_ele.Services
                 }
             }
 
+            if (new string[] { "开模单", "样品单" }.Contains(order.order_type_name)) {
+                if (order.batch_time == null || string.IsNullOrEmpty(order.total_quantity) || string.IsNullOrEmpty(order.monthly_quantity)) {
+                    return order.order_type_name + "：量产时间、订单总量、月订单量都必须填写才能保存。";
+                }
+            }
+
             var taxRateNum = 17;
             if (DateTime.Now > DateTime.Parse("2019-04-01")) {
                 taxRateNum = 13;

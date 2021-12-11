@@ -5,7 +5,6 @@ using System.Web;
 using Newtonsoft.Json;
 using Sale_platform_ele.Models;
 using Sale_platform_ele.Utils;
-using Newtonsoft.Json;
 using org.in2bits.MyXls;
 
 namespace Sale_platform_ele.Services

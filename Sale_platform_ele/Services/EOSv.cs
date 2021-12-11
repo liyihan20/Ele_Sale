@@ -196,6 +196,10 @@ namespace Sale_platform_ele.Services
 
         public override Dictionary<string, int?> GetProcessDic()
         {
+            //Dictionary<string, int?> dic = new Dictionary<string, int?>();
+            //dic.Add("部门NO", new UA(bill.applier_id).GetUser().department_no);
+
+            //return dic;
             return null;
         }
 

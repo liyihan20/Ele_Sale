@@ -75,6 +75,6 @@ namespace Sale_platform_ele.Models
     {
         public string stepName { get; set; }
         public string auditorName { get; set; }
-        public DateTime auditTime { get; set; }
+        public DateTime? auditTime { get; set; }
     }
 }

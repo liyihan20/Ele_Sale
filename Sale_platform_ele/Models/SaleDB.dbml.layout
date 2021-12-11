@@ -44,7 +44,7 @@
         <elementListCompartment Id="f61d28f2-098a-4d8b-b3a6-979bb195a701" absoluteBounds="7.015, 3.21, 1.9700000000000002, 2.539703369140625" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
       </nestedChildShapes>
     </classShape>
-    <associationConnector edgePoints="[(10.125 : 3.125); (10.125 : 2.825)]" fixedFrom="Algorithm" fixedTo="Algorithm">
+    <associationConnector edgePoints="[(10.125 : 3.125); (10.125 : 2.825)]" fixedFrom="NotFixed" fixedTo="NotFixed">
       <AssociationMoniker Name="/SaleDBDataContext/Authority/Authority_GroupAndAuth" />
       <nodes>
         <classShapeMoniker Id="5e9b09c6-5079-4a18-94f7-db46bc502e55" />
@@ -209,7 +209,7 @@
         <elementListCompartment Id="b57741ae-2621-41e7-94ab-7d0e1f4d182b" absoluteBounds="9.14, 6.71, 1.9700000000000002, 1.0115458170572915" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
       </nestedChildShapes>
     </classShape>
-    <associationConnector edgePoints="[(8.69698050724766 : 3.2); (8.69698050724766 : 6.475); (9.125 : 6.475)]" fixedFrom="Algorithm" fixedTo="Algorithm">
+    <associationConnector edgePoints="[(8.69698050724766 : 3.2); (8.69698050724766 : 6.475); (9.125 : 6.475)]" fixedFrom="NotFixed" fixedTo="NotFixed">
       <AssociationMoniker Name="/SaleDBDataContext/User/User_ClerkAndCustomer" />
       <nodes>
         <classShapeMoniker Id="81c4eb8b-1339-428b-9164-8aa28df49612" />
@@ -297,7 +297,7 @@
         <elementListCompartment Id="e8c0f5e2-4862-4821-b0e6-8b95c9cf5e83" absoluteBounds="0.51499999999999968, 8.335, 1.9700000000000002, 3.3037821451822915" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
       </nestedChildShapes>
     </classShape>
-    <associationConnector edgePoints="[(1.5 : 8.325); (1.5 : 8.625)]" fixedFrom="Algorithm" fixedTo="Algorithm">
+    <associationConnector edgePoints="[(1.5 : 8.325); (1.5 : 8.625)]" fixedFrom="NotFixed" fixedTo="NotFixed">
       <AssociationMoniker Name="/SaleDBDataContext/Sale_eqm_ch_bill/Sale_eqm_ch_bill_Sale_eqm_ch_bill_detail" />
       <nodes>
         <classShapeMoniker Id="217b63b3-3820-443f-95cb-8bcce5132ce9" />
@@ -328,7 +328,7 @@
         <elementListCompartment Id="f0d8f4da-5174-4f46-bb0b-238c7fc0189a" absoluteBounds="4.89, 6.835, 1.9700000000000002, 4.831939697265625" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
       </nestedChildShapes>
     </classShape>
-    <associationConnector edgePoints="[(5.875 : 5.95); (5.875 : 6.375)]" fixedFrom="Algorithm" fixedTo="Algorithm">
+    <associationConnector edgePoints="[(5.875 : 5.95); (5.875 : 6.375)]" fixedFrom="NotFixed" fixedTo="NotFixed">
       <AssociationMoniker Name="/SaleDBDataContext/ChBill/ChBill_ChBillDetail" />
       <nodes>
         <classShapeMoniker Id="d6eda3df-d459-40bf-8341-c77423516b96" />
@@ -339,12 +339,6 @@
       <DataClassMoniker Name="/SaleDBDataContext/Sale_BL" />
       <nestedChildShapes>
         <elementListCompartment Id="1b330d07-dfc2-4ef1-82db-8d46e035eb9b" absoluteBounds="9.14, 7.71, 1.9700000000000002, 5.787038167317708" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
-      </nestedChildShapes>
-    </classShape>
-    <classShape Id="35565112-1d0a-40e7-9dad-1e8b861ea44b" isExpanded="false" absoluteBounds="9.125, 8.25, 2, 0.45">
-      <DataClassMoniker Name="/SaleDBDataContext/Sale_MX" />
-      <nestedChildShapes>
-        <elementListCompartment Id="423dd0ed-48d3-4d7f-9dd1-3db5bb66e284" absoluteBounds="9.14, 8.71, 1.9700000000000002, 2.921742757161458" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
       </nestedChildShapes>
     </classShape>
     <classShape Id="6ef9d46d-c0d6-4172-b70c-240e6e6886dc" isExpanded="false" absoluteBounds="9.125, 9, 2, 0.45">
@@ -359,7 +353,7 @@
         <elementListCompartment Id="d186e3fc-1ade-41c6-b57f-ed53f17ba362" absoluteBounds="4.89, 7.5850000000000009, 1.9700000000000002, 4.067860921223958" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
       </nestedChildShapes>
     </classShape>
-    <associationConnector edgePoints="[(5.875 : 7.575); (5.875 : 7.875)]" fixedFrom="Algorithm" fixedTo="Algorithm">
+    <associationConnector edgePoints="[(5.875 : 7.575); (5.875 : 7.875)]" fixedFrom="NotFixed" fixedTo="NotFixed">
       <AssociationMoniker Name="/SaleDBDataContext/Sale_eo_bill/Sale_eo_bill_Sale_eo_bill_detail" />
       <nodes>
         <classShapeMoniker Id="47dee7cb-dc82-4f4e-8496-b20b5f6722b1" />
@@ -373,18 +367,24 @@
       </nestedChildShapes>
     </classShape>
     <associationConnector edgePoints="[(10.125 : 4.325); (10.125 : 4.625)]" fixedFrom="Algorithm" fixedTo="Algorithm">
-      <AssociationMoniker Name="/SaleDBDataContext/Order/Sale_order_OrderDetail" />
+      <AssociationMoniker Name="/SaleDBDataContext/Order/Order_OrderDetail" />
       <nodes>
         <classShapeMoniker Id="06eaa348-c7a7-4426-8576-3491984714f2" />
         <classShapeMoniker Id="aea0518c-4199-42a7-b89f-a5cac7d94abe" />
       </nodes>
     </associationConnector>
     <associationConnector edgePoints="[(9 : 3.2); (9.125 : 3.875)]" fixedFrom="NotFixed" fixedTo="NotFixed">
-      <AssociationMoniker Name="/SaleDBDataContext/User/User_Sale_order" />
+      <AssociationMoniker Name="/SaleDBDataContext/User/User_Order" />
       <nodes>
         <classShapeMoniker Id="81c4eb8b-1339-428b-9164-8aa28df49612" />
         <classShapeMoniker Id="06eaa348-c7a7-4426-8576-3491984714f2" />
       </nodes>
     </associationConnector>
+    <classShape Id="2953b8e1-3402-45d9-8b6b-af7bb21b5be6" isExpanded="false" absoluteBounds="9.125, 8.25, 2, 0.45">
+      <DataClassMoniker Name="/SaleDBDataContext/Sale_MX" />
+      <nestedChildShapes>
+        <elementListCompartment Id="ec18c0e5-3d7f-4ad5-b451-ec9bbd38e68b" absoluteBounds="9.14, 8.71, 1.9700000000000002, 3.112762451171875" name="DataPropertiesCompartment" titleTextColor="Black" itemTextColor="Black" />
+      </nestedChildShapes>
+    </classShape>
   </nestedChildShapes>
 </ordesignerObjectsDiagram>

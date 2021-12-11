@@ -894,7 +894,7 @@ namespace Sale_platform_ele.Services
                     {
                         stepName = ad.step_name,
                         auditorName = u.real_name,
-                        auditTime = (DateTime)ad.finish_date
+                        auditTime = ad.finish_date
                     }).ToList();
         }
 

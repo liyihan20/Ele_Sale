@@ -246,7 +246,11 @@ namespace Sale_platform_ele.Services
 
         public override void DoWhenFinishAudit(bool isPass)
         {
-            
+            if (isPass) {
+                //生成编码
+                bill.code_num = GetNextNo("PCB", DateTime.Now.ToString("yy-"), 3);
+                db.SubmitChanges();
+            }
         }
 
         private class ExcelData
