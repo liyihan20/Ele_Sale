@@ -85,6 +85,10 @@ namespace Sale_platform_ele.Services
                 return "备料明细必须至少勾选一个";
             }
 
+            if ("PCBa".Equals(bill.product_type) && "有合同协议".Equals(bill.bl_type) && string.IsNullOrEmpty(bill.protocol_no)) {
+                return "有合同协议的备料单请填写协议号";
+            }
+
             var existedBill = db.Sale_BL.Where(e => e.sys_no == bill.sys_no).FirstOrDefault();
             if (existedBill == null) {
                 bill.applier_id = user.userId;
@@ -174,6 +178,9 @@ namespace Sale_platform_ele.Services
 
         public override string GetProcessNo()
         {
+            if (bill.product_type == "PCBa") {
+                return "BL_" + bill.product_type;
+            }
             return BillType;
         }
 
@@ -239,7 +246,7 @@ namespace Sale_platform_ele.Services
             //列名：
             string[] colName = new string[] { "审核结果","流水号","备料日期","客户型号","版本号","产品类别","客户编码","客户名称","终端客户编码","终端客户名称",
                                             "产品代码","产品名称","产品型号","备料数量(粒)","营业员","产品用途","订料良率","产品类型","表面处理","是否半孔板",
-                                            "是否出样","制单人","备料项目","备注","消耗计划" };
+                                            "是否出样","贸易类型","事业部","备料类型","协议号","制单人","备料项目","备注","消耗计划" };
 
             //設置excel文件名和sheet名
             XlsDocument xls = new XlsDocument();
@@ -277,8 +284,8 @@ namespace Sale_platform_ele.Services
                 colIndex = 1;
 
                 // "审核结果","流水号","备料日期","客户型号","版本号","产品类别","客户编码","客户名称","终端客户编码","终端客户名称",
-                //"产品代码","产品名称","产品型号","备料数量(粒)","营业员","产品用途","订料良率","产品类型","表面处理","是否半孔板",
-                //"是否出样","制单人","备料项目","备注"
+                // "产品代码","产品名称","产品型号","备料数量(粒)","营业员","产品用途","订料良率","产品类型","表面处理","是否半孔板",
+                // "是否出样","贸易类型","事业部","备料类型","协议号","制单人","备料项目","备注","消耗计划"
 
                 cells.Add(++rowIndex, colIndex, d.auditStatus);
                 cells.Add(rowIndex, ++colIndex, d.h.sys_no);
@@ -303,6 +310,10 @@ namespace Sale_platform_ele.Services
                 cells.Add(rowIndex, ++colIndex, d.h.is_half_hole);
 
                 cells.Add(rowIndex, ++colIndex, d.h.is_make_sample);
+                cells.Add(rowIndex, ++colIndex, d.h.trade_type);
+                cells.Add(rowIndex, ++colIndex, d.h.bus_name);
+                cells.Add(rowIndex, ++colIndex, d.h.bl_type);
+                cells.Add(rowIndex, ++colIndex, d.h.protocol_no);
                 cells.Add(rowIndex, ++colIndex, d.h.applier_name);
                 cells.Add(rowIndex, ++colIndex, d.h.bl_project);
                 cells.Add(rowIndex, ++colIndex, d.h.comment);

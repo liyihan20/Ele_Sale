@@ -101,7 +101,7 @@
     }
 
     function ExportAuditorExcel(typ) {
-        showTip("正在导出符合查询条件且已审核的数据，请稍等...");
+        showTip("正在导出符合查询条件的数据，请稍等...");
 
         $("#fm").form("submit", {
             url: "@Url.Content("~/File/ExportAuditorExcel?billType=")" + typ,

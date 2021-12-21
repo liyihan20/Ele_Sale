@@ -146,27 +146,59 @@
                         <input value="@bill.clerk_name" />
                     </td>
                 </tr>
+                @if (bill.product_type == "硬板") { 
+                    <tr>
+                        <td>
+                            产品类型:
+                        </td>
+                        <td>
+                            <input value="@bill.product_classification" />
+                        </td>
+                        <td>
+                            表面处理:
+                        </td>
+                        <td>
+                            <input value="@bill.surface_type" />
+                        </td>
+                        <td>
+                            是否半孔板:
+                        </td>
+                        <td>
+                            <input value="@bill.is_half_hole" />
+                        </td>
+                    </tr>
+                }
+                @if (bill.product_type == "PCBa") {
+                    <tr>
+                        <td>
+                            贸易类型:
+                        </td>
+                        <td>
+                            <input value="@bill.trade_type" />
+                        </td>
+                        <td>
+                            备料类型:
+                        </td>
+                        <td>
+                            <input value="@bill.bl_type" />
+                        </td>
+                        <td>
+                            协议号:
+                        </td>
+                        <td>
+                            <input value="@bill.protocol_no" />
+                        </td>
+                    </tr>
+                }
                 <tr>
-                    <td>
-                        产品类型:
-                    </td>
-                    <td>
-                        <input value="@bill.product_classification" />
-                    </td>
-                    <td>
-                        表面处理:
-                    </td>
-                    <td>
-                        <input value="@bill.surface_type" />
-                    </td>
-                    <td>
-                        是否半孔板:
-                    </td>
-                    <td>
-                        <input value="@bill.is_half_hole" />
-                    </td>
-                </tr>
-                <tr>
+                    @if (bill.product_type == "PCBa") {
+                        <td>
+                            事业部:
+                        </td>
+                        <td>
+                            <input value="@bill.bus_name" />
+                        </td>
+                    }
                     <td>
                         是否出样:
                     </td>
@@ -191,9 +223,10 @@
             </table>
         </div>
 
+        @if (bill.product_type == "硬板") { 
         <div>
             <fieldset>
-                <legend>备料项目</legend>
+                <legend>硬板备料项目</legend>
                 <div style="padding:8px 0;">
                     @foreach (var p in new string[] { "全套物料", "覆铜板", "P片", "铜箔", "干膜", "油墨" }) {
                         <input type="checkbox" name="bl_project" value="@p" /><span class="ck_label">@p</span>
@@ -201,6 +234,19 @@
                 </div>
             </fieldset>
         </div>
+        }
+        @if (bill.product_type == "PCBa") { 
+        <div>
+            <fieldset>
+                <legend>PCBa备料项目</legend>
+                <div style="padding:8px 0;">
+                    @foreach (var p in new string[] { "全套物料", "IC", "电容", "电阻", "二极管", "软性线路板", "印刷电路板", "元件", "电感", "TVS管", "磁珠", "晶振", "三极管", "屏蔽罩底座" }) {
+                        <input type="checkbox" name="bl_project" value="@p" /><span class="ck_label">@p</span>
+                    }
+                </div>
+            </fieldset>
+        </div>
+        }
         @if (!string.IsNullOrEmpty(bill.bl_plan)) { 
             <div>
                 <fieldset>

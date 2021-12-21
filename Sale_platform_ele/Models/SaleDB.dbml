@@ -577,39 +577,6 @@
       <Association Name="ChBill_ChBillDetail" Member="ChBill" ThisKey="ch_bill_id" OtherKey="id" Type="ChBill" IsForeignKey="true" />
     </Type>
   </Table>
-  <Table Name="dbo.Sale_BL" Member="Sale_BL">
-    <Type Name="Sale_BL">
-      <Column Name="id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
-      <Column Name="sys_no" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
-      <Column Name="step_version" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="applier_id" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="applier_name" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
-      <Column Name="apply_time" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
-      <Column Name="bill_date" Type="System.DateTime" DbType="SmallDateTime NOT NULL" CanBeNull="false" />
-      <Column Name="customer_no" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
-      <Column Name="customer_name" Type="System.String" DbType="NVarChar(100)" CanBeNull="true" />
-      <Column Name="zz_customer_no" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
-      <Column Name="zz_customer_name" Type="System.String" DbType="NVarChar(100)" CanBeNull="true" />
-      <Column Name="customer_pn" Type="System.String" DbType="NVarChar(100)" CanBeNull="true" />
-      <Column Name="version_no" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
-      <Column Name="clerk_no" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
-      <Column Name="clerk_name" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
-      <Column Name="product_no" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
-      <Column Name="product_model" Type="System.String" DbType="NVarChar(100)" CanBeNull="true" />
-      <Column Name="product_name" Type="System.String" DbType="NVarChar(100)" CanBeNull="true" />
-      <Column Name="bl_qty" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
-      <Column Name="usage" Type="System.String" DbType="NVarChar(200)" CanBeNull="true" />
-      <Column Name="comment" Type="System.String" DbType="NVarChar(500)" CanBeNull="true" />
-      <Column Name="bl_project" Type="System.String" DbType="NVarChar(500)" CanBeNull="true" />
-      <Column Name="product_type" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
-      <Column Name="good_percent" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
-      <Column Name="is_make_sample" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
-      <Column Name="product_classification" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
-      <Column Name="surface_type" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
-      <Column Name="is_half_hole" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
-      <Column Name="bl_plan" Type="System.String" DbType="NVarChar(2000)" CanBeNull="true" />
-    </Type>
-  </Table>
   <Table Name="dbo.Sale_MX_detail" Member="Sale_MX_detail">
     <Type Name="Sale_MX_detail">
       <Column Name="id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
@@ -735,6 +702,43 @@
       <Column Name="change_project" Type="System.String" DbType="NVarChar(100)" CanBeNull="true" />
       <Column Name="comment" Type="System.String" DbType="NVarChar(1000)" CanBeNull="true" />
       <Column Name="code_num" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+    </Type>
+  </Table>
+  <Table Name="dbo.Sale_BL" Member="Sale_BL">
+    <Type Name="Sale_BL">
+      <Column Name="id" Type="System.Int32" DbType="Int NOT NULL IDENTITY" IsPrimaryKey="true" IsDbGenerated="true" CanBeNull="false" />
+      <Column Name="sys_no" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="step_version" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="applier_id" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="applier_name" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="apply_time" Type="System.DateTime" DbType="DateTime NOT NULL" CanBeNull="false" />
+      <Column Name="bill_date" Type="System.DateTime" DbType="SmallDateTime NOT NULL" CanBeNull="false" />
+      <Column Name="customer_no" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="customer_name" Type="System.String" DbType="NVarChar(100)" CanBeNull="true" />
+      <Column Name="zz_customer_no" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="zz_customer_name" Type="System.String" DbType="NVarChar(100)" CanBeNull="true" />
+      <Column Name="customer_pn" Type="System.String" DbType="NVarChar(100)" CanBeNull="true" />
+      <Column Name="version_no" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="clerk_no" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="clerk_name" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="product_no" Type="System.String" DbType="VarChar(50)" CanBeNull="true" />
+      <Column Name="product_model" Type="System.String" DbType="NVarChar(100)" CanBeNull="true" />
+      <Column Name="product_name" Type="System.String" DbType="NVarChar(100)" CanBeNull="true" />
+      <Column Name="bl_qty" Type="System.Int32" DbType="Int NOT NULL" CanBeNull="false" />
+      <Column Name="usage" Type="System.String" DbType="NVarChar(200)" CanBeNull="true" />
+      <Column Name="comment" Type="System.String" DbType="NVarChar(500)" CanBeNull="true" />
+      <Column Name="bl_project" Type="System.String" DbType="NVarChar(500)" CanBeNull="true" />
+      <Column Name="product_type" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="good_percent" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="is_make_sample" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="product_classification" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="surface_type" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="is_half_hole" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="bl_plan" Type="System.String" DbType="NVarChar(2000)" CanBeNull="true" />
+      <Column Name="bus_name" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="trade_type" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="bl_type" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
+      <Column Name="protocol_no" Type="System.String" DbType="NVarChar(50)" CanBeNull="true" />
     </Type>
   </Table>
   <Function Name="dbo.getExchangeRate" Method="getExchangeRate">

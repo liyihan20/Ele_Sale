@@ -590,7 +590,7 @@ namespace Sale_platform_ele.Services
         public override void ExportSalerExcle(SalerSearchParamModel pm,int userId)
         {
             //首先从K3同步一下订单号
-            db.updateAllK3OrderNo();
+            //db.updateAllK3OrderNo();
 
             pm.searchValue = pm.searchValue ?? "";
             pm.customerName = pm.customerName ?? "";     
@@ -634,7 +634,7 @@ namespace Sale_platform_ele.Services
         public override void ExportAuditorExcle(AuditSearchParamModel pm, int userId)
         {
             //首先从K3同步一下订单号
-            db.updateAllK3OrderNo();
+            //db.updateAllK3OrderNo();
 
             DateTime fDate, tDate;
             if (!DateTime.TryParse(pm.fromDate, out fDate)) {

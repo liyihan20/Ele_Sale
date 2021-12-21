@@ -84,21 +84,37 @@
             <td>产品用途:</td>
             <td>@bl.usage</td>
         </tr>
+        @if ("硬板".Equals(bl.product_type)) { 
+            <tr>
+                <td>产品类型:</td>
+                <td>@bl.product_classification</td>
+                <td>表面处理:</td>
+                <td>@bl.surface_type</td>
+            </tr>
+            <tr>
+                <td>是否半孔板:</td>
+                <td>@bl.is_half_hole</td>
+                <td>订料良率:</td>
+                <td>@bl.good_percent</td>
+            </tr>
+        }
+        @if ("PCBa".Equals(bl.product_type)) {
+            <tr>
+                <td>贸易类型:</td>
+                <td>@bl.trade_type</td>
+                <td>事业部:</td>
+                <td>@bl.bus_name</td>
+            </tr>
+            <tr>
+                <td>备料类型:</td>
+                <td>@bl.bl_type</td>
+                <td>协议号:</td>
+                <td>@bl.protocol_no</td>
+            </tr>
+        }
         <tr>
-            <td>产品类型:</td>
-            <td>@bl.product_classification</td>
-            <td>表面处理:</td>
-            <td>@bl.surface_type</td>
-        </tr>
-        <tr>
-            <td>是否半孔板:</td>
-            <td>@bl.is_half_hole</td>
             <td>是否出样</td>
             <td>@bl.is_make_sample</td>
-        </tr>
-        <tr>
-            <td>订料良率:</td>
-            <td>@bl.good_percent</td>
             <td>耗料计划:</td>
             <td>
                 @foreach (var plan in bl.bl_plan.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries)) {                        
